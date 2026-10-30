@@ -28,6 +28,10 @@ public struct PathSample: Hashable, Sendable, Codable {
     public var x: Double
     public var along: Double
     public var height: Double
+
+    public init(t: Double, phase: PathPhase, x: Double, along: Double, height: Double) {
+        self.t = t; self.phase = phase; self.x = x; self.along = along; self.height = height
+    }
 }
 
 public struct ShotResult: Hashable, Sendable, Codable {

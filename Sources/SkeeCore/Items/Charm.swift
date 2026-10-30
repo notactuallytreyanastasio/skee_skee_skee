@@ -32,7 +32,7 @@ public enum Charm: String, Hashable, Sendable, Codable, CaseIterable {
         case .heavyHand: "+40 chips for each 50"
         case .gutterRat: "Gutter balls are worth 25 chips"
         case .evenSteven: "x2 mult if all three balls hit the same hole"
-        case .ladder: "x3 mult for three consecutive rings (e.g. 30-40-50)"
+        case .ladder: "x3 mult for three rings in a row, like 30-40-50"
         case .cornerOffice: "x1.5 mult for each 100 pocket"
         case .nearMiss: "+15 chips for every lip rattle"
         case .multBall: "+4 mult"

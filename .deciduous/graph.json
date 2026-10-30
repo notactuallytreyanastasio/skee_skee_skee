@@ -80,6 +80,16 @@
       "to_change_id": "04665092-244c-4c16-9160-39cfed52723a",
       "weight": 1.0
     },
+    "4efc6ca751d1f2e2c1f9": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T08:46:36.997705-04:00",
+      "edge_id": "4efc6ca751d1f2e2c1f9",
+      "edge_type": "leads_to",
+      "from_change_id": "eb182f5e-5636-4d11-9268-d292a500d748",
+      "rationale": "imperative shell of the chosen architecture",
+      "to_change_id": "6fece280-91d6-4254-a580-91bf22a0ed1d",
+      "weight": 1.0
+    },
     "5052b07195e26fdcbd11": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:10:02.073018-04:00",
@@ -88,6 +98,26 @@
       "from_change_id": "8a6ded27-d5f1-4a94-870d-8ecfd683c44a",
       "rationale": "result",
       "to_change_id": "ab4273c0-5d08-4b71-95a3-c6977e085485",
+      "weight": 1.0
+    },
+    "5ef801381a44daef01eb": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T08:50:00.927055-04:00",
+      "edge_id": "5ef801381a44daef01eb",
+      "edge_type": "leads_to",
+      "from_change_id": "4ca441b6-4ee9-4f9f-a534-0ebde029b0ac",
+      "rationale": "fixes from playtest",
+      "to_change_id": "d87f55c7-5f1e-4843-80d8-f84980174af9",
+      "weight": 1.0
+    },
+    "5f9cff35ec0bea25c895": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T08:50:01.219961-04:00",
+      "edge_id": "5f9cff35ec0bea25c895",
+      "edge_type": "leads_to",
+      "from_change_id": "d87f55c7-5f1e-4843-80d8-f84980174af9",
+      "rationale": "result",
+      "to_change_id": "52c21135-67e9-4a2e-9433-966bf3896ffd",
       "weight": 1.0
     },
     "6717f314f98db5c39427": {
@@ -118,6 +148,26 @@
       "from_change_id": "2e90e1ad-4339-42bb-8140-8ffc0cdafdc0",
       "rationale": "chosen",
       "to_change_id": "8b016f98-5074-41f0-8a95-258570885fa3",
+      "weight": 1.0
+    },
+    "7e3ae8fb65016dfa8bdc": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T08:50:00.609367-04:00",
+      "edge_id": "7e3ae8fb65016dfa8bdc",
+      "edge_type": "leads_to",
+      "from_change_id": "0c054b82-d51c-4f94-955f-aff5648d5200",
+      "rationale": "playtest on the built game",
+      "to_change_id": "4ca441b6-4ee9-4f9f-a534-0ebde029b0ac",
+      "weight": 1.0
+    },
+    "8080dc9201fc958418e0": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T08:31:03.532696-04:00",
+      "edge_id": "8080dc9201fc958418e0",
+      "edge_type": "leads_to",
+      "from_change_id": "8a5677af-964c-45d7-a327-ebd4e4ff1174",
+      "rationale": "result",
+      "to_change_id": "c3248fcd-2aa9-422b-beb2-5c984aa042ff",
       "weight": 1.0
     },
     "818036fb7ac2aca83d28": {
@@ -190,6 +240,16 @@
       "to_change_id": "2e90e1ad-4339-42bb-8140-8ffc0cdafdc0",
       "weight": 1.0
     },
+    "b28d6cb6f26addb08075": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T08:46:37.273244-04:00",
+      "edge_id": "b28d6cb6f26addb08075",
+      "edge_type": "leads_to",
+      "from_change_id": "6fece280-91d6-4254-a580-91bf22a0ed1d",
+      "rationale": "result",
+      "to_change_id": "0c054b82-d51c-4f94-955f-aff5648d5200",
+      "weight": 1.0
+    },
     "b73eb76ce6a66b43221a": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:03:19.000449-04:00",
@@ -208,6 +268,16 @@
       "from_change_id": "fe0bcf09-ee25-451f-b2cc-25d43517866e",
       "rationale": "rejected",
       "to_change_id": "8b016f98-5074-41f0-8a95-258570885fa3",
+      "weight": 1.0
+    },
+    "c2488f237e8fda86d024": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T08:31:03.265349-04:00",
+      "edge_id": "c2488f237e8fda86d024",
+      "edge_type": "leads_to",
+      "from_change_id": "6e9758f5-ac60-4e1f-983e-cb924c2c40f0",
+      "rationale": "implementation",
+      "to_change_id": "8a5677af-964c-45d7-a327-ebd4e4ff1174",
       "weight": 1.0
     },
     "c58575db0d48d1074434": {
@@ -240,6 +310,16 @@
       "to_change_id": "1193e010-180a-479c-80ca-e49adc3d6281",
       "weight": 1.0
     },
+    "d7757d667fcc049abf09": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T08:46:37.518211-04:00",
+      "edge_id": "d7757d667fcc049abf09",
+      "edge_type": "leads_to",
+      "from_change_id": "0c054b82-d51c-4f94-955f-aff5648d5200",
+      "rationale": "testing constraint",
+      "to_change_id": "6da7921c-b88d-477d-8b71-561b96144fad",
+      "weight": 1.0
+    },
     "e79e6535aaf0daf0c599": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:03:20.561432-04:00",
@@ -248,6 +328,16 @@
       "from_change_id": "fb8961bc-ce84-4d5d-93aa-53441619dd83",
       "rationale": "chosen",
       "to_change_id": "43a5276f-85c8-4c9d-a21f-498506d74a17",
+      "weight": 1.0
+    },
+    "ea58299c7ecb9f4fb0b4": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T08:42:57.022405-04:00",
+      "edge_id": "ea58299c7ecb9f4fb0b4",
+      "edge_type": "leads_to",
+      "from_change_id": "6addc45a-99c3-483b-a867-a296f0740369",
+      "rationale": "result",
+      "to_change_id": "cd85c89d-0479-4651-bd70-ff0a181a3038",
       "weight": 1.0
     },
     "eeb4c66a216df9c37118": {
@@ -268,6 +358,16 @@
       "from_change_id": "43a5276f-85c8-4c9d-a21f-498506d74a17",
       "rationale": "implementation",
       "to_change_id": "9dc303fc-554c-4bcd-b787-ff8b5317e328",
+      "weight": 1.0
+    },
+    "f363a9b4418f445d5a86": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T08:42:56.799319-04:00",
+      "edge_id": "f363a9b4418f445d5a86",
+      "edge_type": "leads_to",
+      "from_change_id": "8b016f98-5074-41f0-8a95-258570885fa3",
+      "rationale": "implementation",
+      "to_change_id": "6addc45a-99c3-483b-a867-a296f0740369",
       "weight": 1.0
     }
   },
@@ -310,6 +410,20 @@
       "status": "pending",
       "title": "Skee-ball roguelike for iPhone Duo",
       "updated_at": "2026-10-30T08:01:57.409468-04:00"
+    },
+    "0c054b82-d51c-4f94-955f-aff5648d5200": {
+      "author": "Bobby Grayson",
+      "change_id": "0c054b82-d51c-4f94-955f-aff5648d5200",
+      "created_at": "2026-10-30T08:46:37.145170-04:00",
+      "description": "Inner unfolded display could not be shown: simctl has no fold control and Simulator GUI is not scriptable here.",
+      "metadata": {
+        "branch": "main",
+        "confidence": 75
+      },
+      "node_type": "outcome",
+      "status": "pending",
+      "title": "App runs in iPhone Duo simulator (outer display) across pixel/depth/neon eras; closed-hinge-as-max-fold bug found and fixed",
+      "updated_at": "2026-10-30T08:46:37.145170-04:00"
     },
     "1193e010-180a-479c-80ca-e49adc3d6281": {
       "author": "Bobby Grayson",
@@ -390,6 +504,33 @@
       "title": "Use SpriteKit physics engine",
       "updated_at": "2026-10-30T08:03:19.132134-04:00"
     },
+    "4ca441b6-4ee9-4f9f-a534-0ebde029b0ac": {
+      "author": "Bobby Grayson",
+      "change_id": "4ca441b6-4ee9-4f9f-a534-0ebde029b0ac",
+      "created_at": "2026-10-30T08:50:00.455353-04:00",
+      "description": "Warm-up cleared with 3 cherries + 7-7-7 pocket jackpot (2990/300). Feature hit 450/450 exactly under --hand regular. Old Slick Lane shifted 50 window only 0.03 power.",
+      "metadata": {
+        "branch": "main",
+        "confidence": 85
+      },
+      "node_type": "observation",
+      "status": "pending",
+      "title": "Hand playtest: jackpot via pocket gamble felt great; exact keyboard throws unrealistic; Slick Lane boss had no bite; swipe power invisible",
+      "updated_at": "2026-10-30T08:50:00.455353-04:00"
+    },
+    "52c21135-67e9-4a2e-9433-966bf3896ffd": {
+      "author": "Bobby Grayson",
+      "change_id": "52c21135-67e9-4a2e-9433-966bf3896ffd",
+      "created_at": "2026-10-30T08:50:01.081378-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 80
+      },
+      "node_type": "outcome",
+      "status": "pending",
+      "title": "Slick Lane shifts the 50 from power 0.63 to 0.56; gauge renders; all tests pass",
+      "updated_at": "2026-10-30T08:50:01.081378-04:00"
+    },
     "55d9e3ac-0ed9-4e68-ab03-8025a0feed2c": {
       "author": "Bobby Grayson",
       "change_id": "55d9e3ac-0ed9-4e68-ab03-8025a0feed2c",
@@ -404,6 +545,34 @@
       "title": "Balance run 1: expert bot 77% 50s, 46 jackpots/run, median score 10x target, 2% nail-biters",
       "updated_at": "2026-10-30T08:25:39.551748-04:00"
     },
+    "6addc45a-99c3-483b-a867-a296f0740369": {
+      "author": "Bobby Grayson",
+      "change_id": "6addc45a-99c3-483b-a867-a296f0740369",
+      "created_at": "2026-10-30T08:42:56.683604-04:00",
+      "metadata": {
+        "branch": "main",
+        "commit": "b956db06a8d71d92963e90b041eaaa17c6d2f831",
+        "confidence": 85
+      },
+      "node_type": "action",
+      "status": "pending",
+      "title": "Built SkeeRender: procedural glyphs, pixel font, 4 styles, iris restyle, pure Presentation timeline, render/film CLI",
+      "updated_at": "2026-10-30T08:42:56.683604-04:00"
+    },
+    "6da7921c-b88d-477d-8b71-561b96144fad": {
+      "author": "Bobby Grayson",
+      "change_id": "6da7921c-b88d-477d-8b71-561b96144fad",
+      "created_at": "2026-10-30T08:46:37.400743-04:00",
+      "description": "simctl io screenshot --display=LCD captures it; inner LCD-1 is black. No simctl fold command.",
+      "metadata": {
+        "branch": "main",
+        "confidence": 90
+      },
+      "node_type": "observation",
+      "status": "pending",
+      "title": "Simulator boots the Duo folded; only outer display 466x678pt is capturable",
+      "updated_at": "2026-10-30T08:46:37.400743-04:00"
+    },
     "6e9758f5-ac60-4e1f-983e-cb924c2c40f0": {
       "author": "Bobby Grayson",
       "change_id": "6e9758f5-ac60-4e1f-983e-cb924c2c40f0",
@@ -416,6 +585,24 @@
       "status": "pending",
       "title": "Spinning per-hole reels with HOLD power-up; retune targets after",
       "updated_at": "2026-10-30T08:25:40.410818-04:00"
+    },
+    "6fece280-91d6-4254-a580-91bf22a0ed1d": {
+      "author": "Bobby Grayson",
+      "change_id": "6fece280-91d6-4254-a580-91bf22a0ed1d",
+      "created_at": "2026-10-30T08:46:36.861025-04:00",
+      "metadata": {
+        "branch": "main",
+        "commit": "c545b548769879f9e947db0f284ce9e96d739c52",
+        "confidence": 80,
+        "files": [
+          "App/Sources/GameModel.swift",
+          "App/Sources/SkeeApp.swift"
+        ]
+      },
+      "node_type": "action",
+      "status": "pending",
+      "title": "Built iOS app shell: Canvas renderer, swipe/tap gestures, UIHingeInteraction fold, haptics, save/replay, debug launch args",
+      "updated_at": "2026-10-30T08:46:36.861025-04:00"
     },
     "710749f0-3d87-44cd-ab2d-a6b60dd88852": {
       "author": "Bobby Grayson",
@@ -443,6 +630,20 @@
       "status": "pending",
       "title": "Web/TypeScript PWA running in Safari",
       "updated_at": "2026-10-30T08:03:18.411212-04:00"
+    },
+    "8a5677af-964c-45d7-a327-ebd4e4ff1174": {
+      "author": "Bobby Grayson",
+      "change_id": "8a5677af-964c-45d7-a327-ebd4e4ff1174",
+      "created_at": "2026-10-30T08:31:03.132277-04:00",
+      "metadata": {
+        "branch": "main",
+        "commit": "477ea483da52ef52f4dbf78b67c103093b924579",
+        "confidence": 85
+      },
+      "node_type": "action",
+      "status": "pending",
+      "title": "Implemented spinning per-hole reels, Hold/Purge, EV bots, skee CLI (map/windows/play/balance/bot)",
+      "updated_at": "2026-10-30T08:31:03.132277-04:00"
     },
     "8a6ded27-d5f1-4a94-870d-8ecfd683c44a": {
       "author": "Bobby Grayson",
@@ -530,6 +731,48 @@
       "status": "pending",
       "title": "Per-hole reel strips that spin (seeded) after every ball; player sees current symbols and aims for what completes the line; stamps add symbols to strips",
       "updated_at": "2026-10-30T08:25:39.861299-04:00"
+    },
+    "c3248fcd-2aa9-422b-beb2-5c984aa042ff": {
+      "author": "Bobby Grayson",
+      "change_id": "c3248fcd-2aa9-422b-beb2-5c984aa042ff",
+      "created_at": "2026-10-30T08:31:03.405363-04:00",
+      "description": "Targets [300,650,1100,1600,2300,3100,4000,5200]; triples flattened; The House now blocks pairs only; crosswind 0.4.",
+      "metadata": {
+        "branch": "main",
+        "confidence": 80
+      },
+      "node_type": "outcome",
+      "status": "pending",
+      "title": "Balance pass: novice 2% / regular 16% / expert 22% win; pockets exploit fixed; bot nondeterminism fixed",
+      "updated_at": "2026-10-30T08:31:03.405363-04:00"
+    },
+    "cd85c89d-0479-4651-bd70-ff0a181a3038": {
+      "author": "Bobby Grayson",
+      "change_id": "cd85c89d-0479-4651-bd70-ff0a181a3038",
+      "created_at": "2026-10-30T08:42:56.914404-04:00",
+      "description": "Bugs found by looking at PNGs: depth gradient extents, pixel text smearing (pixel scale 3->2), HUD score regression after tally.",
+      "metadata": {
+        "branch": "main",
+        "confidence": 80
+      },
+      "node_type": "outcome",
+      "status": "pending",
+      "title": "All four styles render correctly from CLI; contact sheets show roll, hinge flight, tally and reel spin",
+      "updated_at": "2026-10-30T08:42:56.914404-04:00"
+    },
+    "d87f55c7-5f1e-4843-80d8-f84980174af9": {
+      "author": "Bobby Grayson",
+      "change_id": "d87f55c7-5f1e-4843-80d8-f84980174af9",
+      "created_at": "2026-10-30T08:50:00.787041-04:00",
+      "metadata": {
+        "branch": "main",
+        "commit": "74b13a461f3789e1012034f388a5efe9fc1bb4f6",
+        "confidence": 80
+      },
+      "node_type": "action",
+      "status": "pending",
+      "title": "Strengthened Slick Lane (0 friction, carry 1.04), added lane power gauge, skee play --hand noise",
+      "updated_at": "2026-10-30T08:50:00.787041-04:00"
     },
     "de36b4b8-eb8c-4f7c-8fbb-559c50cafedf": {
       "author": "Bobby Grayson",

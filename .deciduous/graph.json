@@ -80,6 +80,16 @@
       "to_change_id": "04665092-244c-4c16-9160-39cfed52723a",
       "weight": 1.0
     },
+    "4a563b1e3f6607b0c7d3": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T08:52:45.313887-04:00",
+      "edge_id": "4a563b1e3f6607b0c7d3",
+      "edge_type": "leads_to",
+      "from_change_id": "37b6071b-f2b2-45ab-a9ce-7cbba2ac6049",
+      "rationale": "result",
+      "to_change_id": "72cd587a-eca3-46f8-9df8-ec7b3284aa95",
+      "weight": 1.0
+    },
     "4efc6ca751d1f2e2c1f9": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:46:36.997705-04:00",
@@ -320,6 +330,16 @@
       "to_change_id": "6da7921c-b88d-477d-8b71-561b96144fad",
       "weight": 1.0
     },
+    "dab31e373ffb18e73d1e": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T08:52:45.037238-04:00",
+      "edge_id": "dab31e373ffb18e73d1e",
+      "edge_type": "leads_to",
+      "from_change_id": "067bae9a-b27a-440e-abe6-cb95c2d438c9",
+      "rationale": "document everything",
+      "to_change_id": "37b6071b-f2b2-45ab-a9ce-7cbba2ac6049",
+      "weight": 1.0
+    },
     "e79e6535aaf0daf0c599": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:03:20.561432-04:00",
@@ -478,6 +498,20 @@
       "title": "Shared CoreGraphics renderer (SkeeRender) driven by a pure scene description; one style per ante pair: pixel, cel, 3D, vector neon",
       "updated_at": "2026-10-30T08:13:19.231522-04:00"
     },
+    "37b6071b-f2b2-45ab-a9ce-7cbba2ac6049": {
+      "author": "Bobby Grayson",
+      "change_id": "37b6071b-f2b2-45ab-a9ce-7cbba2ac6049",
+      "created_at": "2026-10-30T08:52:44.894021-04:00",
+      "metadata": {
+        "branch": "main",
+        "commit": "599b0e886f02597c5ae912920c122e40798e61b4",
+        "confidence": 85
+      },
+      "node_type": "action",
+      "status": "pending",
+      "title": "Wrote docs: README, DESIGN, ARCHITECTURE, PHYSICS, TOOLS, BALANCE, PLAYTEST with rendered screenshots",
+      "updated_at": "2026-10-30T08:52:44.894021-04:00"
+    },
     "43a5276f-85c8-4c9d-a21f-498506d74a17": {
       "author": "Bobby Grayson",
       "change_id": "43a5276f-85c8-4c9d-a21f-498506d74a17",
@@ -617,6 +651,19 @@
       "status": "pending",
       "title": "65 core tests pass incl. never-impossible guarantee at ante 8 for every boss",
       "updated_at": "2026-10-30T08:16:16.038831-04:00"
+    },
+    "72cd587a-eca3-46f8-9df8-ec7b3284aa95": {
+      "author": "Bobby Grayson",
+      "change_id": "72cd587a-eca3-46f8-9df8-ec7b3284aa95",
+      "created_at": "2026-10-30T08:52:45.183729-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 85
+      },
+      "node_type": "outcome",
+      "status": "pending",
+      "title": "Docs committed; unverified items listed explicitly (inner display never seen running, hinge angle mapping, swipe calibration)",
+      "updated_at": "2026-10-30T08:52:45.183729-04:00"
     },
     "8a0c0787-8e53-414d-abb3-7a21bb4db862": {
       "author": "Bobby Grayson",

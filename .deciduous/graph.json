@@ -290,6 +290,16 @@
       "to_change_id": "1b730ae0-f224-4ff9-a7e2-dcd3c1dbcfa6",
       "weight": 1.0
     },
+    "5def00e4f7c82a8d12c0": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T17:01:19.840231-04:00",
+      "edge_id": "5def00e4f7c82a8d12c0",
+      "edge_type": "leads_to",
+      "from_change_id": "b321742b-db07-4936-bd77-d68386e32c17",
+      "rationale": "approach",
+      "to_change_id": "42862e1f-5d1d-432b-9ed8-e3750779fb5c",
+      "weight": 1.0
+    },
     "5ef801381a44daef01eb": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:50:00.927055-04:00",
@@ -320,6 +330,16 @@
       "to_change_id": "a9541e57-0848-4e11-b5a2-25c6fe6a5c46",
       "weight": 1.0
     },
+    "62d68bd23fef12a09203": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T17:01:20.083568-04:00",
+      "edge_id": "62d68bd23fef12a09203",
+      "edge_type": "leads_to",
+      "from_change_id": "b321742b-db07-4936-bd77-d68386e32c17",
+      "rationale": "approach",
+      "to_change_id": "ef7d9a4c-e5a3-4afc-b4f9-18021b110ded",
+      "weight": 1.0
+    },
     "630561d7b3ea21d9b167": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T09:07:36.700290-04:00",
@@ -328,6 +348,16 @@
       "from_change_id": "4067a26c-4d2f-4921-ba29-7d629748a1ff",
       "rationale": "result",
       "to_change_id": "02fb2fc0-a2ef-4611-b398-dd2e76e68e42",
+      "weight": 1.0
+    },
+    "6407c88c538a4277d321": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T17:10:39.010295-04:00",
+      "edge_id": "6407c88c538a4277d321",
+      "edge_type": "leads_to",
+      "from_change_id": "a05cb22d-22da-4580-9138-65905453af03",
+      "rationale": "chosen: keeps run balance independent of meta progress",
+      "to_change_id": "5819bd39-c604-4318-9154-188e376f542d",
       "weight": 1.0
     },
     "66957b0b18aeb3e0e8be": {
@@ -650,6 +680,16 @@
       "to_change_id": "8b016f98-5074-41f0-8a95-258570885fa3",
       "weight": 1.0
     },
+    "b85122ebea2561645499": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T17:10:39.499904-04:00",
+      "edge_id": "b85122ebea2561645499",
+      "edge_type": "leads_to",
+      "from_change_id": "cf7cf4c1-aa43-4dc6-8b54-289bd2647939",
+      "rationale": "result",
+      "to_change_id": "51015eb2-8210-40ba-8c20-48e1c92ab04d",
+      "weight": 1.0
+    },
     "bd2ad4930f4bff42f16e": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T09:20:50.147240-04:00",
@@ -658,6 +698,16 @@
       "from_change_id": "d659e919-a722-48f5-b681-a782478d41b1",
       "rationale": "implementation",
       "to_change_id": "7664f313-91e5-48dc-8aba-c5bbbc8ecf7b",
+      "weight": 1.0
+    },
+    "bf7a4caad7c4fb3041eb": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T17:01:20.315766-04:00",
+      "edge_id": "bf7a4caad7c4fb3041eb",
+      "edge_type": "leads_to",
+      "from_change_id": "42862e1f-5d1d-432b-9ed8-e3750779fb5c",
+      "rationale": "chosen: aim is the skill, spin is the show",
+      "to_change_id": "28899d3c-779a-4290-b7c9-70017a983348",
       "weight": 1.0
     },
     "c2488f237e8fda86d024": {
@@ -742,6 +792,26 @@
       "to_change_id": "8d9b699b-2e6e-4bbc-89df-47e12526989e",
       "weight": 1.0
     },
+    "d6587783acca21402ac2": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T17:06:01.823158-04:00",
+      "edge_id": "d6587783acca21402ac2",
+      "edge_type": "leads_to",
+      "from_change_id": "28899d3c-779a-4290-b7c9-70017a983348",
+      "rationale": "implementation",
+      "to_change_id": "594e64b4-5603-4742-9e25-f69e2f24e088",
+      "weight": 1.0
+    },
+    "d6e71aed75a0736e68be": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T17:10:39.248978-04:00",
+      "edge_id": "d6e71aed75a0736e68be",
+      "edge_type": "leads_to",
+      "from_change_id": "5819bd39-c604-4318-9154-188e376f542d",
+      "rationale": "implementation",
+      "to_change_id": "cf7cf4c1-aa43-4dc6-8b54-289bd2647939",
+      "weight": 1.0
+    },
     "d7757d667fcc049abf09": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:46:37.518211-04:00",
@@ -782,6 +852,16 @@
       "to_change_id": "37b6071b-f2b2-45ab-a9ce-7cbba2ac6049",
       "weight": 1.0
     },
+    "dbd1408c7245a1a4a7c6": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T17:06:02.056864-04:00",
+      "edge_id": "dbd1408c7245a1a4a7c6",
+      "edge_type": "leads_to",
+      "from_change_id": "594e64b4-5603-4742-9e25-f69e2f24e088",
+      "rationale": "result",
+      "to_change_id": "6176341e-c2bf-444a-9a87-59d00a5f62fb",
+      "weight": 1.0
+    },
     "e02e068f8b2e3e279fd3": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T10:32:13.792360-04:00",
@@ -810,6 +890,16 @@
       "from_change_id": "fb8961bc-ce84-4d5d-93aa-53441619dd83",
       "rationale": "chosen",
       "to_change_id": "43a5276f-85c8-4c9d-a21f-498506d74a17",
+      "weight": 1.0
+    },
+    "e88f0c3f62c891f21a0e": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T17:10:38.774971-04:00",
+      "edge_id": "e88f0c3f62c891f21a0e",
+      "edge_type": "leads_to",
+      "from_change_id": "70d9c395-7e30-4cb4-9806-8ba4d6d659e7",
+      "rationale": "approach",
+      "to_change_id": "a05cb22d-22da-4580-9138-65905453af03",
       "weight": 1.0
     },
     "ea58299c7ecb9f4fb0b4": {
@@ -1051,6 +1141,19 @@
       "title": "99 tests pass; 220pt flick now 0.60 power -> 50 (was 0.35 -> gutter); all symbols readable on both displays in renders; feel unverified on device",
       "updated_at": "2026-10-30T16:54:01.138104-04:00"
     },
+    "28899d3c-779a-4290-b7c9-70017a983348": {
+      "author": "Bobby Grayson",
+      "change_id": "28899d3c-779a-4290-b7c9-70017a983348",
+      "created_at": "2026-10-30T17:01:20.203770-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 75
+      },
+      "node_type": "decision",
+      "status": "pending",
+      "title": "Marquee shows the next throw's targets; combo chains across throws in a round",
+      "updated_at": "2026-10-30T17:01:20.203770-04:00"
+    },
     "2e90e1ad-4339-42bb-8140-8ffc0cdafdc0": {
       "author": "Bobby Grayson",
       "change_id": "2e90e1ad-4339-42bb-8140-8ffc0cdafdc0",
@@ -1106,6 +1209,19 @@
       "status": "pending",
       "title": "Redo the presentation layer: must look and feel like real skee-ball, holes in every ring, good graphics",
       "updated_at": "2026-10-30T09:02:17.040862-04:00"
+    },
+    "42862e1f-5d1d-432b-9ed8-e3750779fb5c": {
+      "author": "Bobby Grayson",
+      "change_id": "42862e1f-5d1d-432b-9ed8-e3750779fb5c",
+      "created_at": "2026-10-30T17:01:19.719709-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 75
+      },
+      "node_type": "option",
+      "status": "pending",
+      "title": "Marquee spins after every throw to 3 seeded symbols; a ball whose symbol matches k reels adds +0.5*k mult times a combo level that grows on consecutive matching throws and breaks on a miss; you aim for it before throwing",
+      "updated_at": "2026-10-30T17:01:19.719709-04:00"
     },
     "43a5276f-85c8-4c9d-a21f-498506d74a17": {
       "author": "Bobby Grayson",
@@ -1189,6 +1305,19 @@
       "title": "Pure stroke analysis: release velocity->power/aim, sideways change->spin, hitches->skid, crease crossing->foul",
       "updated_at": "2026-10-30T09:09:11.565542-04:00"
     },
+    "51015eb2-8210-40ba-8c20-48e1c92ab04d": {
+      "author": "Bobby Grayson",
+      "change_id": "51015eb2-8210-40ba-8c20-48e1c92ab04d",
+      "created_at": "2026-10-30T17:10:39.388992-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 75
+      },
+      "node_type": "outcome",
+      "status": "pending",
+      "title": "116 core tests pass; shop renders in CLI; installed on Duo (locked, not launched); crediting untested on device",
+      "updated_at": "2026-10-30T17:10:39.388992-04:00"
+    },
     "52c21135-67e9-4a2e-9433-966bf3896ffd": {
       "author": "Bobby Grayson",
       "change_id": "52c21135-67e9-4a2e-9433-966bf3896ffd",
@@ -1243,6 +1372,33 @@
       "title": "Flick: ball waits at the release line; shot fires after lift-off from the whole stroke curve (peak/release velocity, acceleration, jerk); foul only on a long drag far past the crease",
       "updated_at": "2026-10-30T10:32:13.961288-04:00"
     },
+    "5819bd39-c604-4318-9154-188e376f542d": {
+      "author": "Bobby Grayson",
+      "change_id": "5819bd39-c604-4318-9154-188e376f542d",
+      "created_at": "2026-10-30T17:10:38.893881-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 80
+      },
+      "node_type": "decision",
+      "status": "pending",
+      "title": "Winnings separate from tickets; prizes purely cosmetic",
+      "updated_at": "2026-10-30T17:10:38.893881-04:00"
+    },
+    "594e64b4-5603-4742-9e25-f69e2f24e088": {
+      "author": "Bobby Grayson",
+      "change_id": "594e64b4-5603-4742-9e25-f69e2f24e088",
+      "created_at": "2026-10-30T17:06:01.698046-04:00",
+      "metadata": {
+        "branch": "main",
+        "commit": "3b4f816ac09ad6d3b14987fc9d6baaa025a09b54",
+        "confidence": 85
+      },
+      "node_type": "action",
+      "status": "pending",
+      "title": "TopSlot in core (seeded strip, hits, combo mult, ticket jackpot), reducer spins it every throw, presentation scrolls it, HUD reels + cyan ring halos + combo chime",
+      "updated_at": "2026-10-30T17:06:01.698046-04:00"
+    },
     "59d4ea6a-5d26-42ae-8a82-1d36e744bd42": {
       "author": "Bobby Grayson",
       "change_id": "59d4ea6a-5d26-42ae-8a82-1d36e744bd42",
@@ -1269,6 +1425,19 @@
       "status": "pending",
       "title": "Round 3: icons invisible, slot mechanic unclear, slides unnatural, fouls too easy; switch to a natural flick fired from its full velocity/acceleration/jerk curve; think about FUN",
       "updated_at": "2026-10-30T10:32:13.527289-04:00"
+    },
+    "6176341e-c2bf-444a-9a87-59d00a5f62fb": {
+      "author": "Bobby Grayson",
+      "change_id": "6176341e-c2bf-444a-9a87-59d00a5f62fb",
+      "created_at": "2026-10-30T17:06:01.939285-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 75
+      },
+      "node_type": "outcome",
+      "status": "pending",
+      "title": "110 tests pass; bot score/target up 10-30% mid-run from chance matches; targets not retuned; human feel unverified",
+      "updated_at": "2026-10-30T17:06:01.939285-04:00"
     },
     "6addc45a-99c3-483b-a867-a296f0740369": {
       "author": "Bobby Grayson",
@@ -1328,6 +1497,20 @@
       "status": "pending",
       "title": "Built iOS app shell: Canvas renderer, swipe/tap gestures, UIHingeInteraction fold, haptics, save/replay, debug launch args",
       "updated_at": "2026-10-30T08:46:36.861025-04:00"
+    },
+    "70d9c395-7e30-4cb4-9806-8ba4d6d659e7": {
+      "author": "Bobby Grayson",
+      "change_id": "70d9c395-7e30-4cb4-9806-8ba4d6d659e7",
+      "created_at": "2026-10-30T17:01:20.441090-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 80,
+        "prompt": "and make there be a fake store ro spend winnings on prizes that dont affexf rbe game"
+      },
+      "node_type": "goal",
+      "status": "pending",
+      "title": "Prize store for winnings, cosmetic only",
+      "updated_at": "2026-10-30T17:01:20.441090-04:00"
     },
     "710749f0-3d87-44cd-ab2d-a6b60dd88852": {
       "author": "Bobby Grayson",
@@ -1496,6 +1679,19 @@
       "title": "toon.js = 3-band gradient ramp [150,205,255] + hemisphere fill (sky fff4fb, ground d9c8ff, 1.6) + sun 2.2 + hard rim band smoothstep(.62,.68)*.28 + inverted-hull ink #3a2346 thick*(-z/20) + desat/tint uniforms; grade.js = saturation/noir pass",
       "updated_at": "2026-10-30T09:05:15.709452-04:00"
     },
+    "a05cb22d-22da-4580-9138-65905453af03": {
+      "author": "Bobby Grayson",
+      "change_id": "a05cb22d-22da-4580-9138-65905453af03",
+      "created_at": "2026-10-30T17:10:38.649312-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 80
+      },
+      "node_type": "option",
+      "status": "pending",
+      "title": "Separate out-of-run currency (winnings from points/rounds/win) buying 10 cosmetic prizes for a shelf on the title screen",
+      "updated_at": "2026-10-30T17:10:38.649312-04:00"
+    },
     "a117cc8c-039f-4d84-ad98-e43817435b27": {
       "author": "Bobby Grayson",
       "change_id": "a117cc8c-039f-4d84-ad98-e43817435b27",
@@ -1605,6 +1801,20 @@
       "status": "pending",
       "title": "Physics tests pass: deterministic, mirror-symmetric, every hole reachable, lips rattle",
       "updated_at": "2026-10-30T08:10:01.942383-04:00"
+    },
+    "b321742b-db07-4936-bd77-d68386e32c17": {
+      "author": "Bobby Grayson",
+      "change_id": "b321742b-db07-4936-bd77-d68386e32c17",
+      "created_at": "2026-10-30T17:01:19.584184-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 80,
+        "prompt": "incorporate a top level slot machine that soins evert throw and comvos with getting them by throw"
+      },
+      "node_type": "goal",
+      "status": "pending",
+      "title": "Top slot machine that spins every throw and combos with what you hit",
+      "updated_at": "2026-10-30T17:01:19.584184-04:00"
     },
     "b5ae3392-3f1a-4090-9e24-d9c4ed3aa280": {
       "author": "Bobby Grayson",
@@ -1731,6 +1941,20 @@
       "title": "All four styles render correctly from CLI; contact sheets show roll, hinge flight, tally and reel spin",
       "updated_at": "2026-10-30T08:42:56.914404-04:00"
     },
+    "cf7cf4c1-aa43-4dc6-8b54-289bd2647939": {
+      "author": "Bobby Grayson",
+      "change_id": "cf7cf4c1-aa43-4dc6-8b54-289bd2647939",
+      "created_at": "2026-10-30T17:10:39.134927-04:00",
+      "metadata": {
+        "branch": "main",
+        "commit": "614c300881a902b8ff6d55239274c19f06647117",
+        "confidence": 85
+      },
+      "node_type": "action",
+      "status": "pending",
+      "title": "Wallet/Prize core with tests, procedural prize art, PrizeShopView, title shelf, game over winnings, wallet.json",
+      "updated_at": "2026-10-30T17:10:39.134927-04:00"
+    },
     "d659e919-a722-48f5-b681-a782478d41b1": {
       "author": "Bobby Grayson",
       "change_id": "d659e919-a722-48f5-b681-a782478d41b1",
@@ -1798,6 +2022,19 @@
       "status": "pending",
       "title": "Build in native Swift with functional core / imperative shell split",
       "updated_at": "2026-10-30T08:03:18.766901-04:00"
+    },
+    "ef7d9a4c-e5a3-4afc-b4f9-18021b110ded": {
+      "author": "Bobby Grayson",
+      "change_id": "ef7d9a4c-e5a3-4afc-b4f9-18021b110ded",
+      "created_at": "2026-10-30T17:01:19.966396-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 40
+      },
+      "node_type": "option",
+      "status": "pending",
+      "title": "Marquee spins at release and settles mid-flight (pure luck relative to aim)",
+      "updated_at": "2026-10-30T17:01:19.966396-04:00"
     },
     "f2688b2e-0cb1-454b-b272-5723aeb69126": {
       "author": "Bobby Grayson",

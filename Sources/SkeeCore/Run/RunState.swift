@@ -8,6 +8,8 @@ public struct RoundState: Hashable, Sendable, Codable {
     public var currentBalls: [BallRecord] = []
     /// Consecutive scoring balls this round.
     public var streak = 0
+    /// Consecutive throws this round that matched the top slot.
+    public var combo = 0
     /// Power-up applied to the next throw.
     public var armed: PowerUp?
 
@@ -38,6 +40,8 @@ public struct RunState: Hashable, Sendable, Codable {
     public var setup: BoardSetup
     /// Where each hole's reel has stopped: index into `setup.reel(hole)`.
     public var stops: [Hole: Int]
+    /// The slot on top: the next throw's targets.
+    public var topSlot: TopSlot
     public var charms: [Charm]
     public var powerUps: [PowerUp]
     public var tickets: Int
@@ -117,4 +121,6 @@ public struct Payout: Hashable, Sendable, Codable {
 public struct Step: Sendable {
     public var state: RunState
     public var events: [GameEvent]
+
+    public init(state: RunState, events: [GameEvent]) { self.state = state; self.events = events }
 }

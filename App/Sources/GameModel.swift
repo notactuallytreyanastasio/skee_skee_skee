@@ -349,6 +349,7 @@ final class Haptics {
         case .lip: light.impactOccurred(intensity: 0.8)
         case .drop(let h): heavy.impactOccurred(intensity: min(1, 0.45 + CGFloat(h.faceValue) / 110))
         case .reelStop: light.impactOccurred(intensity: 0.4)
+        case .combo(let n): rigid.impactOccurred(intensity: min(1, 0.5 + CGFloat(n) * 0.1))
         default: break
         }
     }

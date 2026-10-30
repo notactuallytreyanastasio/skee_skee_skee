@@ -82,6 +82,31 @@ struct SymbolImage: View {
     }
 }
 
+/// One top-slot reel: the strip scrolls past a window, so a spin reads as
+/// a spin and not a flicker.
+struct SlotReel: View {
+    let position: Double
+    var body: some View {
+        GeometryReader { g in
+            let n = TopSlot.strip.count
+            let base = Int(position.rounded(.down))
+            let frac = position - Double(base)
+            let h = g.size.height
+            ZStack {
+                RoundedRectangle(cornerRadius: 6).fill(Ink.cream)
+                ForEach(-1..<2, id: \.self) { k in
+                    SymbolImage(symbol: TopSlot.strip[((base + k) % n + n) % n])
+                        .padding(3)
+                        .frame(width: g.size.width, height: h)
+                        .offset(y: (Double(k) - frac) * h)
+                }
+                RoundedRectangle(cornerRadius: 6).strokeBorder(Ink.ink, lineWidth: 2)
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 6))
+        }
+    }
+}
+
 // MARK: - HUD
 
 public struct HUDView: View {
@@ -101,6 +126,7 @@ public struct HUDView: View {
                 } else {
                     VStack(spacing: 6) {
                         topBar
+                        topSlot
                         if state.isBoss { CelText(text: state.bossBlurb, size: 12, fill: Ink.butter).padding(.horizontal, 20) }
                         Spacer()
                     }
@@ -167,6 +193,27 @@ public struct HUDView: View {
             }
         }
         .padding(.horizontal, 12)
+    }
+
+    /// The slot on top of the cabinet. It spins after every throw; hit a
+    /// hole showing one of its symbols and the combo climbs.
+    var topSlot: some View {
+        VStack(spacing: 1) {
+            if state.combo > 0 {
+                CelText(text: "COMBO x\(state.combo) · hit one to keep it", size: 11, fill: Ink.butter)
+            } else {
+                CelText(text: "TOP SLOT · hit one = combo", size: 10)
+            }
+            HStack(spacing: 3) {
+                ForEach(0..<3, id: \.self) { i in
+                    SlotReel(position: state.topSlot.indices.contains(i) ? state.topSlot[i] : 0)
+                        .frame(width: 27, height: 27)
+                }
+            }
+            .padding(3)
+            .background(RoundedRectangle(cornerRadius: 8).fill(state.combo > 0 ? Ink.butter : Ink.pink))
+            .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Ink.ink, lineWidth: 3))
+        }
     }
 
     /// The slot machine: this frame's three reels, and the fever meter.

@@ -8,10 +8,15 @@ public struct BallRecord: Hashable, Sendable, Codable {
     public var fold: Double
     /// The thumb crossed the crease: the ball never counted.
     public var foul: Bool
+    /// Top slot reels this ball's symbol matched, and the combo level after it.
+    public var slotHits: Int
+    public var combo: Int
 
-    public init(hole: Hole, symbol: Symbol, chips: Int, rattles: Int = 0, fold: Double = 0, foul: Bool = false) {
+    public init(hole: Hole, symbol: Symbol, chips: Int, rattles: Int = 0, fold: Double = 0, foul: Bool = false,
+                slotHits: Int = 0, combo: Int = 0) {
         self.hole = hole; self.symbol = symbol; self.chips = chips
         self.rattles = rattles; self.fold = fold; self.foul = foul
+        self.slotHits = slotHits; self.combo = combo
     }
 
     public var scored: Bool { hole != .gutter }
@@ -36,7 +41,7 @@ public struct ScoringContext: Hashable, Sendable {
 /// these back one by one, Balatro-style; the total is just their fold.
 public struct ScoreStep: Hashable, Sendable, Codable {
     public enum Source: Hashable, Sendable, Codable {
-        case base, ball(Int), payline, charm(Charm), fever
+        case base, ball(Int), slot(Int), payline, charm(Charm), fever
     }
     public enum Effect: Hashable, Sendable, Codable {
         case base(chips: Int, mult: Double)
@@ -64,7 +69,7 @@ public struct FrameScore: Hashable, Sendable, Codable {
 }
 
 /// Score one three-ball frame. Order: base, each ball's chips, flat symbol
-/// chips, the payline, charms left to right, fever. Order matters because
+/// chips and top slot combo, the payline, charms left to right, fever. Order matters because
 /// `timesMult` multiplies whatever mult exists at that point.
 public func scoreFrame(_ balls: [BallRecord], context: ScoringContext) -> FrameScore {
     var steps: [ScoreStep] = [ScoreStep(source: .base, effect: .base(chips: 0, mult: 1))]
@@ -72,6 +77,10 @@ public func scoreFrame(_ balls: [BallRecord], context: ScoringContext) -> FrameS
         steps.append(ScoreStep(source: .ball(i), effect: .chips(b.chips)))
         if b.symbol.flatChips > 0 {
             steps.append(ScoreStep(source: .ball(i), effect: .chips(b.symbol.flatChips)))
+        }
+        if b.slotHits > 0 {
+            steps.append(ScoreStep(source: .slot(i), effect: .mult(TopSlot.comboMult(hits: b.slotHits, level: b.combo))))
+            if b.slotHits >= 3 { steps.append(ScoreStep(source: .slot(i), effect: .tickets(TopSlot.jackpotTickets))) }
         }
     }
     let payline = Payline.evaluate(balls.map(\.symbol))

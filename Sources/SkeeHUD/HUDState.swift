@@ -21,6 +21,10 @@ public struct HUDState: Sendable {
     public var heat = 0
     public var heatMax = 10
     public var fever = false
+    /// The top slot's reels, as positions on `TopSlot.strip` (fractional
+    /// while spinning), and the combo running into the next throw.
+    public var topSlot: [Double] = [0, 1, 2]
+    public var combo = 0
     /// This frame's three reel stops so far (nil = not thrown yet).
     public var frame: [Symbol?] = [nil, nil, nil]
     public var frameNumber = 1
@@ -75,6 +79,8 @@ public struct HUDState: Sendable {
         h.ballsLeft = s.round.ballsLeft
         h.charms = s.charms; h.powerUps = s.powerUps; h.armed = s.round.armed
         h.busy = p.isBusy
+        h.topSlot = p.slotPositions
+        h.combo = s.round.combo
         h.selectedOffer = selectedOffer; h.selectedCharm = selectedCharm
         h.firstThrow = s.ante == 1 && s.round.kind == .warmup && s.round.frames.isEmpty && s.round.currentBalls.isEmpty
         if case .prizeCounter(let c) = s.phase, !p.isBusy { h.counter = c }
@@ -113,7 +119,7 @@ public struct HUDState: Sendable {
         let line = Payline.evaluate(have)
         switch (have.count, line) {
         case (0, _):
-            return Hint(text: "3 balls = 1 spin · match symbols for MULT")
+            return Hint(text: "3 balls = 1 line · match symbols for MULT")
         case (1, _):
             if have[0] == .blank { return Hint(text: "gutter · the next two can still pair") }
             return Hint(text: "match the", symbol: have[0].isWild ? nil : have[0], after: "· glowing rings pair it")
@@ -154,6 +160,9 @@ public struct HUDState: Sendable {
         switch st.source {
         case .base: return "frame"
         case .ball(let i): return "ball \(i + 1)  \(what)"
+        case .slot(let i):
+            let b = f.balls[i]
+            return b.combo > 1 ? "top slot combo x\(b.combo)  \(what)" : "top slot  \(what)"
         case .payline:
             switch f.payline {
             case .none: return what

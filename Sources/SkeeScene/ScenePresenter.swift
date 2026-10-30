@@ -123,6 +123,7 @@ public final class ScenePresenter: @unchecked Sendable {
         let have = (p.tallyProgress == nil && !p.isBusy) ? s.round.currentBalls.map(\.symbol) : []
         let lineNow = Payline.evaluate(have).addedMult
         let pulse = Float(0.6 + 0.4 * sin(p.clock * 7))
+        let slot = p.isBusy ? nil : s.topSlot
         for hole in BoardSetup.reelHoles {
             let reel = s.setup.reel(hole)
             let pos = p.reelPositions[hole] ?? 0
@@ -134,7 +135,7 @@ public final class ScenePresenter: @unchecked Sendable {
                 if gain > 0 { glow = (have.count == 2) ? 2 : 1 }
             }
             if let age = flashAge[hole], age < 0.6 { glow = max(glow, 2); }
-            cabinet.setReel(hole, sym, turn: pos, glow: glow,
+            cabinet.setReel(hole, sym, turn: pos, glow: glow, slotMatch: s.phase == .throwing && (slot?.hits(sym) ?? 0) > 0,
                             pulse: flashAge[hole].map { $0 < 0.6 ? 1 - $0 / 0.6 + 0.3 : pulse } ?? pulse)
         }
 

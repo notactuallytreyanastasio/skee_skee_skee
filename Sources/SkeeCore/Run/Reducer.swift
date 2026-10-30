@@ -6,10 +6,11 @@ public func newRun(seed: UInt64, config: RunConfig = .standard) -> RunState {
     var s = RunState(
         config: config, rng: rng, seed: seed, ante: 1, boss: boss,
         round: RoundState(kind: .warmup, target: 0, framesTotal: 0),
-        phase: .throwing, setup: .standard, stops: [:], charms: [], powerUps: [],
+        phase: .throwing, setup: .standard, stops: [:], topSlot: TopSlot(stops: [0, 1, 2]), charms: [], powerUps: [],
         tickets: config.startTickets, heat: 0, fever: false, stats: RunStats())
     s.round = freshRound(.warmup, in: s)
     spinReels(&s)
+    s.topSlot = .spin(&s.rng)
     return s
 }
 
@@ -57,8 +58,10 @@ private func foul(_ s0: RunState) -> Step {
     var s = s0
     s.round.armed = nil
     s.round.currentBalls.append(BallRecord(hole: .gutter, symbol: .blank, chips: 0, foul: true))
+    s.round.combo = 0
     s.stats.balls += 1
     spinReels(&s)
+    s.topSlot = .spin(&s.rng)
     return finishBall(s, [.fouled])
 }
 
@@ -70,10 +73,13 @@ private func throwBall(_ launch: Launch, _ s0: RunState) -> Step {
     var chips = s.setup.chips(for: shot.hole)
     if s.round.kind == .boss { chips = s.boss.chips(for: shot.hole, base: chips) }
     if armed == .goldenBall { chips *= 3 }
+    let symbol = armed == .wildBall && shot.hole != .gutter ? Symbol.clover : s.showing(shot.hole)
+    let hits = s.topSlot.hits(symbol)
+    s.round.combo = hits > 0 ? s.round.combo + 1 : 0
     let record = BallRecord(
-        hole: shot.hole,
-        symbol: armed == .wildBall && shot.hole != .gutter ? .clover : s.showing(shot.hole),
-        chips: chips, rattles: shot.rattles, fold: launch.fold)
+        hole: shot.hole, symbol: symbol,
+        chips: chips, rattles: shot.rattles, fold: launch.fold,
+        slotHits: hits, combo: s.round.combo)
     s.round.armed = nil
     s.round.currentBalls.append(record)
     s.heat += shot.rattles + (shot.hole == .gutter ? 1 : 0)
@@ -82,6 +88,7 @@ private func throwBall(_ launch: Launch, _ s0: RunState) -> Step {
     s.stats.holes[shot.hole, default: 0] += 1
     events.append(.shot(shot, record))
     if armed != .hold { spinReels(&s) }
+    s.topSlot = .spin(&s.rng)
     return finishBall(s, events)
 }
 

@@ -204,6 +204,26 @@ to 3100 pt/s effective speed (lift-off and peak speed weighted evenly); smooth f
 10-15. A gauge on the right of the lane marks each recent throw's power,
 coloured by where it went, so the flick can be learned.
 
+## The top slot
+
+A three-reel slot sits on top of the cabinet and spins after every throw,
+fouls included. It lands on the next throw's targets. Rings showing one of
+its symbols get a cyan halo. A ball whose symbol matches k of the top reels
+adds 0.5 x k mult to its frame, times the combo: the count of consecutive
+throws this round that matched, capped at 5. A miss, gutter or foul breaks
+it. A ball that matches all three reels also pays 3 tickets. Clover is wild
+both ways.
+
+The spin happens after a throw and before the next aim, never while the
+ball is in the air. If it landed during the flight, matching it would be
+luck; shown first, it is a target, and the combo is a streak you earn.
+It draws from its own strip (`TopSlot.strip`): common symbols often, sevens,
+diamonds and clovers once each.
+
+Bots ignore it and still score 10-30% more in the middle antes from chance
+matches; players who aim for it will score more than that. Targets have not
+been retuned for it.
+
 ## The slot, on the board
 
 The rings are the reels. Each ring shows the symbol its reel is on, four to

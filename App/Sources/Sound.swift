@@ -148,6 +148,11 @@ final class SoundEngine: @unchecked Sendable {
             add([v(.tri, 2600, amp: 0.07, decay: 0.012)])
         case .reelStop:
             add([v(.tri, 1500, amp: 0.18, decay: 0.05), v(.sine, 750, amp: 0.12, decay: 0.08)])
+        case .combo(let n):
+            // A rising two-note chime, higher each link of the chain.
+            let k = pow(1.0595, Float(2 * min(n, 6)))
+            add([v(.square, 659 * k, amp: 0.1, decay: 0.08), v(.square, 988 * k, amp: 0.1, decay: 0.14, delay: 0.07)]
+                + bell(1318 * k, amp: 0.15, delay: 0.14))
         case .tallyChips(let i):
             add([v(.sine, 440 * pow(1.06, Float(i)), amp: 0.22, decay: 0.07)])
         case .tallyMult(let i):

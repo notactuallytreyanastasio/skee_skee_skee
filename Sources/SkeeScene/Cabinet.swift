@@ -361,8 +361,9 @@ public final class Cabinet: @unchecked Sendable {
 
     /// Show `symbol` on a hole's reel. `turn` is how far the reel has
     /// spun (in symbols, fractional while spinning); `glow` 0...2 lights it
-    /// (1 = would pair, 2 = would complete the line).
-    public func setReel(_ hole: Hole, _ symbol: Symbol, turn: Double, glow: Float, pulse: Float) {
+    /// (1 = would pair, 2 = would complete the line). `slotMatch` rings it in
+    /// cyan: the top slot is showing this symbol, so it keeps the combo.
+    public func setReel(_ hole: Hole, _ symbol: Symbol, turn: Double, glow: Float, slotMatch: Bool = false, pulse: Float) {
         guard let r = reelsOnBoard[hole] else { return }
         let n = r.decals.count
         let spin = Float(turn) * 2 * .pi / Float(max(n, 3))
@@ -380,8 +381,8 @@ public final class Cabinet: @unchecked Sendable {
                 ? PlatformColor(red: CGFloat(0.55 * pulse), green: CGFloat((glow > 1 ? 0.45 : 0.3) * pulse), blue: CGFloat(glow > 1 ? 0 : 0.25 * pulse), alpha: 1)
                 : PlatformColor.black
         }
-        r.halo.opacity = CGFloat(glow > 0 ? (glow > 1 ? 0.75 : 0.45) * pulse : 0)
-        r.halo.geometry?.firstMaterial?.diffuse.contents = hex(glow > 1 ? 0xFFD84D : 0xFFF6B0)
+        r.halo.opacity = CGFloat(glow > 0 ? (glow > 1 ? 0.75 : 0.45) * pulse : slotMatch ? 0.4 * pulse : 0)
+        r.halo.geometry?.firstMaterial?.diffuse.contents = hex(glow > 1 ? 0xFFD84D : glow > 0 ? 0xFFF6B0 : 0x6FF0FF)
         reelsOnBoard[hole]?.shown = symbol
     }
 

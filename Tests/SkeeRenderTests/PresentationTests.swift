@@ -117,3 +117,35 @@ struct PresentationTests {
         #expect(Presentation.sample(path, at: 9)!.along == 2)
     }
 }
+
+@Suite("Presentation: top slot")
+struct TopSlotPresentationTests {
+    @Test func theTopSlotSpinsToItsNewStopsAfterAThrow() throws {
+        let s = newRun(seed: 2)
+        var p = Presentation(state: s)
+        let step = try apply(.foul, to: s).get()
+        p.enqueue(step)
+        #expect(p.slotPositions == s.topSlot.stops.map(Double.init))
+        var moved = false
+        while p.isBusy {
+            p.advance(1.0 / 60)
+            if p.slotPositions != s.topSlot.stops.map(Double.init) { moved = true }
+        }
+        #expect(moved)
+        #expect(p.slotPositions == step.state.topSlot.stops.map(Double.init))
+        #expect(p.shownSlot == step.state.topSlot.symbols)
+    }
+
+    @Test func aMatchingBallCallsOutTheCombo() {
+        let s = newRun(seed: 2)
+        var p = Presentation(state: s)
+        var after = s
+        let ball = BallRecord(hole: .ring30, symbol: .bell, chips: 30, slotHits: 2, combo: 3)
+        after.round.currentBalls = [ball]
+        let shot = simulateShot(Launch(power: 0.5, aim: 0), on: .standard)
+        p.enqueue(Step(state: after, events: [.shot(shot, ball)]))
+        var cues: [Cue] = []
+        while p.isBusy { p.advance(1.0 / 60); cues += p.cues }
+        #expect(cues.contains(.combo(3)))
+    }
+}

@@ -34,6 +34,7 @@ public func table(for s: RunState) -> Table {
 public func apply(_ action: Action, to s: RunState) -> Result<Step, ActionError> {
     switch (action, s.phase) {
     case (.throwBall(let l), .throwing): .success(throwBall(l, s))
+    case (.foul, .throwing): .success(foul(s))
     case (.arm(let i), .throwing): arm(i, s)
     case (.buy(let i, let target), .prizeCounter(let c)): buy(i, target, c, s)
     case (.reroll, .prizeCounter(let c)): reroll(c, s)
@@ -50,6 +51,15 @@ private func freshRound(_ kind: RoundKind, in s: RunState) -> RoundState {
     if s.charms.contains(.extraBall) { frames += 1 }
     if kind == .boss { frames += s.boss.frameDelta }
     return RoundState(kind: kind, target: s.config.target(ante: s.ante, kind: kind), framesTotal: frames)
+}
+
+private func foul(_ s0: RunState) -> Step {
+    var s = s0
+    s.round.armed = nil
+    s.round.currentBalls.append(BallRecord(hole: .gutter, symbol: .blank, chips: 0, foul: true))
+    s.stats.balls += 1
+    spinReels(&s)
+    return finishBall(s, [.fouled])
 }
 
 private func throwBall(_ launch: Launch, _ s0: RunState) -> Step {
@@ -72,7 +82,13 @@ private func throwBall(_ launch: Launch, _ s0: RunState) -> Step {
     s.stats.holes[shot.hole, default: 0] += 1
     events.append(.shot(shot, record))
     if armed != .hold { spinReels(&s) }
+    return finishBall(s, events)
+}
 
+/// After any ball: score the frame if it is full, end the round if it was
+/// the last frame.
+private func finishBall(_ s0: RunState, _ events0: [GameEvent]) -> Step {
+    var s = s0, events = events0
     guard s.round.currentBalls.count == s.config.ballsPerFrame else { return Step(state: s, events: events) }
 
     let context = ScoringContext(

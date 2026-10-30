@@ -68,6 +68,7 @@ func describe(_ f: FrameScore) -> String {
 func describe(_ e: GameEvent) -> String? {
     switch e {
     case .shot(let r, let b): "ball: \(describe(r))\n  -> \(b.chips) chips, \(b.symbol.rawValue)"
+    case .fouled: "FOUL: thumb past the crease. Ball spent."
     case .frameScored(let f): describe(f)
     case .feverLit: "The jackpot meter is full: next frame plays at FEVER (x2)."
     case .roundCleared(let s, let t, let p):

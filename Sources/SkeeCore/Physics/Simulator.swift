@@ -55,7 +55,8 @@ private struct ShotSim {
     mutating func run() -> ShotResult {
         let g = table.gravity, dt = table.dt
         let halfLane = lane.width / 2 - r
-        let v0 = lane.releaseSpeed(power: launch.power)
+        let v0 = lane.releaseSpeed(power: launch.power) * (1 - lane.skidLoss * launch.skid)
+        let hook = launch.spin * lane.hook
         let angle = launch.aim * lane.maxAimAngle
         var x = launch.start * halfLane, s = 0.0
         var vx = v0 * _sin(angle), vs = v0 * _cos(angle)
@@ -68,7 +69,7 @@ private struct ShotSim {
             let speed = (vx * vx + vs * vs).squareRoot()
             let f = speed > 0 ? friction / speed : 0
             vs += (slopePull - f * vs) * dt
-            vx += (-f * vx) * dt
+            vx += (-f * vx + hook) * dt
             x += vx * dt
             s += vs * dt
             if abs(x) > halfLane {
@@ -96,6 +97,7 @@ private struct ShotSim {
         var vz = carried * _sin(beta)
         var airborne = true
         var resting = 0.0
+        var nudges = 0
         let gIn = Vec2(0, -g * _sin(board.tilt)) + board.wind
         let gN = g * _cos(board.tilt)
         let halfBoard = board.width / 2 - r
@@ -166,7 +168,20 @@ private struct ShotSim {
             }
             if !airborne && v.length < 0.05 {
                 resting += dt
-                if resting > 0.2 { break }
+                if resting > 0.2 {
+                    // A ring is a cup: nothing rests on it except in its
+                    // hole. A ball balanced on top of an inner wall (dead
+                    // centre, nothing to tip it) is nudged around the wall
+                    // toward the bottom, on the side it is already on.
+                    let zone = board.zone(at: p)
+                    guard zone != .gutter, nudges < 6 else { break }
+                    let rel = p - board.ringCenter
+                    let side = rel.x >= 0 ? 1.0 : -1.0
+                    let tangent = Vec2(-rel.y, rel.x).normalized * (rel.y > 0 ? side : -side)
+                    v = (tangent + Vec2(0, -0.3)).normalized * 0.35
+                    nudges += 1
+                    resting = 0
+                }
             } else {
                 resting = 0
             }
@@ -211,6 +226,8 @@ private struct ShotSim {
 
     func holeUnder(_ p: Vec2, cleanFlight: Bool) -> Hole? {
         if (p - board.centerHole).length < board.centerHoleRadius { return .ring50 }
+        let zone = board.zone(at: p)
+        if zone != .gutter && (p - board.holeCenter(zone)).length < board.ringHoleRadius { return zone }
         for pocket in board.pockets where (p - pocket.center).length < pocket.radius && (!board.pocketsNeedFlight || cleanFlight) {
             return pocket.hole
         }

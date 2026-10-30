@@ -217,3 +217,19 @@ func anteOf(_ target: Int) -> Int {
     for a in 1...c.antes { for k in RoundKind.allCases where c.target(ante: a, kind: k) == target { return a } }
     return 0
 }
+
+func settleProbe() {
+    let b = BoardSpec.standard
+    var n = 0
+    for aim in [-0.4, 0, 0.3] { for i in 0...200 {
+        let r = simulateShot(Launch(power: Double(i)/200, aim: aim), on: .standard)
+        guard r.hole != .gutter, r.events.last != .dropped(r.hole), let last = r.path.last else { continue }
+        n += 1
+        if n <= 8 {
+            let p = Vec2(last.x, last.along - 2.4)
+            let h = b.holeCenter(r.hole)
+            print(r.hole, "rest", f2(p.x), f2(p.y), "hole", f2(h.x), f2(h.y), "d", String(format: "%.3f", (p - h).length), "t", f2(r.duration), r.events.suffix(2))
+        }
+    }}
+    print("settled:", n)
+}

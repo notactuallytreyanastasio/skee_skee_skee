@@ -29,6 +29,10 @@ public struct LaneSpec: Hashable, Sendable, Codable {
     public var maxSpeed = 5.0
     /// Release angle at aim = ±1.
     public var maxAimAngle = degrees(8)
+    /// Sideways acceleration (m/s²) at full spin while the ball is on the lane.
+    public var hook = 0.35
+    /// Fraction of release speed a fully jerky stroke loses.
+    public var skidLoss = 0.12
 
     public static let standard = LaneSpec()
 
@@ -107,6 +111,25 @@ public struct BoardSpec: Hashable, Sendable, Codable {
     public static let standard = BoardSpec()
 
     public var centerHole: Vec2 { ringCenter + centerHoleOffset }
+
+    /// Each ring's own hole sits at the bottom of the ring, where a ball
+    /// rolling down inside it comes to rest: one ball radius inside the
+    /// ring's outer wall. Together with the 50 they form a column below the
+    /// centre, as on a real cabinet.
+    public func holeCenter(_ hole: Hole) -> Vec2 {
+        switch hole {
+        case .ring50: return centerHole
+        case .ring40, .ring30, .ring20, .ring10:
+            let wall = ringWalls[Hole.byWallIndex.firstIndex(of: hole)!]
+            return Vec2(ringCenter.x, ringCenter.y - (wall - ballRadius))
+        case .pocketLeft: return pockets[0].center
+        case .pocketRight: return pockets[1].center
+        case .gutter: return Vec2(0, -0.1)
+        }
+    }
+
+    /// How close the ball's centre must be to a ring hole to fall in.
+    public var ringHoleRadius = 0.03
 
     /// Which ring zone a resting point is in, ignoring holes and pockets.
     public func zone(at p: Vec2) -> Hole {

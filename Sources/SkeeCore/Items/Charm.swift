@@ -68,7 +68,7 @@ public enum Charm: String, Hashable, Sendable, Codable, CaseIterable {
             let n = f.count { $0.hole == .ring50 }
             return n > 0 ? [.chips(40 * n)] : []
         case .gutterRat:
-            let n = f.count { $0.hole == .gutter }
+            let n = f.count { $0.hole == .gutter && !$0.foul }
             return n > 0 ? [.chips(25 * n)] : []
         case .evenSteven:
             return Set(f.balls.map(\.hole)).count == 1 && f.balls.count == 3 ? [.timesMult(2)] : []

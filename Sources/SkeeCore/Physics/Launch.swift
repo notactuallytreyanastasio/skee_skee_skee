@@ -12,13 +12,21 @@ public struct Launch: Hashable, Sendable, Codable {
     /// How far the device is folded: 0 = flat open, 1 = folded to the
     /// steepest ramp the game honours. Lofts the ball off the hinge.
     public let fold: Double
+    /// Side spin from a thumb that curves as it lets go: -1 hooks left,
+    /// 1 hooks right. The ball curves on the lane.
+    public let spin: Double
+    /// How jerky the stroke was, 0 smooth to 1 ragged. A jerky release
+    /// skids the ball and costs speed, as a bad throw does.
+    public let skid: Double
 
-    public init(power: Double, aim: Double, start: Double = 0, fold: Double = 0) {
+    public init(power: Double, aim: Double, start: Double = 0, fold: Double = 0, spin: Double = 0, skid: Double = 0) {
         self.power = clamp(power, 0, 1)
         self.aim = clamp(aim, -1, 1)
         self.start = clamp(start, -1, 1)
         self.fold = clamp(fold, 0, 1)
+        self.spin = clamp(spin, -1, 1)
+        self.skid = clamp(skid, 0, 1)
     }
 
-    public var mirrored: Launch { Launch(power: power, aim: -aim, start: -start, fold: fold) }
+    public var mirrored: Launch { Launch(power: power, aim: -aim, start: -start, fold: fold, spin: -spin, skid: skid) }
 }

@@ -71,6 +71,8 @@ public struct Presentation: Sendable {
         var spun = false
         for event in step.events {
             switch event {
+            case .fouled:
+                beats.append(.banner("FOUL", sub: "thumb past the crease", seconds: 1.0))
             case .shot(let r, let b):
                 beats.append(.roll(r, b))
             case .frameScored(let f):

@@ -6,10 +6,12 @@ public struct BallRecord: Hashable, Sendable, Codable {
     public var chips: Int
     public var rattles: Int
     public var fold: Double
+    /// The thumb crossed the crease: the ball never counted.
+    public var foul: Bool
 
-    public init(hole: Hole, symbol: Symbol, chips: Int, rattles: Int = 0, fold: Double = 0) {
+    public init(hole: Hole, symbol: Symbol, chips: Int, rattles: Int = 0, fold: Double = 0, foul: Bool = false) {
         self.hole = hole; self.symbol = symbol; self.chips = chips
-        self.rattles = rattles; self.fold = fold
+        self.rattles = rattles; self.fold = fold; self.foul = foul
     }
 
     public var scored: Bool { hole != .gutter }

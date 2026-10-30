@@ -59,6 +59,8 @@ public struct RunStats: Hashable, Sendable, Codable {
 
 public enum Action: Hashable, Sendable, Codable {
     case throwBall(Launch)
+    /// The thumb touched past the crease. The ball is spent, scores nothing.
+    case foul
     /// Arm the power-up at this inventory index for the next throw.
     case arm(Int)
     /// Buy offer at index; stamps and gilds need a target hole.
@@ -90,6 +92,7 @@ extension RunState {
 /// Things the shell should show or play. Order is the order they happened.
 public enum GameEvent: Hashable, Sendable {
     case shot(ShotResult, BallRecord)
+    case fouled
     case frameScored(FrameScore)
     case feverLit
     case roundCleared(score: Int, target: Int, payout: Payout)

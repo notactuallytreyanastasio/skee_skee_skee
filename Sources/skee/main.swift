@@ -68,5 +68,6 @@ case "balance": balanceCommand()
 case "bot": botCommand()
 case "render": renderCommand()
 case "film": filmCommand()
+case "settleprobe": settleProbe()
 default: print(usage); exit(1)
 }

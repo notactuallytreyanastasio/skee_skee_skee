@@ -94,3 +94,20 @@ struct PhysicsTests {
         #expect(l == Launch(power: 1, aim: -1, start: 1, fold: 0))
     }
 }
+
+@Suite("Power curve")
+struct PowerCurveTests {
+    @Test func powerAndSpeedInvert() {
+        let lane = LaneSpec.standard
+        for p in stride(from: 0.0, through: 1.0, by: 0.05) {
+            #expect(abs(lane.power(forSpeed: lane.releaseSpeed(power: p)) - p) < 1e-9)
+        }
+    }
+
+    @Test func mostOfThePowerRangeIsSpentWhereBallsScore() {
+        let lane = LaneSpec.standard
+        #expect(lane.releaseSpeed(power: 0) == lane.minSpeed)
+        #expect(lane.releaseSpeed(power: lane.knee) == lane.scoringSpeed)
+        #expect(lane.knee < 0.2)
+    }
+}

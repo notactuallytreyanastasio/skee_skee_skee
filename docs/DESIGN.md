@@ -199,7 +199,7 @@ line; after your thumb lifts, the shot fires from the whole motion
   **Line**: where across the lane you flicked.
 - **foul**: only a drag 140 pt past the crease. Flicks overshoot naturally.
 
-Calibrated with `skee flickprobe` on minimum-jerk flicks: power runs from 300
+Power maps to release speed in two parts: the bottom 12% ramps from a dud (2.0 m/s) to the first scoring speed (3.0), the rest covers 3.0-4.5, so most of the flick is spent where balls score; the 40 and 50 take 9% and 11% of power, twice what a linear 2-5 m/s gave. Calibrated with `skee flickprobe` on minimum-jerk flicks: power runs from 300
 to 3100 pt/s effective speed (lift-off and peak speed weighted evenly); smooth flicks measure jerk 2-8, shaky ones
 10-15. A gauge on the right of the lane marks each recent throw's power,
 coloured by where it went, so the flick can be learned.

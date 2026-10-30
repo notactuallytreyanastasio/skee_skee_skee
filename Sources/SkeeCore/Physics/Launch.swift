@@ -45,7 +45,7 @@ public struct Launch: Hashable, Sendable, Codable {
         let lane = LaneSpec.standard
         self.speed = clamp(speed, 0, lane.maxSpeed * 1.3)
         self.from = clamp(from, 0, lane.length - 0.05)
-        self.power = clamp((self.speed - lane.minSpeed) / (lane.maxSpeed - lane.minSpeed), 0, 1)
+        self.power = lane.power(forSpeed: self.speed)
         self.aim = clamp(aim, -1, 1)
         self.start = clamp(start, -1, 1)
         self.fold = clamp(fold, 0, 1)

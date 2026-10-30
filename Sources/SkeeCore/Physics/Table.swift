@@ -24,9 +24,15 @@ public struct LaneSpec: Hashable, Sendable, Codable {
     public var incline = degrees(6)
     public var rollingFriction = 0.02
     public var railRestitution = 0.6
-    /// Ball speed at power 0 and power 1.
+    /// Ball speed at power 0 and power 1, and the speed where scoring
+    /// starts. Below `knee` power the speed ramps up from a dud; above it,
+    /// the remaining power covers only the speeds that reach the board.
+    /// A linear 2-5 m/s spent a third of the flick on duds and backwall
+    /// slams and left the 40 a 5% window.
     public var minSpeed = 2.0
-    public var maxSpeed = 5.0
+    public var scoringSpeed = 3.0
+    public var maxSpeed = 4.5
+    public var knee = 0.12
     /// Release angle at aim = ±1.
     public var maxAimAngle = degrees(8)
     /// Sideways acceleration (m/s²) at full spin while the ball is on the lane.
@@ -37,7 +43,17 @@ public struct LaneSpec: Hashable, Sendable, Codable {
     public static let standard = LaneSpec()
 
     public func releaseSpeed(power: Double) -> Double {
-        minSpeed + power * (maxSpeed - minSpeed)
+        power < knee
+            ? minSpeed + power / knee * (scoringSpeed - minSpeed)
+            : scoringSpeed + (power - knee) / (1 - knee) * (maxSpeed - scoringSpeed)
+    }
+
+    /// The inverse of `releaseSpeed`, clamped to 0...1.
+    public func power(forSpeed v: Double) -> Double {
+        let p = v < scoringSpeed
+            ? (v - minSpeed) / (scoringSpeed - minSpeed) * knee
+            : knee + (v - scoringSpeed) / (maxSpeed - scoringSpeed) * (1 - knee)
+        return clamp(p, 0, 1)
     }
 }
 

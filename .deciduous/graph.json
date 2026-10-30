@@ -70,6 +70,16 @@
       "to_change_id": "89ce6e47-d9c9-4c86-afa2-648418fef3c8",
       "weight": 1.0
     },
+    "0d37424c46b6420ec203": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T17:44:14.289637-04:00",
+      "edge_id": "0d37424c46b6420ec203",
+      "edge_type": "leads_to",
+      "from_change_id": "353833fe-5d1e-4abe-8939-06b00ece291a",
+      "rationale": "implementation",
+      "to_change_id": "00306ae2-4254-4a5d-b103-09908862e6e5",
+      "weight": 1.0
+    },
     "147eccdcc92bf3993d0d": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:03:20.678906-04:00",
@@ -88,6 +98,16 @@
       "from_change_id": "59f8fb99-74c2-4375-9887-b325a620e006",
       "rationale": "input option",
       "to_change_id": "f2f92f3d-42b5-4b70-953c-eee8befe8b53",
+      "weight": 1.0
+    },
+    "18f843810c2c020e9aa5": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T17:44:13.541567-04:00",
+      "edge_id": "18f843810c2c020e9aa5",
+      "edge_type": "leads_to",
+      "from_change_id": "d5ed0148-6b86-4334-9827-0d5d6f4b022b",
+      "rationale": "approach",
+      "to_change_id": "f1ec666a-62ce-4658-8129-e71d54ff71c4",
       "weight": 1.0
     },
     "1a8fa2420cecc9155989": {
@@ -138,6 +158,16 @@
       "from_change_id": "a288fb15-4cf7-49f5-a576-26b2dae7df2b",
       "rationale": "port",
       "to_change_id": "7664f313-91e5-48dc-8aba-c5bbbc8ecf7b",
+      "weight": 1.0
+    },
+    "2b7b722c9f309108995b": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T17:44:13.777975-04:00",
+      "edge_id": "2b7b722c9f309108995b",
+      "edge_type": "leads_to",
+      "from_change_id": "d5ed0148-6b86-4334-9827-0d5d6f4b022b",
+      "rationale": "tried",
+      "to_change_id": "175653b3-d355-45bf-872c-aaa7b353f4eb",
       "weight": 1.0
     },
     "2e03faf37251bfc846fc": {
@@ -318,6 +348,16 @@
       "from_change_id": "b321742b-db07-4936-bd77-d68386e32c17",
       "rationale": "approach",
       "to_change_id": "42862e1f-5d1d-432b-9ed8-e3750779fb5c",
+      "weight": 1.0
+    },
+    "5e15e69106f49556c520": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T17:44:14.524542-04:00",
+      "edge_id": "5e15e69106f49556c520",
+      "edge_type": "leads_to",
+      "from_change_id": "00306ae2-4254-4a5d-b103-09908862e6e5",
+      "rationale": "result",
+      "to_change_id": "41cf2595-2b38-4939-acbd-2cace58b859e",
       "weight": 1.0
     },
     "5ef801381a44daef01eb": {
@@ -770,6 +810,16 @@
       "to_change_id": "8a5677af-964c-45d7-a327-ebd4e4ff1174",
       "weight": 1.0
     },
+    "c3c20e87afcfb4874c9e": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T17:44:14.005550-04:00",
+      "edge_id": "c3c20e87afcfb4874c9e",
+      "edge_type": "leads_to",
+      "from_change_id": "f1ec666a-62ce-4658-8129-e71d54ff71c4",
+      "rationale": "chosen",
+      "to_change_id": "353833fe-5d1e-4abe-8939-06b00ece291a",
+      "weight": 1.0
+    },
     "c58575db0d48d1074434": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:03:19.834018-04:00",
@@ -1004,6 +1054,20 @@
     }
   },
   "nodes": {
+    "00306ae2-4254-4a5d-b103-09908862e6e5": {
+      "author": "Bobby Grayson",
+      "change_id": "00306ae2-4254-4a5d-b103-09908862e6e5",
+      "created_at": "2026-10-30T17:44:14.167236-04:00",
+      "metadata": {
+        "branch": "main",
+        "commit": "e9e69d17ccd6f3e3a7f55d8c54e3a16af88187f2",
+        "confidence": 85
+      },
+      "node_type": "action",
+      "status": "pending",
+      "title": "LaneSpec knee curve (2.0 -> 3.0 over 12%, 3.0 -> 4.5 over rest) with inverse and tests",
+      "updated_at": "2026-10-30T17:44:14.167236-04:00"
+    },
     "02fb2fc0-a2ef-4611-b398-dd2e76e68e42": {
       "author": "Bobby Grayson",
       "change_id": "02fb2fc0-a2ef-4611-b398-dd2e76e68e42",
@@ -1110,6 +1174,19 @@
       "status": "pending",
       "title": "iPhone Duo inner display is 669x951pt portrait; hinge runs horizontally across the middle; UIHingeInteraction reports hinge angle (iOS 27.1)",
       "updated_at": "2026-10-30T08:02:53.577656-04:00"
+    },
+    "175653b3-d355-45bf-872c-aaa7b353f4eb": {
+      "author": "Bobby Grayson",
+      "change_id": "175653b3-d355-45bf-872c-aaa7b353f4eb",
+      "created_at": "2026-10-30T17:44:13.662003-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 40
+      },
+      "node_type": "option",
+      "status": "pending",
+      "title": "Plain narrower linear range 3.0-4.5 (loses duds: every flick clears the hump)",
+      "updated_at": "2026-10-30T17:44:13.662003-04:00"
     },
     "1a1e1f41-c265-438d-bd52-66b72504c694": {
       "author": "Bobby Grayson",
@@ -1231,6 +1308,19 @@
       "title": "Shared CoreGraphics renderer (SkeeRender) driven by a pure scene description; one style per ante pair: pixel, cel, 3D, vector neon",
       "updated_at": "2026-10-30T08:13:19.231522-04:00"
     },
+    "353833fe-5d1e-4abe-8939-06b00ece291a": {
+      "author": "Bobby Grayson",
+      "change_id": "353833fe-5d1e-4abe-8939-06b00ece291a",
+      "created_at": "2026-10-30T17:44:13.896178-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 80
+      },
+      "node_type": "decision",
+      "status": "pending",
+      "title": "Two-part curve keeps duds and doubles windows",
+      "updated_at": "2026-10-30T17:44:13.896178-04:00"
+    },
     "37b6071b-f2b2-45ab-a9ce-7cbba2ac6049": {
       "author": "Bobby Grayson",
       "change_id": "37b6071b-f2b2-45ab-a9ce-7cbba2ac6049",
@@ -1272,6 +1362,19 @@
       "status": "pending",
       "title": "Redo the presentation layer: must look and feel like real skee-ball, holes in every ring, good graphics",
       "updated_at": "2026-10-30T09:02:17.040862-04:00"
+    },
+    "41cf2595-2b38-4939-acbd-2cace58b859e": {
+      "author": "Bobby Grayson",
+      "change_id": "41cf2595-2b38-4939-acbd-2cace58b859e",
+      "created_at": "2026-10-30T17:44:14.409049-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 75
+      },
+      "node_type": "outcome",
+      "status": "pending",
+      "title": "Windows ~1.8x wider (40: 5->9.2%, 50: 6.7->11.3%); 126 tests pass; not installed, Duo unavailable",
+      "updated_at": "2026-10-30T17:44:14.409049-04:00"
     },
     "422bc003-1535-4084-b9cc-90ab97f96aa6": {
       "author": "Bobby Grayson",
@@ -2072,6 +2175,20 @@
       "title": "Wallet/Prize core with tests, procedural prize art, PrizeShopView, title shelf, game over winnings, wallet.json",
       "updated_at": "2026-10-30T17:10:39.134927-04:00"
     },
+    "d5ed0148-6b86-4334-9827-0d5d6f4b022b": {
+      "author": "Bobby Grayson",
+      "change_id": "d5ed0148-6b86-4334-9827-0d5d6f4b022b",
+      "created_at": "2026-10-30T17:44:13.278042-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 80,
+        "prompt": "its still a little too had to land the shots"
+      },
+      "node_type": "goal",
+      "status": "pending",
+      "title": "Make shots easier to land",
+      "updated_at": "2026-10-30T17:44:13.278042-04:00"
+    },
     "d659e919-a722-48f5-b681-a782478d41b1": {
       "author": "Bobby Grayson",
       "change_id": "d659e919-a722-48f5-b681-a782478d41b1",
@@ -2152,6 +2269,19 @@
       "status": "pending",
       "title": "Marquee spins at release and settles mid-flight (pure luck relative to aim)",
       "updated_at": "2026-10-30T17:01:19.966396-04:00"
+    },
+    "f1ec666a-62ce-4658-8129-e71d54ff71c4": {
+      "author": "Bobby Grayson",
+      "change_id": "f1ec666a-62ce-4658-8129-e71d54ff71c4",
+      "created_at": "2026-10-30T17:44:13.422636-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 80
+      },
+      "node_type": "option",
+      "status": "pending",
+      "title": "Two-part power curve: 12% ramp from dud to scoring speed, rest over 3.0-4.5 m/s instead of linear 2-5",
+      "updated_at": "2026-10-30T17:44:13.422636-04:00"
     },
     "f2688b2e-0cb1-454b-b272-5723aeb69126": {
       "author": "Bobby Grayson",

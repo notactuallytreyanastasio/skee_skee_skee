@@ -1,0 +1,282 @@
+{
+  "edges": {
+    "147eccdcc92bf3993d0d": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T08:03:20.678906-04:00",
+      "edge_id": "147eccdcc92bf3993d0d",
+      "edge_type": "leads_to",
+      "from_change_id": "212544ce-6851-480c-9842-78d18bf43b6e",
+      "rationale": "rejected",
+      "to_change_id": "43a5276f-85c8-4c9d-a21f-498506d74a17",
+      "weight": 1.0
+    },
+    "2027936827bf5a41b7d0": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T08:03:20.203005-04:00",
+      "edge_id": "2027936827bf5a41b7d0",
+      "edge_type": "leads_to",
+      "from_change_id": "067bae9a-b27a-440e-abe6-cb95c2d438c9",
+      "rationale": "reward mechanic",
+      "to_change_id": "212544ce-6851-480c-9842-78d18bf43b6e",
+      "weight": 1.0
+    },
+    "2f1fff41bad058e78d35": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T08:03:19.723622-04:00",
+      "edge_id": "2f1fff41bad058e78d35",
+      "edge_type": "leads_to",
+      "from_change_id": "1afb7e6c-31de-41fa-b093-dec2f9bcde14",
+      "rationale": "chosen",
+      "to_change_id": "0477e2ee-f304-44f9-914d-a38324e2d568",
+      "weight": 1.0
+    },
+    "39a151798cf9995fb53d": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T08:03:18.526091-04:00",
+      "edge_id": "39a151798cf9995fb53d",
+      "edge_type": "leads_to",
+      "from_change_id": "067bae9a-b27a-440e-abe6-cb95c2d438c9",
+      "rationale": "platform approach",
+      "to_change_id": "04665092-244c-4c16-9160-39cfed52723a",
+      "weight": 1.0
+    },
+    "6717f314f98db5c39427": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T08:03:18.881996-04:00",
+      "edge_id": "6717f314f98db5c39427",
+      "edge_type": "leads_to",
+      "from_change_id": "04665092-244c-4c16-9160-39cfed52723a",
+      "rationale": "chosen",
+      "to_change_id": "eb182f5e-5636-4d11-9268-d292a500d748",
+      "weight": 1.0
+    },
+    "67f1538fb837be2bdd79": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T08:03:20.318299-04:00",
+      "edge_id": "67f1538fb837be2bdd79",
+      "edge_type": "leads_to",
+      "from_change_id": "067bae9a-b27a-440e-abe6-cb95c2d438c9",
+      "rationale": "reward mechanic",
+      "to_change_id": "fb8961bc-ce84-4d5d-93aa-53441619dd83",
+      "weight": 1.0
+    },
+    "818036fb7ac2aca83d28": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T08:03:18.639514-04:00",
+      "edge_id": "818036fb7ac2aca83d28",
+      "edge_type": "leads_to",
+      "from_change_id": "067bae9a-b27a-440e-abe6-cb95c2d438c9",
+      "rationale": "platform approach",
+      "to_change_id": "8a0c0787-8e53-414d-abb3-7a21bb4db862",
+      "weight": 1.0
+    },
+    "8e5bb1c558160ecc5836": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T08:03:19.371602-04:00",
+      "edge_id": "8e5bb1c558160ecc5836",
+      "edge_type": "leads_to",
+      "from_change_id": "067bae9a-b27a-440e-abe6-cb95c2d438c9",
+      "rationale": "physics approach",
+      "to_change_id": "4b68f760-81f5-4aa1-b5c9-60a714238ba0",
+      "weight": 1.0
+    },
+    "b73eb76ce6a66b43221a": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T08:03:19.000449-04:00",
+      "edge_id": "b73eb76ce6a66b43221a",
+      "edge_type": "leads_to",
+      "from_change_id": "8a0c0787-8e53-414d-abb3-7a21bb4db862",
+      "rationale": "rejected: no hinge API",
+      "to_change_id": "eb182f5e-5636-4d11-9268-d292a500d748",
+      "weight": 1.0
+    },
+    "c58575db0d48d1074434": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T08:03:19.834018-04:00",
+      "edge_id": "c58575db0d48d1074434",
+      "edge_type": "leads_to",
+      "from_change_id": "4b68f760-81f5-4aa1-b5c9-60a714238ba0",
+      "rationale": "rejected",
+      "to_change_id": "0477e2ee-f304-44f9-914d-a38324e2d568",
+      "weight": 1.0
+    },
+    "d2ef3ea75ab8e8de7791": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T08:02:53.705333-04:00",
+      "edge_id": "d2ef3ea75ab8e8de7791",
+      "edge_type": "leads_to",
+      "from_change_id": "067bae9a-b27a-440e-abe6-cb95c2d438c9",
+      "rationale": "Platform constraint shaping the layout: lane below hinge, board above",
+      "to_change_id": "1193e010-180a-479c-80ca-e49adc3d6281",
+      "weight": 1.0
+    },
+    "e79e6535aaf0daf0c599": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T08:03:20.561432-04:00",
+      "edge_id": "e79e6535aaf0daf0c599",
+      "edge_type": "leads_to",
+      "from_change_id": "fb8961bc-ce84-4d5d-93aa-53441619dd83",
+      "rationale": "chosen",
+      "to_change_id": "43a5276f-85c8-4c9d-a21f-498506d74a17",
+      "weight": 1.0
+    },
+    "eeb4c66a216df9c37118": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T08:03:19.482958-04:00",
+      "edge_id": "eeb4c66a216df9c37118",
+      "edge_type": "leads_to",
+      "from_change_id": "067bae9a-b27a-440e-abe6-cb95c2d438c9",
+      "rationale": "physics approach",
+      "to_change_id": "1afb7e6c-31de-41fa-b093-dec2f9bcde14",
+      "weight": 1.0
+    }
+  },
+  "nodes": {
+    "04665092-244c-4c16-9160-39cfed52723a": {
+      "author": "Bobby Grayson",
+      "change_id": "04665092-244c-4c16-9160-39cfed52723a",
+      "created_at": "2026-10-30T08:03:18.282316-04:00",
+      "description": "Core is testable with swift test on macOS; app gets UIHingeInteraction; CLI reuses core for bots and rendering.",
+      "metadata": {
+        "confidence": 85
+      },
+      "node_type": "option",
+      "status": "pending",
+      "title": "Native Swift: pure SkeeCore package + SwiftUI iOS shell + macOS CLI tools",
+      "updated_at": "2026-10-30T08:03:18.282316-04:00"
+    },
+    "0477e2ee-f304-44f9-914d-a38324e2d568": {
+      "author": "Bobby Grayson",
+      "change_id": "0477e2ee-f304-44f9-914d-a38324e2d568",
+      "created_at": "2026-10-30T08:03:19.609286-04:00",
+      "description": "Repeatability is a requirement; 'edge' comes from lips and narrow sweet spots, not from randomness.",
+      "metadata": {
+        "confidence": 85
+      },
+      "node_type": "decision",
+      "status": "pending",
+      "title": "Write own deterministic physics as pure functions",
+      "updated_at": "2026-10-30T08:03:19.609286-04:00"
+    },
+    "067bae9a-b27a-440e-abe6-cb95c2d438c9": {
+      "author": "Bobby Grayson",
+      "change_id": "067bae9a-b27a-440e-abe6-cb95c2d438c9",
+      "created_at": "2026-10-30T08:01:57.409468-04:00",
+      "metadata": {
+        "confidence": 85,
+        "prompt": "lets make a skeeball roguelike\n\nit will be for iphone duo\n\nyou launch the ball over the hinge, which is the ridge at the start of the game\n\nlook at slot machine roguelike reward mechanics and base the gamemplay around those\n\nemphasize FUN\n\nskeball is FUN\n\nphysics should be repeatable and have an edge to it as you go but not become impossible\n\nseek inspo from ballatro too\n\nBuild tools to test and play teh game yourself to judge it\n\nyou want to emphasize bu ilding with a functional core and imperative shell, use your types well and use TDD\n\ndocument everything\n\nkeep deciduous very current"
+      },
+      "node_type": "goal",
+      "status": "pending",
+      "title": "Skee-ball roguelike for iPhone Duo",
+      "updated_at": "2026-10-30T08:01:57.409468-04:00"
+    },
+    "1193e010-180a-479c-80ca-e49adc3d6281": {
+      "author": "Bobby Grayson",
+      "change_id": "1193e010-180a-479c-80ca-e49adc3d6281",
+      "created_at": "2026-10-30T08:02:53.577656-04:00",
+      "metadata": {
+        "confidence": 75,
+        "prompt": "Derived from simdevicetype profile: outer 466x678pt, inner 669x951pt @3x. Half of inner (669x475) rotated matches outer, so the fold line crosses the inner display's native portrait at y=475pt. UIKit/UIHinge.h gives status + angle in radians."
+      },
+      "node_type": "observation",
+      "status": "pending",
+      "title": "iPhone Duo inner display is 669x951pt portrait; hinge runs horizontally across the middle; UIHingeInteraction reports hinge angle (iOS 27.1)",
+      "updated_at": "2026-10-30T08:02:53.577656-04:00"
+    },
+    "1afb7e6c-31de-41fa-b093-dec2f9bcde14": {
+      "author": "Bobby Grayson",
+      "change_id": "1afb7e6c-31de-41fa-b093-dec2f9bcde14",
+      "created_at": "2026-10-30T08:03:19.258512-04:00",
+      "description": "Pure function of (Launch, Modifiers); 240Hz fixed step; same input same result.",
+      "metadata": {
+        "confidence": 85
+      },
+      "node_type": "option",
+      "status": "pending",
+      "title": "Custom fixed-step deterministic ball sim in the core (lane -> hinge launch -> flight -> board with ring lips)",
+      "updated_at": "2026-10-30T08:03:19.258512-04:00"
+    },
+    "212544ce-6851-480c-9842-78d18bf43b6e": {
+      "author": "Bobby Grayson",
+      "change_id": "212544ce-6851-480c-9842-78d18bf43b6e",
+      "created_at": "2026-10-30T08:03:19.954501-04:00",
+      "description": "Bolted on; skill doesn't touch it.",
+      "metadata": {
+        "confidence": 40
+      },
+      "node_type": "option",
+      "status": "pending",
+      "title": "Slot reward as a separate spin after each round",
+      "updated_at": "2026-10-30T08:03:19.954501-04:00"
+    },
+    "43a5276f-85c8-4c9d-a21f-498506d74a17": {
+      "author": "Bobby Grayson",
+      "change_id": "43a5276f-85c8-4c9d-a21f-498506d74a17",
+      "created_at": "2026-10-30T08:03:20.448981-04:00",
+      "description": "Ties slot-machine reward loop directly to the skee-ball skill.",
+      "metadata": {
+        "confidence": 85
+      },
+      "node_type": "decision",
+      "status": "pending",
+      "title": "Holes are reels: aim picks symbols, 3-ball frame resolves as a slot payline",
+      "updated_at": "2026-10-30T08:03:20.448981-04:00"
+    },
+    "4b68f760-81f5-4aa1-b5c9-60a714238ba0": {
+      "author": "Bobby Grayson",
+      "change_id": "4b68f760-81f5-4aa1-b5c9-60a714238ba0",
+      "created_at": "2026-10-30T08:03:19.132134-04:00",
+      "description": "Not deterministic across frame rates; cannot run headless in tests.",
+      "metadata": {
+        "confidence": 30
+      },
+      "node_type": "option",
+      "status": "pending",
+      "title": "Use SpriteKit physics engine",
+      "updated_at": "2026-10-30T08:03:19.132134-04:00"
+    },
+    "8a0c0787-8e53-414d-abb3-7a21bb4db862": {
+      "author": "Bobby Grayson",
+      "change_id": "8a0c0787-8e53-414d-abb3-7a21bb4db862",
+      "created_at": "2026-10-30T08:03:18.411212-04:00",
+      "description": "Fast iteration but no hinge API, weaker iPhone feel.",
+      "metadata": {
+        "confidence": 40
+      },
+      "node_type": "option",
+      "status": "pending",
+      "title": "Web/TypeScript PWA running in Safari",
+      "updated_at": "2026-10-30T08:03:18.411212-04:00"
+    },
+    "eb182f5e-5636-4d11-9268-d292a500d748": {
+      "author": "Bobby Grayson",
+      "change_id": "eb182f5e-5636-4d11-9268-d292a500d748",
+      "created_at": "2026-10-30T08:03:18.766901-04:00",
+      "description": "Hinge API is UIKit-only; Swift Testing for TDD; same core drives app, CLI player and balance bots.",
+      "metadata": {
+        "confidence": 85
+      },
+      "node_type": "decision",
+      "status": "pending",
+      "title": "Build in native Swift with functional core / imperative shell split",
+      "updated_at": "2026-10-30T08:03:18.766901-04:00"
+    },
+    "fb8961bc-ce84-4d5d-93aa-53441619dd83": {
+      "author": "Bobby Grayson",
+      "change_id": "fb8961bc-ce84-4d5d-93aa-53441619dd83",
+      "created_at": "2026-10-30T08:03:20.084018-04:00",
+      "description": "Luck be a Landlord symbol-building without its dilution problem: you choose which symbols you hit. Balatro chips x mult scoring, CloverPit-style deadlines and two currencies.",
+      "metadata": {
+        "confidence": 85
+      },
+      "node_type": "option",
+      "status": "pending",
+      "title": "Board holes carry reel symbols; every 3 balls is a payline the player aims (skill-picked reel stops)",
+      "updated_at": "2026-10-30T08:03:20.084018-04:00"
+    }
+  },
+  "tags": {},
+  "themes": {},
+  "version": 1
+}

@@ -1,0 +1,11 @@
+# Deciduous: local database stays private, the shared graph is tracked
+.deciduous/*
+!.deciduous/config.toml
+!.deciduous/graph.json
+.build/
+.swiftpm/
+*.xcodeproj/
+xcuserdata/
+DerivedData/
+.prs/
+/out/

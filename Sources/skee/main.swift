@@ -20,11 +20,10 @@ skee — play and measure Skee Skee Skee from the terminal
       Monte Carlo bot runs with fun metrics.
   skee bot <seed> [--skill name]
       Narrate one bot run round by round.
-  skee render [--save run.json] [--out f.png] [--t secs | --settle] [--style pixel|cel|depth|neon]
-              [--title] [--fold f] [--select offer] [--drag x0,y0,x1,y1]
-      Draw a frame exactly as the app would, at the iPhone Duo inner display size.
-  skee film [--save run.json] [--out f.png] [--frames n] [--dt secs] [--cols n] [--scale k]
-      Contact sheet of the last action's animation.
+  skee scene [--seed n] [--out f.png] [--size outer]
+      Render the 3D cabinet as the app shows it, at the Duo inner display size.
+  skee scenefilm [--save run.json] [--from secs] [--frames n] [--dt secs] [--cols n] [--scale k]
+      Contact sheet of the last action's animation in 3D.
 """
 
 let argv = Array(CommandLine.arguments.dropFirst())
@@ -66,8 +65,8 @@ case "windows": windowsCommand()
 case "play": playCommand()
 case "balance": balanceCommand()
 case "bot": botCommand()
-case "render": renderCommand()
-case "film": filmCommand()
 case "settleprobe": settleProbe()
+case "scene": MainActor.assumeIsolated { sceneCommand() }
+case "scenefilm": MainActor.assumeIsolated { sceneFilmCommand() }
 default: print(usage); exit(1)
 }

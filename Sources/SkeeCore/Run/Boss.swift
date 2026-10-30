@@ -23,7 +23,7 @@ public enum Boss: String, Hashable, Sendable, Codable, CaseIterable {
         case .miser: "The 50 hole pays no chips."
         case .shortHand: "One frame fewer this round."
         case .tightPockets: "The 50 hole and the 100 pockets shrink."
-        case .theHouse: "Paylines pay nothing. Only chips and charms count."
+        case .theHouse: "Pairs pay nothing. Only three of a kind counts."
         }
     }
 
@@ -37,7 +37,7 @@ public enum Boss: String, Hashable, Sendable, Codable, CaseIterable {
         case .slickLane:
             t.lane.rollingFriction *= 0.3
         case .crosswind:
-            t.board.wind = Vec2(0.6, 0)
+            t.board.wind = Vec2(0.4, 0)
         case .tightPockets:
             t.board.centerHoleRadius *= 0.85
             t.board.pockets = t.board.pockets.map { p in var q = p; q.radius *= 0.75; return q }
@@ -48,6 +48,6 @@ public enum Boss: String, Hashable, Sendable, Codable, CaseIterable {
     }
 
     var frameDelta: Int { self == .shortHand ? -1 : 0 }
-    var paylinesPay: Bool { self != .theHouse }
-    func chips(for hole: Hole, base: Int) -> Int { self == .miser && hole == .ring50 ? 0 : base }
+    var pairsPay: Bool { self != .theHouse }
+    public func chips(for hole: Hole, base: Int) -> Int { self == .miser && hole == .ring50 ? 0 : base }
 }

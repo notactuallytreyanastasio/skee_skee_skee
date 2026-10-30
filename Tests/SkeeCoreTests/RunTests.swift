@@ -137,9 +137,23 @@ struct PrizeCounterTests {
         #expect(throws: ActionError.slotsFull) { try apply(.buy(0, target: nil), to: s).get() }
     }
 
-    @Test func stampRewritesAHoleSymbol() throws {
-        let s = try apply(.buy(0, target: .ring40), to: atCounter([.stamp(.seven)])).get().state
-        #expect(s.setup.symbol(for: .ring40) == .seven)
+    @Test func stampAddsASymbolToAReel() throws {
+        let before = atCounter([.stamp(.seven)])
+        let s = try apply(.buy(0, target: .ring40), to: before).get().state
+        #expect(s.setup.reel(.ring40) == before.setup.reel(.ring40) + [.seven])
+    }
+
+    @Test func purgeRemovesTheShowingSymbol() throws {
+        var before = atCounter([.purge])
+        before.stops[.ring10] = 2 // lemon on the standard 10 reel
+        let s = try apply(.buy(0, target: .ring10), to: before).get().state
+        #expect(s.setup.reel(.ring10) == [.cherry, .cherry, .cherry, .bell])
+    }
+
+    @Test func purgeLeavesAtLeastOneSymbol() {
+        var before = atCounter([.purge])
+        before.setup.reels[.ring10] = [.cherry]
+        #expect(throws: ActionError.reelTooShort) { try apply(.buy(0, target: .ring10), to: before).get() }
     }
 
     @Test func stampNeedsATarget() {
@@ -175,6 +189,38 @@ struct PrizeCounterTests {
         s.round.target = 1
         for _ in 0..<9 { s = try! apply(.throwBall(launch(for: .ring10)), to: s).get().state }
         return s
+    }
+}
+
+@Suite("Reels")
+struct ReelTests {
+    @Test func ballTakesTheSymbolShowingWhenThrown() throws {
+        let s = newRun(seed: 11)
+        let showing = s.showing(.ring30)
+        let (after, _) = try throwing(s, .ring30)
+        #expect(after.round.currentBalls[0].symbol == showing)
+    }
+
+    @Test func reelsSpinAfterEveryBallDeterministically() throws {
+        var a = newRun(seed: 12), b = newRun(seed: 12)
+        var changed = false
+        for _ in 0..<6 {
+            let before = a.stops
+            (a, _) = try throwing(a, .ring10)
+            (b, _) = try throwing(b, .ring10)
+            #expect(a.stops == b.stops)
+            if a.stops != before { changed = true }
+        }
+        #expect(changed)
+    }
+
+    @Test func holdKeepsTheReelsStill() throws {
+        var s = newRun(seed: 13)
+        s.powerUps = [.hold]
+        s = try apply(.arm(0), to: s).get().state
+        let before = s.stops
+        let (after, _) = try throwing(s, .ring20)
+        #expect(after.stops == before)
     }
 }
 

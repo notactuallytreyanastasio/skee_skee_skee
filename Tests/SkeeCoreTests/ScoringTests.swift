@@ -3,7 +3,7 @@ import Testing
 
 func ball(_ hole: Hole, _ symbol: Symbol? = nil, rattles: Int = 0, fold: Double = 0,
           setup: BoardSetup = .standard) -> BallRecord {
-    BallRecord(hole: hole, symbol: symbol ?? setup.symbol(for: hole),
+    BallRecord(hole: hole, symbol: symbol ?? setup.homeSymbol(for: hole),
                chips: setup.chips(for: hole), rattles: rattles, fold: fold)
 }
 

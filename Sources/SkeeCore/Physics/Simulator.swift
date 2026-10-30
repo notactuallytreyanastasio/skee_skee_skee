@@ -32,6 +32,7 @@ private struct ShotSim {
     var hingeSpeed: Double?
     var firstLanding: Vec2?
     var peak = 0.0
+    var touchedWall = false
 
     init(launch: Launch, table: Table) {
         self.launch = launch
@@ -142,15 +143,17 @@ private struct ShotSim {
             if abs(p.x) > halfBoard {
                 p.x = p.x > 0 ? halfBoard : -halfBoard
                 v.x = -v.x * board.wallRestitution
+                touchedWall = true
             }
             if p.y > back {
                 p.y = back
                 v.y = -abs(v.y) * board.backwallRestitution
+                touchedWall = true
                 events.append(.backwall)
             }
             t += dt; step += 1
 
-            if z < r * 0.5, v.length <= board.captureSpeed, let hole = holeUnder(p) {
+            if z < r * 0.5, v.length <= board.captureSpeed, let hole = holeUnder(p, cleanFlight: firstLanding == nil && !touchedWall) {
                 if firstLanding == nil { firstLanding = p }
                 record(.board, p.x, lane.length + p.y, 0, force: true)
                 events.append(.dropped(hole))
@@ -206,9 +209,9 @@ private struct ShotSim {
         return (p, v)
     }
 
-    func holeUnder(_ p: Vec2) -> Hole? {
+    func holeUnder(_ p: Vec2, cleanFlight: Bool) -> Hole? {
         if (p - board.centerHole).length < board.centerHoleRadius { return .ring50 }
-        for pocket in board.pockets where (p - pocket.center).length < pocket.radius {
+        for pocket in board.pockets where (p - pocket.center).length < pocket.radius && (!board.pocketsNeedFlight || cleanFlight) {
             return pocket.hole
         }
         return nil

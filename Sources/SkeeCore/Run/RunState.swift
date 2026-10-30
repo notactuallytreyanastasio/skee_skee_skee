@@ -36,6 +36,8 @@ public struct RunState: Hashable, Sendable, Codable {
     public var round: RoundState
     public var phase: Phase
     public var setup: BoardSetup
+    /// Where each hole's reel has stopped: index into `setup.reel(hole)`.
+    public var stops: [Hole: Int]
     public var charms: [Charm]
     public var powerUps: [PowerUp]
     public var tickets: Int
@@ -74,6 +76,15 @@ public enum ActionError: Error, Hashable, Sendable {
     case slotsFull
     case needsTarget
     case alreadyArmed
+    case reelTooShort
+}
+
+extension RunState {
+    /// The symbol a hole is showing right now; the next ball into it gets it.
+    public func showing(_ hole: Hole) -> Symbol {
+        let reel = setup.reel(hole)
+        return reel[(stops[hole] ?? 0) % reel.count]
+    }
 }
 
 /// Things the shell should show or play. Order is the order they happened.

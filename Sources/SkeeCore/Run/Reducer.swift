@@ -6,10 +6,18 @@ public func newRun(seed: UInt64, config: RunConfig = .standard) -> RunState {
     var s = RunState(
         config: config, rng: rng, seed: seed, ante: 1, boss: boss,
         round: RoundState(kind: .warmup, target: 0, framesTotal: 0),
-        phase: .throwing, setup: .standard, charms: [], powerUps: [],
+        phase: .throwing, setup: .standard, stops: [:], charms: [], powerUps: [],
         tickets: config.startTickets, heat: 0, fever: false, stats: RunStats())
     s.round = freshRound(.warmup, in: s)
+    spinReels(&s)
     return s
+}
+
+/// Every reel lands on a fresh seeded stop.
+private func spinReels(_ s: inout RunState) {
+    for hole in BoardSetup.reelHoles {
+        s.stops[hole] = s.rng.nextInt(below: s.setup.reel(hole).count)
+    }
 }
 
 /// The table the next ball is thrown on: ante difficulty, then the boss (on
@@ -54,7 +62,7 @@ private func throwBall(_ launch: Launch, _ s0: RunState) -> Step {
     if armed == .goldenBall { chips *= 3 }
     let record = BallRecord(
         hole: shot.hole,
-        symbol: armed == .wildBall && shot.hole != .gutter ? .clover : s.setup.symbol(for: shot.hole),
+        symbol: armed == .wildBall && shot.hole != .gutter ? .clover : s.showing(shot.hole),
         chips: chips, rattles: shot.rattles, fold: launch.fold)
     s.round.armed = nil
     s.round.currentBalls.append(record)
@@ -63,12 +71,13 @@ private func throwBall(_ launch: Launch, _ s0: RunState) -> Step {
     s.stats.rattles += shot.rattles
     s.stats.holes[shot.hole, default: 0] += 1
     events.append(.shot(shot, record))
+    if armed != .hold { spinReels(&s) }
 
     guard s.round.currentBalls.count == s.config.ballsPerFrame else { return Step(state: s, events: events) }
 
     let context = ScoringContext(
         charms: s.charms, streakBefore: s.round.streak, fever: s.fever,
-        paylinesPay: s.round.kind != .boss || s.boss.paylinesPay)
+        pairsPay: s.round.kind != .boss || s.boss.pairsPay)
     let frame = scoreFrame(s.round.currentBalls, context: context)
     s.round.frames.append(frame)
     s.round.currentBalls = []
@@ -130,7 +139,11 @@ private func rollOffers(_ s: inout RunState) -> [Offer?] {
     let unowned = Charm.allCases.filter { !s.charms.contains($0) }
     let charms = Array(s.rng.shuffled(unowned).prefix(2)).map(Offer.charm)
     let stampSymbols: [Symbol] = [.cherry, .bell, .bar, .seven, .diamond, .clover]
-    let edit: Offer = s.rng.nextInt(below: 3) == 0 ? .gild : .stamp(s.rng.pick(stampSymbols))
+    let edit: Offer = switch s.rng.nextInt(below: 4) {
+    case 0: .gild
+    case 1: .purge
+    default: .stamp(s.rng.pick(stampSymbols))
+    }
     let power = Offer.powerUp(s.rng.pick(PowerUp.allCases))
     return Array((charms + [edit, power]).prefix(s.config.offerCount))
 }
@@ -148,7 +161,14 @@ private func buy(_ i: Int, _ target: Hole?, _ c0: PrizeCounter, _ s0: RunState) 
         s.powerUps.append(p)
     case .stamp(let symbol):
         guard let hole = target, hole != .gutter else { return .failure(.needsTarget) }
-        s.setup.symbols[hole] = symbol
+        s.setup.reels[hole, default: []].append(symbol)
+    case .purge:
+        guard let hole = target, hole != .gutter else { return .failure(.needsTarget) }
+        var reel = s.setup.reel(hole)
+        guard reel.count > 1 else { return .failure(.reelTooShort) }
+        reel.remove(at: (s.stops[hole] ?? 0) % reel.count)
+        s.setup.reels[hole] = reel
+        s.stops[hole] = 0
     case .gild:
         guard let hole = target, hole != .gutter else { return .failure(.needsTarget) }
         s.setup.gild[hole, default: 0] += Offer.gildAmount

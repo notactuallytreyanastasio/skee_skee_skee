@@ -19,13 +19,11 @@ public enum Symbol: String, Hashable, Sendable, Codable, CaseIterable {
     public var tripleMult: Double {
         switch self {
         case .blank: 0
-        case .cherry: 3
-        case .lemon: 4
-        case .bell: 5
-        case .bar: 6
-        case .clover: 7
+        case .cherry, .lemon: 3
+        case .bell: 4
+        case .bar, .clover: 5
         case .seven: 10
-        case .diamond: 15
+        case .diamond: 12
         }
     }
 
@@ -66,20 +64,35 @@ public enum Payline: Hashable, Sendable, Codable {
     }
 }
 
-/// The player's machine: which symbol sits on each hole and any permanent
-/// chip upgrades ("gilding"). This is what stamps from the prize counter
-/// change — the Luck-be-a-Landlord layer, except you choose your reel stops.
+/// The player's machine. Every hole has its own reel strip; after each ball
+/// the reels spin (seeded) and each hole shows one symbol from its strip.
+/// The player sees what's showing and aims for what completes the line.
+/// Stamps add symbols to a strip, purges remove them — Luck be a Landlord's
+/// reel building, except you choose which reel you hit.
 public struct BoardSetup: Hashable, Sendable, Codable {
-    public var symbols: [Hole: Symbol]
+    public var reels: [Hole: [Symbol]]
     public var gild: [Hole: Int]
 
+    /// The first symbol on each strip is the hole's "home" symbol, the one
+    /// a classic cabinet would print: 10 cherry up to 50 seven.
     public static let standard = BoardSetup(
-        symbols: [
-            .gutter: .blank, .ring10: .cherry, .ring20: .lemon, .ring30: .bell,
-            .ring40: .bar, .ring50: .seven, .pocketLeft: .diamond, .pocketRight: .diamond,
+        reels: [
+            .ring10: [.cherry, .cherry, .lemon, .cherry, .bell],
+            .ring20: [.lemon, .lemon, .cherry, .bell, .lemon],
+            .ring30: [.bell, .bell, .lemon, .bar, .bell],
+            .ring40: [.bar, .bar, .bell, .seven, .bar],
+            .ring50: [.seven, .bar, .seven, .bell, .cherry],
+            .pocketLeft: [.diamond, .seven, .diamond, .clover, .bar],
+            .pocketRight: [.diamond, .bar, .diamond, .clover, .seven],
         ],
         gild: [:])
 
-    public func symbol(for hole: Hole) -> Symbol { symbols[hole] ?? .blank }
+    public func reel(_ hole: Hole) -> [Symbol] {
+        hole == .gutter ? [.blank] : (reels[hole] ?? [.blank])
+    }
+    public func homeSymbol(for hole: Hole) -> Symbol { reel(hole).first ?? .blank }
     public func chips(for hole: Hole) -> Int { hole.faceValue + (gild[hole] ?? 0) }
+
+    /// Holes that have reels (everything but the gutter).
+    public static let reelHoles: [Hole] = Hole.allCases.filter { $0 != .gutter }
 }

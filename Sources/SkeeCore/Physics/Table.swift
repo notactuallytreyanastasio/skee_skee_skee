@@ -66,10 +66,15 @@ public struct BoardSpec: Hashable, Sendable, Codable {
     public var ringCenter = Vec2(0, 0.58)
     /// The 50 hole sits near the top of the 40 cup, not dead centre, so a ball
     /// that lands low in the cup rolls away from it instead of falling in.
-    public var centerHoleOffset = Vec2(0, 0.03)
-    public var centerHoleRadius = 0.04
+    public var centerHoleOffset = Vec2(0, 0.04)
+    public var centerHoleRadius = 0.03
     /// Balls moving faster than this in-plane skate over holes and pockets.
     public var captureSpeed = 1.2
+    /// The 100 pockets only take a ball on its first contact with the board,
+    /// and only if it touched no wall on the way: you have to fly it in.
+    /// Without this the side wall and backwall funnelled balls into the
+    /// corners and bots sent three quarters of their balls there.
+    public var pocketsNeedFlight = true
     /// A ball must be falling at least this fast to bounce off a lip top;
     /// slower ones just meet the wall face. Stops balls skipping along lips.
     public var lipMinFall = 0.6
@@ -77,8 +82,8 @@ public struct BoardSpec: Hashable, Sendable, Codable {
     /// 0 and 1 the 30, then 20, then 10. Outside the last wall is open board.
     public var ringWalls: [Double] = [0.10, 0.16, 0.22, 0.29]
     public var pockets: [Pocket] = [
-        Pocket(hole: .pocketLeft, center: Vec2(-0.24, 0.90), radius: 0.05),
-        Pocket(hole: .pocketRight, center: Vec2(0.24, 0.90), radius: 0.05),
+        Pocket(hole: .pocketLeft, center: Vec2(-0.20, 0.86), radius: 0.036),
+        Pocket(hole: .pocketRight, center: Vec2(0.20, 0.86), radius: 0.036),
     ]
     public var lipHeight = 0.025
     public var ballRadius = 0.03

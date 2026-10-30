@@ -21,12 +21,12 @@ public struct ScoringContext: Hashable, Sendable {
     public var streakBefore: Int
     /// Jackpot meter was full going into this frame: everything doubles.
     public var fever: Bool
-    /// False under The House boss: lines are still read, but pay nothing.
-    public var paylinesPay: Bool
+    /// False under The House boss: pairs are still read, but pay nothing.
+    public var pairsPay: Bool
 
-    public init(charms: [Charm] = [], streakBefore: Int = 0, fever: Bool = false, paylinesPay: Bool = true) {
+    public init(charms: [Charm] = [], streakBefore: Int = 0, fever: Bool = false, pairsPay: Bool = true) {
         self.charms = charms; self.streakBefore = streakBefore; self.fever = fever
-        self.paylinesPay = paylinesPay
+        self.pairsPay = pairsPay
     }
 }
 
@@ -73,7 +73,9 @@ public func scoreFrame(_ balls: [BallRecord], context: ScoringContext) -> FrameS
         }
     }
     let payline = Payline.evaluate(balls.map(\.symbol))
-    if payline != .none && context.paylinesPay {
+    if case .pair = payline, !context.pairsPay {
+        steps.append(ScoreStep(source: .payline, effect: .note("the house keeps pairs")))
+    } else if payline != .none {
         steps.append(ScoreStep(source: .payline, effect: .mult(payline.addedMult)))
     }
 

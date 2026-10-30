@@ -1,5 +1,25 @@
 {
   "edges": {
+    "00f4df94548f43adf1e9": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T08:25:40.271176-04:00",
+      "edge_id": "00f4df94548f43adf1e9",
+      "edge_type": "leads_to",
+      "from_change_id": "55d9e3ac-0ed9-4e68-ab03-8025a0feed2c",
+      "rationale": "fix option",
+      "to_change_id": "de36b4b8-eb8c-4f7c-8fbb-559c50cafedf",
+      "weight": 1.0
+    },
+    "058afce439bc2eb2ab1d": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T08:25:39.705239-04:00",
+      "edge_id": "058afce439bc2eb2ab1d",
+      "edge_type": "leads_to",
+      "from_change_id": "710749f0-3d87-44cd-ab2d-a6b60dd88852",
+      "rationale": "found by skee balance",
+      "to_change_id": "55d9e3ac-0ed9-4e68-ab03-8025a0feed2c",
+      "weight": 1.0
+    },
     "147eccdcc92bf3993d0d": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:03:20.678906-04:00",
@@ -20,6 +40,16 @@
       "to_change_id": "212544ce-6851-480c-9842-78d18bf43b6e",
       "weight": 1.0
     },
+    "225fef3af8553d20e549": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T08:16:16.170077-04:00",
+      "edge_id": "225fef3af8553d20e549",
+      "edge_type": "leads_to",
+      "from_change_id": "9dc303fc-554c-4bcd-b787-ff8b5317e328",
+      "rationale": "result",
+      "to_change_id": "710749f0-3d87-44cd-ab2d-a6b60dd88852",
+      "weight": 1.0
+    },
     "2f1fff41bad058e78d35": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:03:19.723622-04:00",
@@ -28,6 +58,16 @@
       "from_change_id": "1afb7e6c-31de-41fa-b093-dec2f9bcde14",
       "rationale": "chosen",
       "to_change_id": "0477e2ee-f304-44f9-914d-a38324e2d568",
+      "weight": 1.0
+    },
+    "2f88ed8cdab647611397": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T08:25:40.145310-04:00",
+      "edge_id": "2f88ed8cdab647611397",
+      "edge_type": "leads_to",
+      "from_change_id": "55d9e3ac-0ed9-4e68-ab03-8025a0feed2c",
+      "rationale": "fix option",
+      "to_change_id": "bcf6ef5b-59ca-42f8-b01e-15c2eb897184",
       "weight": 1.0
     },
     "39a151798cf9995fb53d": {
@@ -110,6 +150,16 @@
       "to_change_id": "4b68f760-81f5-4aa1-b5c9-60a714238ba0",
       "weight": 1.0
     },
+    "90a0d592ee1a76da1dac": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T08:25:40.670100-04:00",
+      "edge_id": "90a0d592ee1a76da1dac",
+      "edge_type": "leads_to",
+      "from_change_id": "de36b4b8-eb8c-4f7c-8fbb-559c50cafedf",
+      "rationale": "rejected",
+      "to_change_id": "6e9758f5-ac60-4e1f-983e-cb924c2c40f0",
+      "weight": 1.0
+    },
     "9bed6c9e5181c48d7e41": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:13:19.377151-04:00",
@@ -118,6 +168,16 @@
       "from_change_id": "b5ae3392-3f1a-4090-9e24-d9c4ed3aa280",
       "rationale": "approach",
       "to_change_id": "fe0bcf09-ee25-451f-b2cc-25d43517866e",
+      "weight": 1.0
+    },
+    "abc9973c957530811f76": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T08:25:40.541121-04:00",
+      "edge_id": "abc9973c957530811f76",
+      "edge_type": "leads_to",
+      "from_change_id": "bcf6ef5b-59ca-42f8-b01e-15c2eb897184",
+      "rationale": "chosen",
+      "to_change_id": "6e9758f5-ac60-4e1f-983e-cb924c2c40f0",
       "weight": 1.0
     },
     "b0fffe5674365c642bfa": {
@@ -198,6 +258,16 @@
       "from_change_id": "067bae9a-b27a-440e-abe6-cb95c2d438c9",
       "rationale": "physics approach",
       "to_change_id": "1afb7e6c-31de-41fa-b093-dec2f9bcde14",
+      "weight": 1.0
+    },
+    "eecff7bca57fe7b57284": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T08:16:15.894437-04:00",
+      "edge_id": "eecff7bca57fe7b57284",
+      "edge_type": "leads_to",
+      "from_change_id": "43a5276f-85c8-4c9d-a21f-498506d74a17",
+      "rationale": "implementation",
+      "to_change_id": "9dc303fc-554c-4bcd-b787-ff8b5317e328",
       "weight": 1.0
     }
   },
@@ -320,6 +390,47 @@
       "title": "Use SpriteKit physics engine",
       "updated_at": "2026-10-30T08:03:19.132134-04:00"
     },
+    "55d9e3ac-0ed9-4e68-ab03-8025a0feed2c": {
+      "author": "Bobby Grayson",
+      "change_id": "55d9e3ac-0ed9-4e68-ab03-8025a0feed2c",
+      "created_at": "2026-10-30T08:25:39.551748-04:00",
+      "description": "Fixed symbols per hole make 'aim at the 50' dominant; no decisions, jackpots meaningless. Pockets were 16% of power range before shallow-pocket fix (now 5%).",
+      "metadata": {
+        "branch": "main",
+        "confidence": 90
+      },
+      "node_type": "observation",
+      "status": "pending",
+      "title": "Balance run 1: expert bot 77% 50s, 46 jackpots/run, median score 10x target, 2% nail-biters",
+      "updated_at": "2026-10-30T08:25:39.551748-04:00"
+    },
+    "6e9758f5-ac60-4e1f-983e-cb924c2c40f0": {
+      "author": "Bobby Grayson",
+      "change_id": "6e9758f5-ac60-4e1f-983e-cb924c2c40f0",
+      "created_at": "2026-10-30T08:25:40.410818-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 85
+      },
+      "node_type": "decision",
+      "status": "pending",
+      "title": "Spinning per-hole reels with HOLD power-up; retune targets after",
+      "updated_at": "2026-10-30T08:25:40.410818-04:00"
+    },
+    "710749f0-3d87-44cd-ab2d-a6b60dd88852": {
+      "author": "Bobby Grayson",
+      "change_id": "710749f0-3d87-44cd-ab2d-a6b60dd88852",
+      "created_at": "2026-10-30T08:16:16.038831-04:00",
+      "description": "Crosswind needs aim into the wind; straight-only check failed, which was the test's mistake.",
+      "metadata": {
+        "branch": "main",
+        "confidence": 85
+      },
+      "node_type": "outcome",
+      "status": "pending",
+      "title": "65 core tests pass incl. never-impossible guarantee at ante 8 for every boss",
+      "updated_at": "2026-10-30T08:16:16.038831-04:00"
+    },
     "8a0c0787-8e53-414d-abb3-7a21bb4db862": {
       "author": "Bobby Grayson",
       "change_id": "8a0c0787-8e53-414d-abb3-7a21bb4db862",
@@ -364,6 +475,20 @@
       "title": "Procedural CoreGraphics renderer with 4 styles keyed off the ante, transitions between them",
       "updated_at": "2026-10-30T08:13:19.661673-04:00"
     },
+    "9dc303fc-554c-4bcd-b787-ff8b5317e328": {
+      "author": "Bobby Grayson",
+      "change_id": "9dc303fc-554c-4bcd-b787-ff8b5317e328",
+      "created_at": "2026-10-30T08:16:15.759266-04:00",
+      "metadata": {
+        "branch": "main",
+        "commit": "168072338b86047204963bede5c9115e850848b0",
+        "confidence": 85
+      },
+      "node_type": "action",
+      "status": "pending",
+      "title": "Implemented payline scoring, 15 charms, bosses, prize counter, fever meter, run reducer (TDD)",
+      "updated_at": "2026-10-30T08:16:15.759266-04:00"
+    },
     "ab4273c0-5d08-4b71-95a3-c6977e085485": {
       "author": "Bobby Grayson",
       "change_id": "ab4273c0-5d08-4b71-95a3-c6977e085485",
@@ -391,6 +516,34 @@
       "status": "pending",
       "title": "No emoji; several graphical styles that change between levels (pixel, cel-shaded, 3D, ...)",
       "updated_at": "2026-10-30T08:13:18.805808-04:00"
+    },
+    "bcf6ef5b-59ca-42f8-b01e-15c2eb897184": {
+      "author": "Bobby Grayson",
+      "change_id": "bcf6ef5b-59ca-42f8-b01e-15c2eb897184",
+      "created_at": "2026-10-30T08:25:39.861299-04:00",
+      "description": "Slot-machine reveal every ball; physics stays deterministic; decision each throw.",
+      "metadata": {
+        "branch": "main",
+        "confidence": 85
+      },
+      "node_type": "option",
+      "status": "pending",
+      "title": "Per-hole reel strips that spin (seeded) after every ball; player sees current symbols and aims for what completes the line; stamps add symbols to strips",
+      "updated_at": "2026-10-30T08:25:39.861299-04:00"
+    },
+    "de36b4b8-eb8c-4f7c-8fbb-559c50cafedf": {
+      "author": "Bobby Grayson",
+      "change_id": "de36b4b8-eb8c-4f7c-8fbb-559c50cafedf",
+      "created_at": "2026-10-30T08:25:40.007700-04:00",
+      "description": "Fixes the numbers, not the boredom.",
+      "metadata": {
+        "branch": "main",
+        "confidence": 30
+      },
+      "node_type": "option",
+      "status": "pending",
+      "title": "Keep fixed symbols and just raise targets",
+      "updated_at": "2026-10-30T08:25:40.007700-04:00"
     },
     "eb182f5e-5636-4d11-9268-d292a500d748": {
       "author": "Bobby Grayson",

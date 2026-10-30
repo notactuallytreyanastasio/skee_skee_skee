@@ -31,9 +31,9 @@ public struct RunConfig: Hashable, Sendable, Codable {
     public var powerUpSlots = 2
     /// Rattles and gutters fill the jackpot meter; at this much heat the
     /// next frame plays at double mult.
-    public var feverHeat = 6
+    public var feverHeat = 10
     /// Target for the warm-up of each ante; feature and boss scale it.
-    public var anteBase = [250, 450, 750, 1200, 1900, 2900, 4300, 6200]
+    public var anteBase = [300, 650, 1100, 1600, 2300, 3100, 4000, 5200]
     public var kindScale: [RoundKind: Double] = [.warmup: 1, .feature: 1.5, .boss: 2]
     public var roundTickets: [RoundKind: Int] = [.warmup: 3, .feature: 4, .boss: 5]
     /// One bonus ticket per this fraction of overkill above the target.

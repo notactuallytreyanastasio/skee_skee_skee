@@ -260,6 +260,16 @@
       "to_change_id": "ab4273c0-5d08-4b71-95a3-c6977e085485",
       "weight": 1.0
     },
+    "51b11f15c4ca5dd69b78": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T16:54:01.263753-04:00",
+      "edge_id": "51b11f15c4ca5dd69b78",
+      "edge_type": "leads_to",
+      "from_change_id": "a1468049-092e-4247-824d-93b58fe4bcb0",
+      "rationale": "result",
+      "to_change_id": "2572f870-5454-4bde-86dc-b183f98488a4",
+      "weight": 1.0
+    },
     "51ef996ef2143bc182e8": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T09:05:15.581828-04:00",
@@ -320,6 +330,16 @@
       "to_change_id": "02fb2fc0-a2ef-4611-b398-dd2e76e68e42",
       "weight": 1.0
     },
+    "66957b0b18aeb3e0e8be": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T16:53:51.140371-04:00",
+      "edge_id": "66957b0b18aeb3e0e8be",
+      "edge_type": "leads_to",
+      "from_change_id": "0791a91e-5660-4644-94c1-39d143d03813",
+      "rationale": "approach",
+      "to_change_id": "71b53359-8302-42f6-89d9-fe32162a069f",
+      "weight": 1.0
+    },
     "6717f314f98db5c39427": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:03:18.881996-04:00",
@@ -348,6 +368,16 @@
       "from_change_id": "a6e5c0ac-620d-4e88-a1ab-3b68dbd4eb81",
       "rationale": "option",
       "to_change_id": "ffb74d6b-a9b7-47d3-ab06-3e0eb81fc138",
+      "weight": 1.0
+    },
+    "76c10dd2a4a29d4912bf": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T16:54:01.012459-04:00",
+      "edge_id": "76c10dd2a4a29d4912bf",
+      "edge_type": "leads_to",
+      "from_change_id": "a8d7cac7-046a-4b8e-b975-36f92536aa44",
+      "rationale": "implementation",
+      "to_change_id": "a1468049-092e-4247-824d-93b58fe4bcb0",
       "weight": 1.0
     },
     "7b9a3ac559eb256a9f1f": {
@@ -448,6 +478,16 @@
       "from_change_id": "bc6b7206-254a-4b57-abfd-52a79338e5ba",
       "rationale": "core support for thumb throw and holes",
       "to_change_id": "4067a26c-4d2f-4921-ba29-7d629748a1ff",
+      "weight": 1.0
+    },
+    "870dd37acfdba8b22bed": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T16:53:51.403807-04:00",
+      "edge_id": "870dd37acfdba8b22bed",
+      "edge_type": "leads_to",
+      "from_change_id": "71b53359-8302-42f6-89d9-fe32162a069f",
+      "rationale": "chosen",
+      "to_change_id": "a8d7cac7-046a-4b8e-b975-36f92536aa44",
       "weight": 1.0
     },
     "8e5bb1c558160ecc5836": {
@@ -876,6 +916,20 @@
       "title": "Skee-ball roguelike for iPhone Duo",
       "updated_at": "2026-10-30T08:01:57.409468-04:00"
     },
+    "0791a91e-5660-4644-94c1-39d143d03813": {
+      "author": "Bobby Grayson",
+      "change_id": "0791a91e-5660-4644-94c1-39d143d03813",
+      "created_at": "2026-10-30T16:53:50.808407-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 85,
+        "prompt": "make the sliding get velocity faster it should be easier swipes\n\nand lets make the graphics show the dymbols even more clear"
+      },
+      "node_type": "goal",
+      "status": "pending",
+      "title": "Easier flicks; symbols clearer on the board",
+      "updated_at": "2026-10-30T16:53:50.808407-04:00"
+    },
     "0c054b82-d51c-4f94-955f-aff5648d5200": {
       "author": "Bobby Grayson",
       "change_id": "0c054b82-d51c-4f94-955f-aff5648d5200",
@@ -983,6 +1037,19 @@
       "status": "pending",
       "title": "Playtest feedback: holes more visible + graphics polish, smooth ball roll, more give at the crease before a foul",
       "updated_at": "2026-10-30T09:32:41.097046-04:00"
+    },
+    "2572f870-5454-4bde-86dc-b183f98488a4": {
+      "author": "Bobby Grayson",
+      "change_id": "2572f870-5454-4bde-86dc-b183f98488a4",
+      "created_at": "2026-10-30T16:54:01.138104-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 80
+      },
+      "node_type": "outcome",
+      "status": "pending",
+      "title": "99 tests pass; 220pt flick now 0.60 power -> 50 (was 0.35 -> gutter); all symbols readable on both displays in renders; feel unverified on device",
+      "updated_at": "2026-10-30T16:54:01.138104-04:00"
     },
     "2e90e1ad-4339-42bb-8140-8ffc0cdafdc0": {
       "author": "Bobby Grayson",
@@ -1276,6 +1343,19 @@
       "title": "65 core tests pass incl. never-impossible guarantee at ante 8 for every boss",
       "updated_at": "2026-10-30T08:16:16.038831-04:00"
     },
+    "71b53359-8302-42f6-89d9-fe32162a069f": {
+      "author": "Bobby Grayson",
+      "change_id": "71b53359-8302-42f6-89d9-fe32162a069f",
+      "created_at": "2026-10-30T16:53:51.016185-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 80
+      },
+      "node_type": "option",
+      "status": "pending",
+      "title": "Lower flick speed range to 300-3100 pt/s, even lift-off/peak weight; board symbols as camera-facing coins, fewer and bigger; slot moved under the rings",
+      "updated_at": "2026-10-30T16:53:51.016185-04:00"
+    },
     "72cd587a-eca3-46f8-9df8-ec7b3284aa95": {
       "author": "Bobby Grayson",
       "change_id": "72cd587a-eca3-46f8-9df8-ec7b3284aa95",
@@ -1429,6 +1509,20 @@
       "title": "Juice pass: procedural sound (roll, hump clack, rattle, drop, reel ticks, fanfare), star bursts and ring flash on drops, jackpot-chance slow-mo with camera lean and bulb chase, faster tally",
       "updated_at": "2026-10-30T10:37:36.669592-04:00"
     },
+    "a1468049-092e-4247-824d-93b58fe4bcb0": {
+      "author": "Bobby Grayson",
+      "change_id": "a1468049-092e-4247-824d-93b58fe4bcb0",
+      "created_at": "2026-10-30T16:54:00.891829-04:00",
+      "metadata": {
+        "branch": "main",
+        "commit": "1b15c8ef3bedac4367b0fdf3d6dccb017b432621",
+        "confidence": 85
+      },
+      "node_type": "action",
+      "status": "pending",
+      "title": "Flick range 300-3100 pt/s; billboarded coin symbols; slot moved under rings; installed on Duo",
+      "updated_at": "2026-10-30T16:54:00.891829-04:00"
+    },
     "a288fb15-4cf7-49f5-a576-26b2dae7df2b": {
       "author": "Bobby Grayson",
       "change_id": "a288fb15-4cf7-49f5-a576-26b2dae7df2b",
@@ -1456,6 +1550,19 @@
       "status": "pending",
       "title": "Ball visibly rolls; 3D graphics, first era cel-shaded",
       "updated_at": "2026-10-30T09:03:50.194517-04:00"
+    },
+    "a8d7cac7-046a-4b8e-b975-36f92536aa44": {
+      "author": "Bobby Grayson",
+      "change_id": "a8d7cac7-046a-4b8e-b975-36f92536aa44",
+      "created_at": "2026-10-30T16:53:51.278450-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 80
+      },
+      "node_type": "decision",
+      "status": "pending",
+      "title": "Retune flick mapping and redraw ring symbols as coins",
+      "updated_at": "2026-10-30T16:53:51.278450-04:00"
     },
     "a9541e57-0848-4e11-b5a2-25c6fe6a5c46": {
       "author": "Bobby Grayson",

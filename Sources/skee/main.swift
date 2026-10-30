@@ -22,6 +22,8 @@ skee — play and measure Skee Skee Skee from the terminal
       Narrate one bot run round by round.
   skee scene [--seed n] [--out f.png] [--size outer]
       Render the 3D cabinet as the app shows it, at the Duo inner display size.
+  skee frame [--save run.json] [--t secs | --settle] [--title] [--select offer] [--size outer] [--out f.png]
+      A full app frame, 3D scene plus HUD, at the phone's size.
   skee scenefilm [--save run.json] [--from secs] [--frames n] [--dt secs] [--cols n] [--scale k]
       Contact sheet of the last action's animation in 3D.
 """
@@ -68,5 +70,6 @@ case "bot": botCommand()
 case "settleprobe": settleProbe()
 case "scene": MainActor.assumeIsolated { sceneCommand() }
 case "scenefilm": MainActor.assumeIsolated { sceneFilmCommand() }
+case "frame": MainActor.assumeIsolated { frameCommand() }
 default: print(usage); exit(1)
 }

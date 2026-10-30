@@ -65,6 +65,15 @@ struct PresentationTests {
         #expect(p.shown.round.score + p.talliedBonus == last.state.round.score)
     }
 
+    @Test func rollStartsWhereTheThumbLetGo() {
+        let s = newRun(seed: 3)
+        var p = Presentation(state: s)
+        p.enqueue(throwOnce(s), releaseAlong: 0.8)
+        p.advance(1 / 120)
+        #expect(p.ball!.along >= 0.8)
+        #expect(p.ball!.along < 0.9)
+    }
+
     @Test func samplingInterpolates() {
         let path = [PathSample(t: 0, phase: .lane, x: 0, along: 0, height: 0),
                     PathSample(t: 1, phase: .lane, x: 0, along: 2, height: 0)]

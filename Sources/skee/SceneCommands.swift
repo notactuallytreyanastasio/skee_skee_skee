@@ -2,6 +2,9 @@ import CoreGraphics
 import Foundation
 import SkeeCore
 import SkeeScene
+import SkeeHUD
+import SkeeRender
+import SwiftUI
 
 /// skee scene: render the 3D cabinet to PNG at the Duo's inner display size.
 @MainActor
@@ -59,5 +62,50 @@ func sceneFilmCommand() {
     }
     try? FileManager.default.createDirectory(atPath: (out as NSString).deletingLastPathComponent, withIntermediateDirectories: true)
     writePNG(sheet.makeImage()!, out)
+    print(out)
+}
+
+/// One full app frame: the 3D scene with the SwiftUI HUD on top.
+@MainActor
+func composeFrame(_ p: Presentation, cab: Cabinet, presenter: ScenePresenter, size: CGSize, scale: CGFloat = 2,
+                  screen: HUDState.Screen = .game, selectedOffer: Int? = nil) -> CGImage? {
+    guard let scene3D = snapshot(cab, size: CGSize(width: size.width * scale, height: size.height * scale)) else { return nil }
+    let a = Float(size.width / size.height)
+    let hud = HUDState.make(p, holeOnScreen: { hole in
+        let w = cab.world
+        let f = presenter.rig.project(w.board(w.table.board.holeCenter(hole)), aspect: a)
+        return CGPoint(x: CGFloat(f.x) * size.width, y: CGFloat(f.y) * size.height)
+    }, center: CGPoint(x: size.width / 2, y: size.height * 0.2), selectedOffer: selectedOffer, screen: screen)
+    let renderer = ImageRenderer(content: HUDView(state: hud).frame(width: size.width, height: size.height))
+    renderer.scale = scale
+    guard let overlay = renderer.cgImage else { return scene3D }
+    let c = bitmap(CGSize(width: size.width * scale, height: size.height * scale))
+    // bitmap() is y-down; CGImage draws y-up, so flip for each image.
+    for img in [scene3D, overlay] {
+        c.saveGState()
+        c.translateBy(x: 0, y: size.height * scale); c.scaleBy(x: 1, y: -1)
+        c.draw(img, in: CGRect(x: 0, y: 0, width: size.width * scale, height: size.height * scale))
+        c.restoreGState()
+    }
+    return c.makeImage()
+}
+
+/// skee frame: the last action of a save, `t` seconds in (or settled), as the
+/// phone would show it, HUD included.
+@MainActor
+func frameCommand() {
+    let out = flag("out") ?? "out/frame.png"
+    let size = flag("size") == "outer" ? CGSize(width: 466, height: 678) : CGSize(width: 626, height: 890)
+    var (p, _) = presentationForSave(flag("save"))
+    let cab = Cabinet()
+    let presenter = ScenePresenter(cabinet: cab, aspect: Float(size.width / size.height))
+    let t = has("settle") ? 30 : (Double(flag("t") ?? "0") ?? 0)
+    var clock = 0.0
+    while clock < t && (p.isBusy || clock < 0.05) { p.advance(1.0 / 60); presenter.update(p, held: nil, dt: 1.0 / 60); clock += 1.0 / 60 }
+    presenter.update(p, held: nil, dt: 0)
+    guard let img = composeFrame(p, cab: cab, presenter: presenter, size: size, screen: has("title") ? .title : .game,
+                                 selectedOffer: flag("select").flatMap(Int.init)) else { fail("render failed") }
+    try? FileManager.default.createDirectory(atPath: (out as NSString).deletingLastPathComponent, withIntermediateDirectories: true)
+    writePNG(img, out)
     print(out)
 }

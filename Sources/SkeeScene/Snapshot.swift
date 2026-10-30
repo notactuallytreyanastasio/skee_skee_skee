@@ -48,7 +48,7 @@ extension Cabinet {
     /// the top of the marquee at the given screen heights. The hump has to
     /// sit on the Duo's crease, so it is weighted most.
     public static func fit(points: (near: SIMD3<Float>, hump: SIMD3<Float>, top: SIMD3<Float>), aspect: Float,
-                           near: Float = 0.84, hump: Float = 0.5, top: Float = 0.13) -> CameraRig {
+                           near: Float = 0.84, hump: Float = 0.5, top: Float = 0.23) -> CameraRig {
         var best = (Float.infinity, CameraRig(position: .zero, target: .zero, fov: 60))
         for fov in stride(from: Float(22), through: 70, by: 2) {
             for h in stride(from: Float(0.55), through: 1.0, by: 0.025) {

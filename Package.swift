@@ -18,14 +18,16 @@ let package = Package(
         .library(name: "SkeeCore", targets: ["SkeeCore"]),
         .library(name: "SkeeRender", targets: ["SkeeRender"]),
         .library(name: "SkeeScene", targets: ["SkeeScene"]),
+        .library(name: "SkeeHUD", targets: ["SkeeHUD"]),
         .executable(name: "skee", targets: ["skee"]),
     ],
     targets: [
         .target(name: "SkeeCore"),
         .target(name: "SkeeRender", dependencies: ["SkeeCore"]),
         .target(name: "SkeeScene", dependencies: ["SkeeCore", "SkeeRender"]),
-        .executableTarget(name: "skee", dependencies: ["SkeeCore", "SkeeRender", "SkeeScene"]),
+        .target(name: "SkeeHUD", dependencies: ["SkeeCore", "SkeeRender", "SkeeScene"]),
+        .executableTarget(name: "skee", dependencies: ["SkeeCore", "SkeeRender", "SkeeScene", "SkeeHUD"]),
         .testTarget(name: "SkeeCoreTests", dependencies: ["SkeeCore"]),
-        .testTarget(name: "SkeeRenderTests", dependencies: ["SkeeRender"]),
+        .testTarget(name: "SkeeRenderTests", dependencies: ["SkeeRender", "SkeeHUD"]),
     ]
 )

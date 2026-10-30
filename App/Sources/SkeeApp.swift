@@ -1,5 +1,7 @@
+import SceneKit
 import SkeeCore
-import SkeeRender
+import SkeeHUD
+import SkeeScene
 import SwiftUI
 import UIKit
 
@@ -17,36 +19,95 @@ struct SkeeApp: App {
     }
 }
 
-/// One Canvas, drawn by the shared renderer; one drag gesture for swipes
-/// and taps; a hidden view that listens to the hinge.
+/// The 3D cabinet, a touch layer for the thumb, and the HUD on top. The HUD
+/// only takes touches on its buttons; everywhere else falls through to the
+/// throw pad.
 struct GameView: View {
     let model: GameModel
 
     var body: some View {
         GeometryReader { geo in
-            let layout = Layout(size: geo.size)
-            Canvas { ctx, _ in
-                ctx.withCGContext { cg in
-                    Renderer.draw(model.presentation, ui: model.ui, layout: layout, in: cg)
-                }
+            ZStack {
+                CabinetView(cabinet: model.cabinet)
+                ThrowPadView(model: model)
+                HUDView(state: model.hud, actions: model.hudActions)
             }
-            .background(HingeReader { model.setFold($0) })
-            .contentShape(Rectangle())
-            .gesture(
-                DragGesture(minimumDistance: 0)
-                    .onChanged { v in model.dragChanged(start: v.startLocation, now: v.location, layout: layout) }
-                    .onEnded { v in
-                        model.dragEnded(start: v.startLocation, end: v.location, velocity: v.velocity, layout: layout)
-                    }
-            )
+            .background(HingeReader { model.fold = $0 })
+            .onAppear { model.resized(geo.size); model.start() }
+            .onChange(of: geo.size) { _, s in model.resized(s) }
         }
-        .onAppear { model.start() }
+    }
+}
+
+struct CabinetView: UIViewRepresentable {
+    let cabinet: Cabinet
+
+    func makeUIView(context: Context) -> SCNView {
+        let v = SCNView(frame: .zero, options: nil)
+        v.scene = cabinet.scene
+        v.pointOfView = cabinet.camera
+        v.antialiasingMode = .multisampling4X
+        v.preferredFramesPerSecond = 120
+        v.rendersContinuously = true
+        v.isUserInteractionEnabled = false
+        v.backgroundColor = .clear
+        return v
+    }
+
+    func updateUIView(_ v: SCNView, context: Context) {}
+}
+
+/// Raw touches with their real timestamps, including coalesced samples, so
+/// the stroke analyser sees the whole slide at the digitiser's rate.
+struct ThrowPadView: UIViewRepresentable {
+    let model: GameModel
+
+    func makeUIView(context: Context) -> ThrowPad {
+        let v = ThrowPad()
+        v.model = model
+        v.isMultipleTouchEnabled = false
+        v.backgroundColor = .clear
+        return v
+    }
+
+    func updateUIView(_ v: ThrowPad, context: Context) { v.model = model }
+}
+
+final class ThrowPad: UIView {
+    weak var model: GameModel?
+
+    func samples(_ touch: UITouch, _ event: UIEvent?) -> [TouchSample] {
+        let all = event?.coalescedTouches(for: touch) ?? [touch]
+        return all.map { t in
+            let p = t.location(in: self)
+            return TouchSample(t: t.timestamp, x: Double(p.x), y: Double(p.y))
+        }
+    }
+
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let t = touches.first, let model else { return }
+        let p = t.location(in: self)
+        if model.tapBoard(at: p) { return }
+        model.touchBegan(TouchSample(t: t.timestamp, x: Double(p.x), y: Double(p.y)))
+    }
+
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let t = touches.first else { return }
+        model?.touchMoved(samples(t, event))
+    }
+
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let t = touches.first else { return }
+        model?.touchEnded(samples(t, event))
+    }
+
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+        model?.touchCancelled()
     }
 }
 
 /// Reports how far the device is folded, 0 (flat open) to 1 (folded to a
-/// right angle or more), using UIHingeInteraction on iOS 27.1+. Earlier
-/// systems and unfolding devices never call back, and the ramp stays flat.
+/// right angle or more), using UIHingeInteraction on iOS 27.1+.
 struct HingeReader: UIViewRepresentable {
     let onFold: (Double) -> Void
 
@@ -55,9 +116,8 @@ struct HingeReader: UIViewRepresentable {
         v.isUserInteractionEnabled = false
         if #available(iOS 27.1, *) {
             let interaction = UIHingeInteraction { _, update in
-                // Closed means the player is on the outer display: there is
-                // no ramp to bend, so no loft. Reading the angle here would
-                // give the steepest ramp to anyone playing folded.
+                // Closed means the player is on the outer display: no ramp to
+                // bend. Reading the angle would give the steepest ramp.
                 guard let hinge = update.hinge, hinge.status != .closed else { onFold(0); return }
                 onFold(HingeReader.fold(angle: Double(hinge.angle)))
             }
@@ -68,8 +128,6 @@ struct HingeReader: UIViewRepresentable {
 
     func updateUIView(_ uiView: UIView, context: Context) {}
 
-    /// The API reports the opening angle; pi is flat. Halfway to closed (a
-    /// right angle, like a little skee-ball cabinet) is full fold.
     static func fold(angle: Double) -> Double {
         clamp((Double.pi - angle) / (Double.pi / 2), 0, 1)
     }

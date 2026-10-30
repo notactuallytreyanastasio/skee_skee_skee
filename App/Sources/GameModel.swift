@@ -1,26 +1,40 @@
-import CoreGraphics
 import Foundation
 import Observation
 import QuartzCore
+import SceneKit
 import SkeeCore
+import SkeeHUD
 import SkeeRender
+import SkeeScene
 import UIKit
 
-/// The imperative shell. Holds the current values, feeds input to the pure
-/// functions, and performs the effects (haptics, saving). No game rules here:
-/// throws go through `apply`, taps through `intent`, swipes through `Swipe`.
+/// The imperative shell. Holds current values, feeds input to the pure
+/// functions, performs effects. Rules live in SkeeCore (`apply`,
+/// `analyzeStroke`); timing in SkeeRender (`Presentation`); the 3D scene in
+/// SkeeScene; the HUD in SkeeHUD.
 @Observable
 @MainActor
 final class GameModel {
     private(set) var state: RunState
     private(set) var presentation: Presentation
-    var ui = UIState()
-    private var seed: UInt64
-    private var actions: [Action] = []
-    private var lastTick: CFTimeInterval?
+    private(set) var hud = HUDState()
+    var screen: HUDState.Screen = .title
+    var selectedOffer: Int?
+    var selectedCharm: Int?
+    var fold: Double = 0
+
+    @ObservationIgnored let cabinet = Cabinet()
+    @ObservationIgnored private(set) var presenter: ScenePresenter
+    @ObservationIgnored var viewSize = CGSize(width: 626, height: 890)
+    @ObservationIgnored private var seed: UInt64
+    @ObservationIgnored private var actions: [Action] = []
+    @ObservationIgnored private var lastTick: CFTimeInterval?
     @ObservationIgnored private var link: CADisplayLink?
     @ObservationIgnored private let haptics = Haptics()
     @ObservationIgnored private var autoplay: [Launch] = []
+    /// The stroke in progress, if the thumb is down on the lane.
+    @ObservationIgnored private var stroke: [TouchSample] = []
+    @ObservationIgnored private var held: SIMD3<Float>?
 
     init() {
         let args = LaunchArguments()
@@ -43,10 +57,9 @@ final class GameModel {
         self.state = s
         self.actions = actions
         self.presentation = Presentation(state: s)
-        var ui = UIState()
-        ui.screen = args.skipTitle || !actions.isEmpty || !args.autoplay.isEmpty ? .game : .title
-        if let f = args.fold { ui.fold = f }
-        self.ui = ui
+        self.presenter = ScenePresenter(cabinet: cabinet, aspect: 626.0 / 890.0)
+        self.screen = args.skipTitle || !actions.isEmpty || !args.autoplay.isEmpty ? .game : .title
+        if let f = args.fold { fold = f }
         self.autoplay = args.autoplay
     }
 
@@ -60,71 +73,135 @@ final class GameModel {
         link = l
     }
 
+    func resized(_ size: CGSize) {
+        guard size.width > 0, size != viewSize else { return }
+        viewSize = size
+        presenter.refit(aspect: Float(size.width / size.height))
+    }
+
     fileprivate func tick(_ now: CFTimeInterval) {
         let dt = min(1.0 / 20, now - (lastTick ?? now))
         lastTick = now
         presentation.advance(dt)
         for beat in presentation.finished { haptics.play(beat) }
+        presenter.update(presentation, held: held, dt: dt)
+        refreshHUD()
         if !presentation.isBusy, case .throwing = state.phase, !autoplay.isEmpty {
             send(.throwBall(autoplay.removeFirst()))
         }
     }
 
-    // MARK: input
-
-    func dragChanged(start: CGPoint, now: CGPoint, layout: Layout) {
-        guard ui.screen == .game, case .throwing = state.phase, !presentation.isBusy,
-              start.y > layout.hingeY, start.y < layout.trayRect.minY else { return }
-        ui.dragStart = start
-        ui.dragNow = now
+    func refreshHUD() {
+        let size = viewSize
+        let a = Float(size.width / size.height)
+        let w = cabinet.world
+        hud = HUDState.make(presentation, holeOnScreen: { [presenter] hole in
+            let f = presenter.rig.project(w.board(w.table.board.holeCenter(hole)), aspect: a)
+            return CGPoint(x: CGFloat(f.x) * size.width, y: CGFloat(f.y) * size.height)
+        }, center: CGPoint(x: size.width / 2, y: size.height * 0.2),
+           selectedOffer: selectedOffer, selectedCharm: selectedCharm, screen: screen)
     }
 
-    func dragEnded(start: CGPoint, end: CGPoint, velocity: CGSize, layout: Layout) {
-        defer { ui.dragStart = nil; ui.dragNow = nil }
-        let moved = hypot(end.x - start.x, end.y - start.y)
-        if moved < 12 {
-            tap(at: end, layout: layout)
-            return
-        }
+    // MARK: thumb
+
+    var geometry: StrokeGeometry { presenter.strokeGeometry(size: viewSize) }
+    var canThrow: Bool {
+        if screen != .game || presentation.isBusy { return false }
+        if case .throwing = state.phase { return true }
+        return false
+    }
+
+    func touchBegan(_ s: TouchSample) {
         if presentation.isBusy { presentation.skip(); return }
-        guard ui.screen == .game, case .throwing = state.phase, start.y > layout.hingeY else { return }
-        let swipe = Swipe(start: start, end: end, velocity: CGVector(dx: velocity.width, dy: velocity.height))
-        if let launch = swipe.launch(in: layout, fold: ui.fold) { send(.throwBall(launch)) }
+        guard canThrow, s.y > geometry.creaseY else { return }
+        stroke = [s]
+        hold(at: s)
     }
 
-    func tap(at p: CGPoint, layout: Layout) {
-        if presentation.isBusy {
-            // Tapping during an animation hurries it along.
-            presentation.skip()
+    func touchMoved(_ samples: [TouchSample]) {
+        guard !stroke.isEmpty else { return }
+        stroke += samples
+        if crossedCrease(samples, in: geometry) {
+            // Past the crease: foul, right now, like stepping over the line.
+            stroke = []
+            held = nil
+            haptics.foul()
+            send(.foul)
             return
         }
-        switch intent(at: p, layout: layout, state: state, ui: ui, busy: presentation.isBusy) {
+        if let last = samples.last { hold(at: last) }
+    }
+
+    func touchEnded(_ samples: [TouchSample]) {
+        guard !stroke.isEmpty else { return }
+        stroke += samples
+        let outcome = analyzeStroke(stroke, in: geometry, fold: fold)
+        let releaseAlong = held.map(alongLane) ?? 0
+        stroke = []
+        held = nil
+        switch outcome {
         case .none: break
-        case .startRun:
-            if ui.screen == .title { ui.screen = .game; haptics.tap(); return }
-            newGame()
-        case .selectOffer(let i): ui.selectedOffer = i; haptics.tap()
-        case .cancelSelection: ui.selectedOffer = nil; ui.selectedCharm = nil
-        case .selectCharm(let i): ui.selectedCharm = i; haptics.tap()
-        case .act(let a):
-            ui.selectedOffer = nil; ui.selectedCharm = nil
-            send(a)
+        case .foul: haptics.foul(); send(.foul)
+        case .release(let l): send(.throwBall(l), releaseAlong: releaseAlong)
         }
     }
 
-    func setFold(_ f: Double) { ui.fold = f }
+    func touchCancelled() { stroke = []; held = nil }
+
+    /// The ball sits just above the thumb so it stays visible.
+    private func hold(at s: TouchSample) {
+        let f = SIMD2(Float(s.x / viewSize.width), Float((s.y - 34) / viewSize.height))
+        held = presenter.lanePoint(screen: f, aspect: Float(viewSize.width / viewSize.height))
+    }
+
+    private func alongLane(_ p: SIMD3<Float>) -> Double {
+        let w = cabinet.world
+        return Double(max(0, simd_dot(p - w.lane(x: 0, s: 0), w.laneForward) / w.laneScale))
+    }
+
+    /// A tap on the board while a stamp, gild or purge is selected.
+    func tapBoard(at p: CGPoint) -> Bool {
+        guard let sel = selectedOffer else { return false }
+        let a = Float(viewSize.width / viewSize.height)
+        let w = cabinet.world
+        let hit = BoardSetup.reelHoles.map { hole -> (Hole, CGFloat) in
+            let f = presenter.rig.project(w.board(w.table.board.holeCenter(hole)), aspect: a)
+            return (hole, hypot(CGFloat(f.x) * viewSize.width - p.x, CGFloat(f.y) * viewSize.height - p.y))
+        }.min { $0.1 < $1.1 }
+        selectedOffer = nil
+        if let hit, hit.1 < 44 { send(.buy(sel, target: hit.0)); return true }
+        return false
+    }
+
+    // MARK: HUD actions
+
+    var hudActions: HUDActions {
+        var a = HUDActions()
+        a.buy = { [weak self] i in self?.send(.buy(i, target: nil)) }
+        a.selectOffer = { [weak self] i in self?.selectedOffer = i; self?.haptics.tap() }
+        a.reroll = { [weak self] in self?.send(.reroll) }
+        a.leave = { [weak self] in self?.selectedOffer = nil; self?.send(.leaveCounter) }
+        a.tapCharm = { [weak self] i in
+            guard let self else { return }
+            if case .prizeCounter = state.phase, selectedCharm == i { selectedCharm = nil; send(.sell(i)) }
+            else if case .prizeCounter = state.phase { selectedCharm = i; haptics.tap() }
+        }
+        a.arm = { [weak self] i in self?.send(.arm(i)) }
+        a.start = { [weak self] in self?.screen = .game; self?.haptics.tap() }
+        a.newRun = { [weak self] in self?.newGame() }
+        return a
+    }
 
     // MARK: effects
 
-    func send(_ action: Action) {
+    func send(_ action: Action, releaseAlong: Double = 0) {
         switch apply(action, to: state) {
-        case .failure(let e):
+        case .failure:
             haptics.reject()
-            ui.message = "\(e)"
         case .success(let step):
             state = step.state
             actions.append(action)
-            presentation.enqueue(step)
+            presentation.enqueue(step, releaseAlong: releaseAlong)
             RunStore.save(seed: seed, actions: actions)
             if case .throwBall = action { haptics.launch() } else { haptics.tap() }
         }
@@ -135,8 +212,8 @@ final class GameModel {
         actions = []
         state = newRun(seed: seed)
         presentation = Presentation(state: state)
-        ui = UIState()
-        ui.screen = .game
+        selectedOffer = nil; selectedCharm = nil
+        screen = .game
         RunStore.save(seed: seed, actions: actions)
     }
 }
@@ -149,12 +226,8 @@ private final class DisplayTarget {
 }
 
 /// Debug and screenshot hooks, read from the launch arguments.
-///   -seed 42          fixed run seed
-///   -fresh            ignore the saved run
-///   -ante 5           start the run at this ante (to see a later art era)
-///   -fold 0.6         pretend the hinge is half folded
+///   -seed 42   -fresh   -ante 5   -fold 0.6   -skipTitle
 ///   -autoplay "0.62,0;0.55,0.1"   throw these launches (power,aim[,start])
-///   -skipTitle
 struct LaunchArguments {
     var seed: UInt64?
     var fresh = false
@@ -181,8 +254,7 @@ struct LaunchArguments {
     }
 }
 
-/// The run on disk is just the seed and the actions; replaying them
-/// rebuilds the exact state.
+/// The run on disk is the seed and the actions; replaying rebuilds it.
 enum RunStore {
     struct File: Codable { var seed: UInt64; var actions: [Action] }
     static var url: URL {
@@ -197,7 +269,6 @@ enum RunStore {
     }
 }
 
-/// Haptics keyed off what the presentation just finished showing.
 @MainActor
 final class Haptics {
     private let light = UIImpactFeedbackGenerator(style: .light)
@@ -206,8 +277,9 @@ final class Haptics {
     private let note = UINotificationFeedbackGenerator()
 
     func tap() { light.impactOccurred() }
-    func launch() { rigid.impactOccurred(intensity: 0.6) }
+    func launch() { rigid.impactOccurred(intensity: 0.7) }
     func reject() { note.notificationOccurred(.warning) }
+    func foul() { note.notificationOccurred(.error) }
 
     func play(_ beat: Beat) {
         switch beat {

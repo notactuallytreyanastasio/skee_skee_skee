@@ -16,6 +16,10 @@ targets:
         product: SkeeCore
       - package: SkeeSkeeSkee
         product: SkeeRender
+      - package: SkeeSkeeSkee
+        product: SkeeScene
+      - package: SkeeSkeeSkee
+        product: SkeeHUD
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.bobbygrayson.skeeskeeskee

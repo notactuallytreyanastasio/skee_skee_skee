@@ -67,14 +67,18 @@ public struct Presentation: Sendable {
 
     /// Turn a reducer step into beats. `step.state` is the truth; beats only
     /// decide how we get there on screen.
-    public mutating func enqueue(_ step: Step) {
+    /// - Parameter releaseAlong: how far up the lane the thumb let go. The
+    ///   physics always starts a shot at the release line; the roll is
+    ///   shown from where the ball actually left the thumb, so it doesn't
+    ///   jump back.
+    public mutating func enqueue(_ step: Step, releaseAlong: Double = 0) {
         var spun = false
         for event in step.events {
             switch event {
             case .fouled:
                 beats.append(.banner("FOUL", sub: "thumb past the crease", seconds: 1.0))
             case .shot(let r, let b):
-                beats.append(.roll(r, b))
+                beats.append(.roll(Self.trim(r, from: releaseAlong), b))
             case .frameScored(let f):
                 beats.append(.tally(f))
             case .feverLit:
@@ -208,6 +212,16 @@ public struct Presentation: Sendable {
         case .banner:
             break
         }
+    }
+
+    /// Drop the part of a path before it reaches `along`, re-timed to start
+    /// at zero.
+    static func trim(_ r: ShotResult, from along: Double) -> ShotResult {
+        guard along > 0, let i = r.path.firstIndex(where: { $0.along >= along }), i > 0 else { return r }
+        let t0 = r.path[i].t
+        var out = r
+        out.path = r.path[i...].map { s in var q = s; q.t -= t0; return q }
+        return out
     }
 
     /// Linear interpolation into a recorded path.

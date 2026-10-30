@@ -20,7 +20,10 @@ public enum Textures {
     }
 
     nonisolated(unsafe) static var cache: [String: CGImage] = [:]
+    static let lock = NSRecursiveLock()
+    /// The render thread and the HUD both ask for textures.
     static func cached(_ k: String, _ make: () -> CGImage) -> CGImage {
+        lock.lock(); defer { lock.unlock() }
         if let i = cache[k] { return i }
         let i = make(); cache[k] = i; return i
     }
@@ -222,6 +225,46 @@ public enum Textures {
         }
         c.textPosition = CGPoint(x: x, y: baseline); CTLineDraw(lineRef, c)
         c.restoreGState()
+    }
+
+    /// The inside of a hole: near-black in the middle, a little lighter at
+    /// the lip, with a soft inner ring, so a flat disc reads as a pit.
+    public static var pit: CGImage {
+        cached("pit") {
+            let n = 256
+            let c = context(n, n)
+            let g = CGGradient(colorsSpace: CGColorSpace(name: CGColorSpace.sRGB),
+                               colors: [RGB(0x07040C).cg(), RGB(0x160C22).cg(), RGB(0x3A2346).cg()] as CFArray,
+                               locations: [0, 0.62, 1])!
+            c.drawRadialGradient(g, startCenter: CGPoint(x: n / 2, y: n / 2 + 18), startRadius: 0,
+                                 endCenter: CGPoint(x: n / 2, y: n / 2), endRadius: CGFloat(n) / 2, options: [.drawsAfterEndLocation])
+            return c.makeImage()!
+        }
+    }
+
+    /// A score badge: cream (or gold for 50 and 100) with the number in ink.
+    public static func badge(_ s: String, special: Bool) -> CGImage {
+        cached("badge-\(s)-\(special)") {
+            let w = 256, h = 140
+            let c = context(w, h)
+            c.setFillColor((special ? RGB(0xFFC94D) : RGB(0xFFF8EC)).cg()); c.fill(CGRect(x: 0, y: 0, width: w, height: h))
+            text(s, in: CGRect(x: 0, y: 0, width: w, height: h), size: 112, fill: special ? RGB(0x3A2346) : RGB(0xFF4D6D), c,
+                 outline: special ? 0 : 10)
+            return c.makeImage()!
+        }
+    }
+
+    /// Soft round shadow for under the ball.
+    public static var blob: CGImage {
+        cached("blob") {
+            let n = 128
+            let c = context(n, n)
+            let g = CGGradient(colorsSpace: CGColorSpace(name: CGColorSpace.sRGB),
+                               colors: [RGB(0x3A2346).cg(0.55), RGB(0x3A2346).cg(0)] as CFArray, locations: [0, 1])!
+            c.drawRadialGradient(g, startCenter: CGPoint(x: n / 2, y: n / 2), startRadius: 0,
+                                 endCenter: CGPoint(x: n / 2, y: n / 2), endRadius: CGFloat(n) / 2, options: [])
+            return c.makeImage()!
+        }
     }
 
     /// A number painted on the board, e.g. "30".

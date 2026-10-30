@@ -4,7 +4,6 @@ import SkeeCore
 
 /// Offscreen render of a cabinet, for the CLI and tests. Same scene, same
 /// shaders as the app's SCNView.
-@MainActor
 public func snapshot(_ cab: Cabinet, size: CGSize, time: TimeInterval = 0) -> CGImage? {
     guard let device = MTLCreateSystemDefaultDevice() else { return nil }
     let r = SCNRenderer(device: device, options: nil)

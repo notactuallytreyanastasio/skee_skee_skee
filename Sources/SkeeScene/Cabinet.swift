@@ -3,13 +3,16 @@ import SkeeCore
 
 /// The whole alley, built from toon parts. Owns handles to everything the
 /// presenter moves or retextures.
-@MainActor
-public final class Cabinet {
+public final class Cabinet: @unchecked Sendable {
     public let scene = SCNScene()
     public let world: World
     public let camera = SCNNode()
     public let ball: SCNNode
     public let board = SCNNode()
+    /// Soft shadow that follows the ball on the lane and board.
+    public let shadow: SCNNode
+    /// Marquee bulbs around the target, for chases on big moments.
+    public private(set) var bulbs: [SCNNode] = []
     /// Symbol plate beside each hole.
     public private(set) var plates: [Hole: SCNNode] = [:]
     /// The three reel windows of the marquee slot machine.
@@ -38,6 +41,16 @@ public final class Cabinet {
         ballGeo.materials = [Toon.material(Textures.ball)]
         ball = SCNNode(geometry: ballGeo)
         Toon.outline(ball, thick: 0.03)
+        let blob = SCNPlane(width: CGFloat(world.ballRadius) * 2.6, height: CGFloat(world.ballRadius) * 2.6)
+        let bm = SCNMaterial()
+        bm.lightingModel = .constant
+        bm.diffuse.contents = Textures.blob
+        bm.writesToDepthBuffer = false
+        bm.blendMode = .alpha
+        blob.materials = [bm]
+        shadow = SCNNode(geometry: blob)
+        shadow.castsShadow = false
+        shadow.renderingOrder = 5
         build()
     }
 
@@ -102,7 +115,9 @@ public final class Cabinet {
         root.addChildNode(camera)
 
         ball.simdPosition = w.lane(x: 0, s: 0.15) + w.laneNormal * w.ballRadius
+        root.addChildNode(shadow)
         root.addChildNode(ball)
+        buildBulbs()
     }
 
     func buildBoard() {
@@ -129,55 +144,62 @@ public final class Cabinet {
             n.castsShadow = false
             board.addChildNode(n)
         }
+        // Ring lips: rounded rails, cut at the bottom where the holes sit,
+        // so the column of holes reads as a channel through the rings.
         for wall in b.ringWalls {
-            let t = SCNTube(innerRadius: CGFloat(wall) - 0.007, outerRadius: CGFloat(wall) + 0.007, height: CGFloat(b.lipHeight))
-            t.radialSegmentCount = 96
-            t.materials = [kit.mat(Self.lip)]
-            let n = SCNNode(geometry: t)
-            n.simdEulerAngles.x = .pi / 2
-            n.position = v3(Float(c.x), Float(c.y), Float(b.lipHeight) / 2)
-            Toon.outline(n, thick: 0.02)
+            let gapHalf = asin(min(0.95, Float(b.ringHoleVisual + 0.006) / Float(wall)))
+            let g = Shapes.lipArc(ring: Float(wall), tube: 0.0085, height: Float(b.lipHeight),
+                                  gapAt: -.pi / 2, gapHalf: gapHalf)
+            g.materials = [kit.mat(Self.lip)]
+            let n = SCNNode(geometry: g)
+            n.position = v3(Float(c.x), Float(c.y), 0)
+            Toon.outline(n, thick: 0.022)
             board.addChildNode(n)
         }
 
         // A hole in every ring, plus the 50 and the two pockets.
         for hole in Hole.allCases where hole != .gutter {
             let p = b.holeCenter(hole)
-            let radius: Float = hole.isPocket ? Float(b.pockets[0].radius) + 0.006 : (hole == .ring50 ? Float(b.centerHoleRadius) + 0.006 : 0.036)
-            let pit = SCNCylinder(radius: CGFloat(radius), height: 0.004)
+            let special = hole.isPocket || hole == .ring50
+            let radius: Float = hole.isPocket ? Float(b.pockets[0].radius) + 0.004
+                : (hole == .ring50 ? Float(b.centerHoleRadius) + 0.004 : Float(b.ringHoleVisual))
+            // The pit: a dark disc shaded darker toward the middle, reads as depth.
+            let pit = SCNCylinder(radius: CGFloat(radius), height: 0.002)
             pit.radialSegmentCount = 48
-            pit.materials = [kit.mat(Self.hole)]
+            let pm = Toon.material(Textures.pit)
+            pit.materials = [kit.mat(Self.hole), pm, kit.mat(Self.hole)]
             let pn = SCNNode(geometry: pit)
             pn.simdEulerAngles.x = .pi / 2
-            pn.position = v3(Float(p.x), Float(p.y), 0.003)
+            pn.position = v3(Float(p.x), Float(p.y), 0.004)
             pn.castsShadow = false
             board.addChildNode(pn)
-            let rim = SCNTube(innerRadius: CGFloat(radius), outerRadius: CGFloat(radius) + 0.008, height: 0.012)
-            rim.radialSegmentCount = 48
-            rim.materials = [kit.mat(hole.isPocket || hole == .ring50 ? 0xFFC94D : Self.lip)]
+            // The rim: a bright ring around the pit.
+            let rim = SCNTorus(ringRadius: CGFloat(radius + 0.003), pipeRadius: 0.0055)
+            rim.ringSegmentCount = 64; rim.pipeSegmentCount = 10
+            rim.materials = [kit.mat(special ? 0xFFC94D : 0xFFF8EC)]
             let rn = SCNNode(geometry: rim)
             rn.simdEulerAngles.x = .pi / 2
             rn.position = v3(Float(p.x), Float(p.y), 0.006)
-            Toon.outline(rn, thick: 0.018)
+            Toon.outline(rn, thick: 0.02)
             board.addChildNode(rn)
 
-            // Number painted beside the hole, symbol plate on the other side.
-            let label = SCNPlane(width: 0.08, height: 0.04)
-            let lm = Toon.material(Textures.label("\(hole.faceValue)"))
-            lm.transparencyMode = .aOne
-            label.materials = [lm]
-            let ln = SCNNode(geometry: label)
+            // Number badge on one side, symbol plate on the other.
             let side: Float = hole == .pocketRight ? 1 : -1
-            ln.position = v3(Float(p.x) + side * (radius + 0.042), Float(p.y), 0.004)
-            ln.castsShadow = false
-            board.addChildNode(ln)
+            let badge = SCNBox(width: 0.062, height: 0.034, length: 0.01, chamferRadius: 0.012)
+            let bm = Toon.material(Textures.badge("\(hole.faceValue)", special: special))
+            let edge = kit.mat(special ? 0xFFC94D : 0xFFF8EC)
+            badge.materials = [bm, edge, edge, edge, edge, edge]
+            let bn = SCNNode(geometry: badge)
+            bn.position = v3(Float(p.x) + side * (radius + 0.042), Float(p.y), 0.008)
+            Toon.outline(bn, thick: 0.016)
+            board.addChildNode(bn)
 
-            let plate = SCNBox(width: 0.056, height: 0.056, length: 0.012, chamferRadius: 0.007)
-            plate.materials = [kit.mat(0xFFF8EC), kit.mat(0xFFF8EC), kit.mat(0xFFF8EC), kit.mat(0xFFF8EC), kit.mat(0xFFF8EC), kit.mat(0xFFF8EC)]
-            plate.materials[0] = Toon.material(Textures.plate(.blank))
+            let plate = SCNBox(width: 0.054, height: 0.054, length: 0.012, chamferRadius: 0.008)
+            let pe = kit.mat(0xFFF8EC)
+            plate.materials = [Toon.material(Textures.plate(.blank)), pe, pe, pe, pe, pe]
             let pl = SCNNode(geometry: plate)
-            pl.position = v3(Float(p.x) - side * (radius + 0.038), Float(p.y), 0.008)
-            Toon.outline(pl, thick: 0.015)
+            pl.position = v3(Float(p.x) - side * (radius + 0.044), Float(p.y), 0.009)
+            Toon.outline(pl, thick: 0.016)
             board.addChildNode(pl)
             plates[hole] = pl
         }
@@ -236,6 +258,37 @@ public final class Cabinet {
             n.eulerAngles = v3(Float(i) * 0.7, Float(i) * 1.3, 0)
             scene.rootNode.addChildNode(n)
             waiting.append(n)
+        }
+    }
+
+    /// A row of bulbs over the target and down both side walls.
+    func buildBulbs() {
+        let b = world.table.board
+        let bw = Float(b.width), bh = Float(b.height)
+        var spots: [SIMD3<Float>] = []
+        for i in 0..<9 { spots.append(SIMD3(-bw / 2 + bw * Float(i) / 8, bh + 0.05, 0.14)) }
+        for i in 0..<7 {
+            let y = bh * Float(i) / 6
+            spots.append(SIMD3(-bw / 2 - 0.02, y, 0.15)); spots.append(SIMD3(bw / 2 + 0.02, y, 0.15))
+        }
+        for (i, p) in spots.enumerated() {
+            let g = SCNSphere(radius: 0.012); g.segmentCount = 16
+            let m = Toon.material(hex(i % 2 == 0 ? 0xFFF1A8 : 0xFF9EC4), emission: hex(0x000000))
+            g.materials = [m]
+            let n = SCNNode(geometry: g)
+            n.simdPosition = p
+            Toon.outline(n, thick: 0.02)
+            board.addChildNode(n)
+            bulbs.append(n)
+        }
+    }
+
+    /// Light bulbs in a chase: `phase` steps the pattern, `level` 0...1.
+    public func lightBulbs(phase: Int, level: Float) {
+        for (i, n) in bulbs.enumerated() {
+            let on = (i + phase) % 3 == 0
+            n.geometry?.firstMaterial?.emission.contents = on && level > 0
+                ? PlatformColor(white: CGFloat(level), alpha: 1) : PlatformColor.black
         }
     }
 

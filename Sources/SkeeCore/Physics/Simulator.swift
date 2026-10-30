@@ -39,9 +39,10 @@ private struct ShotSim {
         self.table = table
     }
 
-    /// Record at 60 Hz (every 4th 240 Hz step); plenty for animation.
+    /// Record at 120 Hz (every 2nd 240 Hz step), so a 120 Hz display never
+    /// interpolates across a bounce.
     mutating func record(_ phase: PathPhase, _ x: Double, _ along: Double, _ h: Double, force: Bool = false) {
-        if force || step % 4 == 0 {
+        if force || step % 2 == 0 {
             path.append(PathSample(t: t, phase: phase, x: x, along: along, height: h))
         }
     }
@@ -55,10 +56,10 @@ private struct ShotSim {
     mutating func run() -> ShotResult {
         let g = table.gravity, dt = table.dt
         let halfLane = lane.width / 2 - r
-        let v0 = lane.releaseSpeed(power: launch.power) * (1 - lane.skidLoss * launch.skid)
+        let v0 = launch.speed * (1 - lane.skidLoss * launch.skid)
         let hook = launch.spin * lane.hook
         let angle = launch.aim * lane.maxAimAngle
-        var x = launch.start * halfLane, s = 0.0
+        var x = launch.start * halfLane, s = launch.from
         var vx = v0 * _sin(angle), vs = v0 * _cos(angle)
         let slopePull = -g * _sin(lane.incline)
         let friction = lane.rollingFriction * g * _cos(lane.incline)

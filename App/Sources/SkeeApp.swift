@@ -28,7 +28,7 @@ struct GameView: View {
     var body: some View {
         GeometryReader { geo in
             ZStack {
-                CabinetView(cabinet: model.cabinet)
+                CabinetView(cabinet: model.cabinet, driver: model.driver)
                 ThrowPadView(model: model)
                 HUDView(state: model.hud, actions: model.hudActions)
             }
@@ -41,6 +41,7 @@ struct GameView: View {
 
 struct CabinetView: UIViewRepresentable {
     let cabinet: Cabinet
+    let driver: RenderDriver
 
     func makeUIView(context: Context) -> SCNView {
         let v = SCNView(frame: .zero, options: nil)
@@ -51,6 +52,8 @@ struct CabinetView: UIViewRepresentable {
         v.rendersContinuously = true
         v.isUserInteractionEnabled = false
         v.backgroundColor = .clear
+        v.delegate = driver
+        v.isPlaying = true
         return v
     }
 
@@ -76,11 +79,11 @@ struct ThrowPadView: UIViewRepresentable {
 final class ThrowPad: UIView {
     weak var model: GameModel?
 
-    func samples(_ touch: UITouch, _ event: UIEvent?) -> [TouchSample] {
+    func samples(_ touch: UITouch, _ event: UIEvent?) -> [(t: Double, x: Double, y: Double)] {
         let all = event?.coalescedTouches(for: touch) ?? [touch]
         return all.map { t in
             let p = t.location(in: self)
-            return TouchSample(t: t.timestamp, x: Double(p.x), y: Double(p.y))
+            return (t.timestamp, Double(p.x), Double(p.y))
         }
     }
 
@@ -88,7 +91,7 @@ final class ThrowPad: UIView {
         guard let t = touches.first, let model else { return }
         let p = t.location(in: self)
         if model.tapBoard(at: p) { return }
-        model.touchBegan(TouchSample(t: t.timestamp, x: Double(p.x), y: Double(p.y)))
+        model.touchBegan(t: t.timestamp, x: Double(p.x), y: Double(p.y))
     }
 
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {

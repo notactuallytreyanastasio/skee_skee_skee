@@ -109,3 +109,30 @@ func frameCommand() {
     writePNG(img, out)
     print(out)
 }
+
+/// skee thumbprobe: how thumb movement on screen maps to lane metres, and
+/// which release speeds score from a typical release point.
+@MainActor
+func thumbProbe() {
+    let size = CGSize(width: 626, height: 890)
+    let a = Float(size.width / size.height)
+    let cab = Cabinet()
+    let pr = ScenePresenter(cabinet: cab, aspect: a)
+    let g = pr.strokeGeometry(size: size)
+    print("crease at y =", Int(g.creaseY), "pt; foul above", Int(g.foulY))
+    var prev: Double?
+    for y in stride(from: 860.0, through: 450, by: -50) {
+        let p = pr.lanePoint(screen: SIMD2(0.5, Float(y / size.height)), aspect: a)!
+        let s = pr.laneCoordinates(p).s
+        if let prev { print("y \(Int(y)): s = \(f2(s)) m  (\(String(format: "%.1f", (s - prev) / 50 * 1000)) mm per pt)") } else { print("y \(Int(y)): s = \(f2(s)) m") }
+        prev = s
+    }
+    for from in [1.2, 1.7, 2.1] {
+        var line = "from \(f2(from)) m:"
+        for sp in stride(from: 1.5, through: 4.5, by: 0.15) {
+            let h = simulateShot(Launch(speed: sp, from: from, aim: 0), on: .standard).hole
+            line += " \(f2(sp)):\(h.faceValue)"
+        }
+        print(line)
+    }
+}

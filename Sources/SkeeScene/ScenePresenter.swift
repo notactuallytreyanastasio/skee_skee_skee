@@ -7,8 +7,9 @@ import SkeeRender
 /// what rolling needs (the ball's orientation and last position) and caches
 /// to avoid re-texturing unchanged plates. Everything else is read fresh
 /// from the presentation each frame.
-@MainActor
-public final class ScenePresenter {
+/// Runs on SceneKit's render thread (renderer(_:updateAtTime:)), so the
+/// ball moves in step with the frames that draw it.
+public final class ScenePresenter: @unchecked Sendable {
     public let cabinet: Cabinet
     public private(set) var rig: CameraRig
     var orientation = simd_quatf(angle: 0, axis: SIMD3(1, 0, 0))
@@ -73,7 +74,9 @@ public final class ScenePresenter {
                 let axis = simd_normalize(simd_cross(normal, d))
                 let angle = dist / (r * scale)
                 orientation = simd_quatf(angle: angle, axis: axis) * orientation
-                spinRate = dt > 0 ? axis * (angle / Float(dt)) : spinRate
+                // Smoothed, and only from real frame steps: a tiny dt made
+                // the in-flight spin explode.
+                if dt > 1.0 / 400 { spinRate = spinRate * 0.6 + axis * (angle / Float(dt)) * 0.4 }
             } else if airborne, simd_length(spinRate) > 0 {
                 let rate = simd_length(spinRate)
                 orientation = simd_quatf(angle: rate * Float(dt), axis: spinRate / rate) * orientation
@@ -81,6 +84,27 @@ public final class ScenePresenter {
         }
         lastCenter = visible ? center : nil
         cabinet.ball.isHidden = !visible
+
+        // Shadow on the surface under the ball: smaller and fainter the
+        // higher the ball is.
+        var ground = center - normal * (r * scale)
+        var height: Float = 0
+        if let sample = p.ball, sample.along > world.table.lane.length {
+            ground = world.board(Vec2(sample.x, sample.along - world.table.lane.length), z: 0)
+            height = Float(sample.height)
+        }
+        let sn = cabinet.shadow
+        sn.isHidden = !visible
+        sn.simdPosition = ground + normal * 0.004
+        sn.simdOrientation = simd_quatf(from: SIMD3(0, 0, 1), to: normal)
+        let fade = max(0.25, 1 - height * 3)
+        sn.simdScale = SIMD3(repeating: scale * (0.7 + 0.3 * fade))
+        sn.opacity = CGFloat(fade)
+
+        // Bulbs: idle twinkle, a fast chase on fever, jackpots and banners.
+        let excited = p.flash > 0.05 || s.fever || p.banner != nil
+        let rate = excited ? 14.0 : 2.0
+        cabinet.lightBulbs(phase: Int(p.clock * rate), level: excited ? 0.9 : 0.35)
         cabinet.ball.simdPosition = center
         cabinet.ball.simdOrientation = orientation
         cabinet.ball.simdScale = SIMD3(repeating: scale)
@@ -127,18 +151,26 @@ public final class ScenePresenter {
         var hit = o + d * t
         let half = Float(world.table.lane.width) / 2 - world.ballRadius
         hit.x = min(max(hit.x, -half), half)
+        // Never past the hump, even while the thumb sinks into the crease.
+        let along = simd_dot(hit - p0, world.laneForward)
+        let maxAlong = world.laneLength - 0.03
+        if along > maxAlong { hit -= world.laneForward * (along - maxAlong) }
         return hit + n * world.ballRadius
     }
 
-    /// Where the lane sits on screen, for stroke analysis.
+    /// Where the crease is on screen, for stroke analysis.
     public func strokeGeometry(size: CGSize) -> StrokeGeometry {
-        let a = Float(size.width / size.height)
-        let crease = rig.project(world.lane(x: 0, s: world.table.lane.length), aspect: a).y
-        let nearL = rig.project(world.lane(x: -world.table.lane.width / 2, s: 0.3), aspect: a).x
-        let nearR = rig.project(world.lane(x: world.table.lane.width / 2, s: 0.3), aspect: a).x
-        let near = rig.project(world.lane(x: 0, s: 0), aspect: a).y
-        return StrokeGeometry(creaseY: Double(crease) * size.height, laneMinX: Double(nearL) * size.width,
-                              laneMaxX: Double(nearR) * size.width, bottomY: Double(near) * size.height)
+        let aspect = Float(size.width / size.height)
+        let hump = world.lane(x: 0, s: world.table.lane.length)
+        let crease = Double(rig.project(hump, aspect: aspect).y) * Double(size.height)
+        return StrokeGeometry(creaseY: crease, laneHalfWidth: world.table.lane.width / 2)
+    }
+
+    /// Physics lane coordinates (x across, s up the lane) of a scene point
+    /// on the lane.
+    public func laneCoordinates(_ p: SIMD3<Float>) -> (x: Double, s: Double) {
+        let rel = p - world.lane(x: 0, s: 0)
+        return (Double(rel.x), Double(simd_dot(rel, world.laneForward) / world.laneScale))
     }
 }
 

@@ -220,7 +220,8 @@ struct SceneDrawer {
             for anchor in reelAnchors(hole, board: board) {
                 let a = proj.board(anchor)
                 let scale = proj.boardDepth(anchor.y)
-                let w: CGFloat = (hole == .ring40 ? 40 : 46) * scale, h: CGFloat = 36 * scale
+                let band = CGFloat(board.ringWalls[1] - board.ringWalls[0]) * proj.hingeScale
+                let w = min(hole == .ring40 ? 40 : 46, band * 0.92) * scale, h = min(36, band * 0.72) * scale
                 let r = CGRect(x: a.x - w / 2, y: a.y - h / 2 + 6, width: w, height: h)
                 reelWindow(hole, r, framed: true)
                 label(board.chipsLabel(hole, setup: s.setup), at: CGPoint(x: a.x, y: r.minY - 9), small: true)

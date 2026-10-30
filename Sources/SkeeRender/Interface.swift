@@ -42,10 +42,16 @@ public struct Rects: Sendable {
         (0..<3).map { CGRect(x: 18 + CGFloat($0) * 50, y: layout.trayRect.minY + 14, width: 44, height: 44) }
     }
     public var powerUpSlots: [CGRect] {
-        (0..<2).map { CGRect(x: 184 + CGFloat($0) * 54, y: layout.trayRect.minY + 14, width: 48, height: 48) }
+        let x0: CGFloat = layout.compact ? layout.size.width - 18 - 102 : 184
+        return (0..<2).map { CGRect(x: x0 + CGFloat($0) * 54, y: layout.trayRect.minY + 14, width: 48, height: 48) }
     }
     public var charmSlots: [CGRect] {
-        let w: CGFloat = 62, gap: CGFloat = 6
+        let gap: CGFloat = 6
+        if layout.compact {
+            let w = (layout.size.width - 36 - 4 * gap) / 5
+            return (0..<5).map { CGRect(x: 18 + CGFloat($0) * (w + gap), y: layout.trayRect.minY + 86, width: w, height: 56) }
+        }
+        let w: CGFloat = 62
         let x0 = layout.size.width - 18 - 5 * w - 4 * gap
         return (0..<5).map { CGRect(x: x0 + CGFloat($0) * (w + gap), y: layout.trayRect.minY + 10, width: w, height: 62) }
     }

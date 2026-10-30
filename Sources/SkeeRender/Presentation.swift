@@ -97,7 +97,12 @@ public struct Presentation: Sendable {
         beats.append(.commit(step.state))
     }
 
+    /// Beats that finished during the last `advance`, for the shell's
+    /// haptics and sound. Cleared at the start of each advance.
+    public private(set) var finished: [Beat] = []
+
     public mutating func advance(_ dt: Double) {
+        finished = []
         clock += dt
         flash = max(0, flash - dt * 2.5)
         shake = max(0, shake - dt * 3)
@@ -118,6 +123,7 @@ public struct Presentation: Sendable {
             beatTime = beat.duration
             during(beat)
             finish(beat)
+            finished.append(beat)
             beats.removeFirst()
             beatTime = 0
         }

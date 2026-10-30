@@ -32,7 +32,10 @@ public struct Layout: Hashable, Sendable {
     public let size: CGSize
     public var hingeY: CGFloat { size.height / 2 }
     public var hudHeight: CGFloat { 64 }
-    public var trayHeight: CGFloat { 104 }
+    /// Narrow screens (the Duo's outer display when folded) stack the tray
+    /// in two rows.
+    public var compact: Bool { size.width < 560 }
+    public var trayHeight: CGFloat { compact ? 150 : 104 }
 
     public init(size: CGSize) { self.size = size }
 

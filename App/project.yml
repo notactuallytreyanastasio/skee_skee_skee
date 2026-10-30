@@ -1,0 +1,32 @@
+name: SkeeSkeeSkee
+options:
+  bundleIdPrefix: com.bobbygrayson
+  deploymentTarget:
+    iOS: "18.0"
+packages:
+  SkeeSkeeSkee:
+    path: ..
+targets:
+  SkeeSkeeSkee:
+    type: application
+    platform: iOS
+    sources: [Sources]
+    dependencies:
+      - package: SkeeSkeeSkee
+        product: SkeeCore
+      - package: SkeeSkeeSkee
+        product: SkeeRender
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.bobbygrayson.skeeskeeskee
+        SWIFT_VERSION: "6.0"
+        TARGETED_DEVICE_FAMILY: "1"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+        INFOPLIST_KEY_UIStatusBarHidden: YES
+        INFOPLIST_KEY_UIRequiresFullScreen: YES
+        INFOPLIST_KEY_CFBundleDisplayName: "Skee Skee Skee"
+        MARKETING_VERSION: "0.1"
+        CURRENT_PROJECT_VERSION: "1"
+        CODE_SIGN_STYLE: Automatic

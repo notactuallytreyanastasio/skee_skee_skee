@@ -7,7 +7,10 @@ import UniformTypeIdentifiers
 
 // PNG output: the same Renderer the app uses, drawn into a bitmap.
 
-let duoInner = CGSize(width: 669, height: 951)
+let duoInnerSize = CGSize(width: 669, height: 951)
+let duoOuterSize = CGSize(width: 466, height: 678)
+/// --size outer renders the folded (outer) display instead of the inner one.
+var duoInner: CGSize { flag("size") == "outer" ? duoOuterSize : duoInnerSize }
 
 func bitmap(_ size: CGSize, scale: CGFloat = 1) -> CGContext {
     let ctx = CGContext(data: nil, width: Int(size.width * scale), height: Int(size.height * scale),

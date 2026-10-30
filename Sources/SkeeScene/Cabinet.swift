@@ -3,6 +3,17 @@ import SkeeCore
 
 /// The whole alley, built from toon parts. Owns handles to everything the
 /// presenter moves or retextures.
+public struct RingReel {
+    public let pivot: SCNNode
+    public let decals: [SCNNode]
+    public let radius: Float
+    /// Angle of the first symbol at rest.
+    public let phase: Float
+    /// Bright band under the symbols that pulses when this ring is a good target.
+    public let halo: SCNNode
+    public var shown: Symbol?
+}
+
 public final class Cabinet: @unchecked Sendable {
     public let scene = SCNScene()
     public let world: World
@@ -13,8 +24,9 @@ public final class Cabinet: @unchecked Sendable {
     public let shadow: SCNNode
     /// Marquee bulbs around the target, for chases on big moments.
     public private(set) var bulbs: [SCNNode] = []
-    /// Symbol plate beside each hole.
-    public private(set) var plates: [Hole: SCNNode] = [:]
+    /// Each hole's reel, drawn as symbols orbiting its ring (or hovering by
+    /// the 50 and the pockets).
+    public private(set) var reelsOnBoard: [Hole: RingReel] = [:]
     /// The three reel windows of the marquee slot machine.
     public private(set) var reels: [SCNNode] = []
     /// Balls waiting in the return trough, nearest first.
@@ -194,15 +206,9 @@ public final class Cabinet: @unchecked Sendable {
             Toon.outline(bn, thick: 0.016)
             board.addChildNode(bn)
 
-            let plate = SCNBox(width: 0.054, height: 0.054, length: 0.012, chamferRadius: 0.008)
-            let pe = kit.mat(0xFFF8EC)
-            plate.materials = [Toon.material(Textures.plate(.blank)), pe, pe, pe, pe, pe]
-            let pl = SCNNode(geometry: plate)
-            pl.position = v3(Float(p.x) - side * (radius + 0.044), Float(p.y), 0.009)
-            Toon.outline(pl, thick: 0.016)
-            board.addChildNode(pl)
-            plates[hole] = pl
         }
+
+        buildRingReels()
 
         // Side walls and backwall.
         for sx: Float in [-1, 1] {
@@ -292,8 +298,83 @@ public final class Cabinet: @unchecked Sendable {
         }
     }
 
-    public func setPlate(_ hole: Hole, _ symbol: Symbol) {
-        plates[hole]?.geometry?.materials[0].diffuse.contents = Textures.plate(symbol)
+    /// Symbols around each ring band: the ring is the reel. Big, repeated,
+    /// upright, so they read from the far end of the alley.
+    func buildRingReels() {
+        let b = world.table.board, c = b.ringCenter, w = b.ringWalls
+        func reel(_ hole: Hole, center: SIMD2<Float>, radius: Float, count: Int, size: Float,
+                  phase: Float = .pi / 2, band: (Double, Double)) {
+            let pivot = SCNNode()
+            pivot.simdPosition = SIMD3(center.x, center.y, 0.006)
+            board.addChildNode(pivot)
+            let tube = SCNTube(innerRadius: CGFloat(band.0), outerRadius: CGFloat(band.1), height: 0.001)
+            tube.radialSegmentCount = 96
+            let hm = SCNMaterial()
+            hm.lightingModel = .constant
+            hm.diffuse.contents = hex(0xFFF6B0)
+            hm.blendMode = .add
+            hm.writesToDepthBuffer = false
+            tube.materials = [hm]
+            let halo = SCNNode(geometry: tube)
+            halo.simdEulerAngles.x = .pi / 2
+            // Pocket symbols hover above their pocket; the halo rings the pocket.
+            halo.simdPosition = SIMD3(center.x, hole.isPocket ? center.y - 0.07 : center.y, 0.0035)
+            halo.opacity = 0
+            halo.renderingOrder = 4
+            board.addChildNode(halo)
+            var decals: [SCNNode] = []
+            for _ in 0..<count {
+                let g = SCNPlane(width: CGFloat(size), height: CGFloat(size))
+                let m = Toon.material(Textures.symbol(.blank))
+                m.transparencyMode = .aOne
+                m.isDoubleSided = false
+                g.materials = [m]
+                let n = SCNNode(geometry: g)
+                n.castsShadow = false
+                pivot.addChildNode(n)
+                decals.append(n)
+            }
+            reelsOnBoard[hole] = RingReel(pivot: pivot, decals: decals, radius: radius, phase: phase, halo: halo)
+        }
+        let cc = SIMD2(Float(c.x), Float(c.y))
+        reel(.ring10, center: cc, radius: Float(w[2] + w[3]) / 2, count: 10, size: 0.058, band: (w[2] + 0.008, w[3] - 0.008))
+        reel(.ring20, center: cc, radius: Float(w[1] + w[2]) / 2, count: 8, size: 0.054, band: (w[1] + 0.008, w[2] - 0.008))
+        reel(.ring30, center: cc, radius: Float(w[0] + w[1]) / 2, count: 6, size: 0.052, band: (w[0] + 0.008, w[1] - 0.008))
+        reel(.ring40, center: cc, radius: Float(w[0]) * 0.62, count: 2, size: 0.046, phase: 0, band: (0.0, w[0] - 0.008))
+        let fifty = b.holeCenter(.ring50)
+        reel(.ring50, center: SIMD2(Float(fifty.x), Float(fifty.y)), radius: 0, count: 1, size: 0.05,
+             band: (b.centerHoleRadius + 0.008, b.centerHoleRadius + 0.02))
+        for p in [Hole.pocketLeft, .pocketRight] {
+            let pc = b.holeCenter(p)
+            reel(p, center: SIMD2(Float(pc.x), Float(pc.y) + 0.07), radius: 0, count: 1, size: 0.06,
+                 band: (b.pockets[0].radius + 0.008, b.pockets[0].radius + 0.022))
+        }
+    }
+
+    /// Show `symbol` on a hole's reel. `turn` is how far the reel has
+    /// spun (in symbols, fractional while spinning); `glow` 0...2 lights it
+    /// (1 = would pair, 2 = would complete the line).
+    public func setReel(_ hole: Hole, _ symbol: Symbol, turn: Double, glow: Float, pulse: Float) {
+        guard let r = reelsOnBoard[hole] else { return }
+        let n = r.decals.count
+        let spin = Float(turn) * 2 * .pi / Float(max(n, 3))
+        for (i, d) in r.decals.enumerated() {
+            let a = Float(i) / Float(n) * 2 * .pi + r.phase + spin
+            d.simdPosition = SIMD3(r.radius * cos(a), r.radius * sin(a), 0)
+            // Hide the ones passing through the hole channel at the bottom.
+            let bottom = abs(atan2(sin(a + .pi / 2), cos(a + .pi / 2))) < 0.75
+            d.isHidden = r.radius > 0 && bottom
+            if r.radius == 0 { d.simdPosition.y = 0; d.simdScale = SIMD3(repeating: 1 + 0.25 * glow * pulse) }
+            else { d.simdScale = SIMD3(repeating: 1 + 0.18 * glow * pulse) }
+            let m = d.geometry!.firstMaterial!
+            if r.shown != symbol { m.diffuse.contents = Textures.symbol(symbol) }
+            m.emission.contents = glow > 0
+                ? PlatformColor(red: CGFloat(0.55 * pulse), green: CGFloat((glow > 1 ? 0.45 : 0.3) * pulse), blue: CGFloat(glow > 1 ? 0 : 0.25 * pulse), alpha: 1)
+                : PlatformColor.black
+        }
+        r.halo.opacity = CGFloat(glow > 0 ? (glow > 1 ? 0.75 : 0.45) * pulse : 0)
+        r.halo.geometry?.firstMaterial?.diffuse.contents = hex(glow > 1 ? 0xFFD84D : 0xFFF6B0)
+        reelsOnBoard[hole]?.shown = symbol
     }
 
     public func setReel(_ i: Int, _ symbol: Symbol?) {

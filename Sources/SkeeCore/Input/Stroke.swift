@@ -1,139 +1,161 @@
-/// The thumb throw, as a pure function of touch samples.
+/// The throw, as a pure function of a flick.
 ///
-/// The ball sits under the thumb. The player slides it up the lane and lets
-/// go before the crease, the way a skee-ball leaves your hand at the foul
-/// line. The release velocity sets power and aim; the shape of the stroke
-/// matters too:
-/// - a thumb that curves as it lets go puts side spin on the ball,
-/// - a stroke that speeds up and slows down (hitches) skids the ball,
-/// - any touch past the crease is a foul.
-///
-/// Each sample has the thumb on the glass (points) and the ball on the lane
-/// (metres, through the camera). Speed comes from the glass: the lane is in
-/// perspective, so a point of travel is 3 mm of lane at the bottom of the
-/// screen and 14 mm at the crease, and a throw measured in lane metres would
-/// be four times harder near the crease for the same thumb. What a player
-/// feels is their thumb's speed, so that is what carries into the throw.
-/// The release point comes from the lane: where the ball actually was.
-public struct StrokeSample: Hashable, Sendable, Codable {
+/// The ball waits at the release line. The player flicks up the lane the way
+/// anyone flicks on a phone; after the thumb lifts, the shot fires from the
+/// whole motion:
+/// - speed: mostly the speed at lift-off, partly the peak, so a flick that
+///   lets go at speed beats one that rides out to a stop,
+/// - snap: accelerating through the release adds a little, easing off before
+///   it costs a little,
+/// - skid: jerk, normalised by the flick's own size and duration, against a
+///   minimum-jerk reach (how people move when they move smoothly); a shaky
+///   flick skids the ball and loses speed,
+/// - aim: the speed-weighted direction near release,
+/// - spin: sideways acceleration at release (a thumb that hooks),
+/// - line: where across the lane the flick happened.
+/// Touching well past the crease is a foul; flicks overshoot naturally, so the
+/// give is generous.
+public struct FlickSample: Hashable, Sendable, Codable {
     public var t: Double
-    /// Thumb on the glass, points (y grows downward).
-    public var screenX: Double
-    public var screenY: Double
-    /// Ball on the lane: x across (0 = centre), s up the lane, metres.
     public var x: Double
-    public var s: Double
-    public init(t: Double, screenX: Double, screenY: Double, x: Double, s: Double) {
-        self.t = t; self.screenX = screenX; self.screenY = screenY; self.x = x; self.s = s
-    }
+    public var y: Double
+    public init(t: Double, x: Double, y: Double) { self.t = t; self.x = x; self.y = y }
 }
 
-public struct StrokeGeometry: Hashable, Sendable, Codable {
+public struct FlickGeometry: Hashable, Sendable, Codable {
     public var creaseY: Double
+    public var laneCenterX: Double
     public var laneHalfWidth: Double
-    /// How far past the crease the thumb may sink before it's a foul. The
-    /// fold is a dip, and a thumb letting go rides down into it; that should
-    /// feel like the release, not get punished.
+    /// How far past the crease the thumb may go, still touching, before it is
+    /// a foul.
     public var foulGive: Double
 
-    public init(creaseY: Double, laneHalfWidth: Double, foulGive: Double = 40) {
-        self.creaseY = creaseY; self.laneHalfWidth = laneHalfWidth; self.foulGive = foulGive
+    public init(creaseY: Double, laneCenterX: Double, laneHalfWidth: Double, foulGive: Double = 140) {
+        self.creaseY = creaseY; self.laneCenterX = laneCenterX; self.laneHalfWidth = laneHalfWidth; self.foulGive = foulGive
     }
 
-    /// Touches above this screen line are fouls.
     public var foulY: Double { creaseY - foulGive }
 }
 
 public enum StrokeOutcome: Hashable, Sendable {
-    /// Not a throw: a tap, a pull backwards, a nudge.
+    /// Not a throw: a tap, a pull backwards, a touch that started above the crease.
     case none
     case foul
     case release(Launch)
 }
 
-public struct StrokeTuning: Hashable, Sendable, Codable {
-    /// Lane metres per point of thumb travel: thrown speed = thumb speed on
-    /// the glass times this. 700-950 pt/s covers the scoring range.
-    public var metersPerPoint = 0.0036
-    /// Release angle off straight up (radians) that maps to full aim.
+public struct FlickTuning: Hashable, Sendable, Codable {
+    /// Effective flick speeds (pt/s) that map to power 0 and power 1.
+    public var slowest = 600.0
+    public var fastest = 4200.0
+    /// Weight of lift-off speed against peak speed.
+    public var releaseWeight = 0.65
+    /// Snap: release acceleration, in units of peak speed per flick
+    /// duration, that changes speed by `snapGain`.
+    public var snapGain = 0.06
+    /// Release angle off straight up (radians) for full aim.
     public var fullAimAngle = 0.35
-    /// Change in sideways thumb speed (pt/s) over the release that maps to
-    /// full spin.
-    public var fullSpin = 900.0
-    /// Speed lost to hitches, as a fraction of peak, that is free; beyond it
-    /// skid grows at `skidGain` per unit.
-    public var hitchAllowance = 0.1
-    public var skidGain = 1.2
-    /// The window at the end of the stroke that defines the release.
-    public var releaseWindow = 0.05
-    /// The window over which hitches are counted.
-    public var strokeWindow = 0.25
+    /// Sideways acceleration at release, in units of peak speed per flick
+    /// duration, for full spin.
+    public var fullSpin = 1.2
+    /// Normalised jerk of a smooth flick, and how fast skid grows past it.
+    public var smoothJerk = 7.0
+    public var skidPerJerk = 0.1
+    /// How much of a lane half-width the flick's horizontal position moves
+    /// the release line.
+    public var lineReach = 0.85
 
-    public static let standard = StrokeTuning()
+    public static let standard = FlickTuning()
 }
 
-public func crossedCrease(_ samples: [StrokeSample], in g: StrokeGeometry) -> Bool {
-    samples.contains { $0.screenY < g.foulY }
+/// What the analyser measured on the last flick it accepted, for the
+/// tuning tool and on-screen feedback.
+public struct FlickMetrics: Hashable, Sendable {
+    public var peak, release, duration, jerk, snap, side, speed: Double
+}
+nonisolated(unsafe) public private(set) var lastMetrics: FlickMetrics?
+
+public func crossedFoulLine(_ samples: [FlickSample], in g: FlickGeometry) -> Bool {
+    samples.contains { $0.y < g.foulY }
 }
 
-public func analyzeStroke(_ samples: [StrokeSample], in g: StrokeGeometry, fold: Double = 0,
-                          tuning k: StrokeTuning = .standard) -> StrokeOutcome {
-    if crossedCrease(samples, in: g) { return .foul }
-    guard samples.count >= 3, let first = samples.first, let last = samples.last,
-          first.screenY - last.screenY > 25 else { return .none }
+public func analyzeFlick(_ samples: [FlickSample], in g: FlickGeometry, fold: Double = 0,
+                         tuning k: FlickTuning = .standard) -> StrokeOutcome {
+    guard let first = samples.first, first.y > g.creaseY else { return .none }
+    if crossedFoulLine(samples, in: g) { return .foul }
+    guard samples.count >= 4, let last = samples.last, first.y - last.y > 25 else { return .none }
 
-    // Velocity between samples, then a 3-tap moving average: raw touch
-    // positions are quantised and jittery.
-    var raw: [(t: Double, vx: Double, vs: Double)] = []
-    for (a, b) in zip(samples, samples.dropFirst()) where b.t > a.t {
-        let dt = b.t - a.t
-        // Upward is positive: screen y decreases as the thumb goes up.
-        raw.append(((a.t + b.t) / 2, (b.screenX - a.screenX) / dt, (a.screenY - b.screenY) / dt))
+    // Velocity, acceleration and jerk by differences, each lightly smoothed:
+    // touch positions are quantised, and each difference amplifies noise.
+    func diff(_ xs: [(t: Double, x: Double, y: Double)]) -> [(t: Double, x: Double, y: Double)] {
+        zip(xs, xs.dropFirst()).compactMap { a, b in
+            let dt = b.t - a.t
+            return dt > 0 ? ((a.t + b.t) / 2, (b.x - a.x) / dt, (a.y - b.y) / dt) : nil
+        }
     }
-    guard raw.count >= 2 else { return .none }
-    let v = raw.indices.map { i -> (t: Double, vx: Double, vs: Double) in
-        let w = raw[max(0, i - 1)...min(raw.count - 1, i + 1)]
-        let n = Double(w.count)
-        return (raw[i].t, w.reduce(0) { $0 + $1.vx } / n, w.reduce(0) { $0 + $1.vs } / n)
+    func smooth(_ xs: [(t: Double, x: Double, y: Double)]) -> [(t: Double, x: Double, y: Double)] {
+        xs.indices.map { i in
+            let w = xs[max(0, i - 1)...min(xs.count - 1, i + 1)]
+            let n = Double(w.count)
+            return (xs[i].t, w.reduce(0) { $0 + $1.x } / n, w.reduce(0) { $0 + $1.y } / n)
+        }
     }
+    let pos = samples.map { (t: $0.t, x: $0.x, y: -$0.y) }   // y up
+    let v = smooth(diff(pos.map { ($0.t, $0.x, -$0.y) }))      // y component = upward speed
+    guard v.count >= 3 else { return .none }
+    let a = smooth(diff(v.map { ($0.t, $0.x, -$0.y) }))
+    let j = diff(a.map { ($0.t, $0.x, -$0.y) })
 
+    let peak = v.map(\.y).max() ?? 0
+    guard peak > 150 else { return .none }
+    // The flick proper: from when it got going to lift-off.
+    let startT = v.first { $0.y > peak * 0.08 }?.t ?? first.t
     let end = last.t
-    func mean(_ from: Double, _ to: Double) -> (vx: Double, vs: Double) {
-        let w = v.filter { $0.t >= from && $0.t <= to }
-        let use = w.isEmpty ? [v.last!] : w
-        let n = Double(use.count)
-        return (use.reduce(0) { $0 + $1.vx } / n, use.reduce(0) { $0 + $1.vs } / n)
-    }
-    // Speed at the instant of letting go: a line through the last stretch of
-    // velocities, read at the end. A plain average lags a thumb that is
-    // still speeding up, and the throw would lose what it built.
-    func atRelease(_ pick: ((t: Double, vx: Double, vs: Double)) -> Double) -> Double {
-        let w = v.filter { $0.t >= end - 1.6 * k.releaseWindow }
-        guard w.count >= 2 else { return pick(v.last!) }
-        let n = Double(w.count)
-        let mt = w.reduce(0) { $0 + $1.t } / n, mv = w.reduce(0) { $0 + pick($1) } / n
+    let T = max(0.03, end - startT)
+
+    // Lift-off speed: a line through the last few velocities, read at the end.
+    let tail = v.filter { $0.t >= end - 0.06 }
+    func atEnd(_ pick: ((t: Double, x: Double, y: Double)) -> Double) -> Double {
+        guard tail.count >= 2 else { return pick(v.last!) }
+        let n = Double(tail.count)
+        let mt = tail.reduce(0) { $0 + $1.t } / n, mv = tail.reduce(0) { $0 + pick($1) } / n
         var num = 0.0, den = 0.0
-        for e in w { num += (e.t - mt) * (pick(e) - mv); den += (e.t - mt) * (e.t - mt) }
+        for e in tail { num += (e.t - mt) * (pick(e) - mv); den += (e.t - mt) * (e.t - mt) }
         return mv + (den > 0 ? num / den : 0) * (end - mt)
     }
-    let release = (vx: atRelease { $0.vx }, vs: atRelease { $0.vs })
-    guard release.vs > 80 else { return .none }
+    let release = max(0, atEnd { $0.y })
+    guard release > 60 || peak > 600 else { return .none }
 
-    let before = mean(end - 3 * k.releaseWindow, end - k.releaseWindow)
-    let spin = (release.vx - before.vx) / k.fullSpin
+    let aTail = a.filter { $0.t >= end - 0.05 }
+    let aUp = aTail.isEmpty ? 0 : aTail.reduce(0) { $0 + $1.y } / Double(aTail.count)
+    let aSide = aTail.isEmpty ? 0 : aTail.reduce(0) { $0 + $1.x } / Double(aTail.count)
+    let unitAccel = peak / T
 
-    let stroke = v.filter { $0.t >= end - k.strokeWindow }
-    let peak = stroke.map(\.vs).max() ?? release.vs
-    var lost = 0.0
-    for (a, b) in zip(stroke, stroke.dropFirst()) where b.vs < a.vs { lost += a.vs - b.vs }
-    let hitch = peak > 0 ? lost / peak : 0
+    var speed = k.releaseWeight * release + (1 - k.releaseWeight) * peak
+    speed *= 1 + k.snapGain * max(-1.5, min(1.5, aUp / unitAccel))
+
+    // Normalised jerk: RMS jerk over the flick, in units of peak / T^2.
+    let jf = j.filter { $0.t >= startT }
+    let rms = jf.isEmpty ? 0 : (jf.reduce(0) { $0 + $1.y * $1.y + $1.x * $1.x } / Double(jf.count)).squareRoot()
+    let jerk = rms * T * T / peak
+    let skid = (jerk - k.smoothJerk) * k.skidPerJerk
+    lastMetrics = FlickMetrics(peak: peak, release: release, duration: T, jerk: jerk,
+                               snap: aUp / unitAccel, side: aSide / unitAccel, speed: speed)
+
+    // Aim: speed-weighted direction over the last part of the flick.
+    let dir = v.filter { $0.t >= end - 0.08 }
+    let wx = dir.reduce(0) { $0 + $1.x * max(0, $1.y) }, wy = dir.reduce(0) { $0 + $1.y * max(0, $1.y) }
+    let aim = _atan2(wx, max(wy, 1)) / k.fullAimAngle
+
+    // The line: horizontal position where the flick was fastest.
+    let fastest = v.max { $0.y < $1.y }!
+    let xAt = samples.min { abs($0.t - fastest.t) < abs($1.t - fastest.t) }!.x
+    let line = (xAt - g.laneCenterX) / g.laneHalfWidth * k.lineReach
 
     return .release(Launch(
-        speed: release.vs * k.metersPerPoint,
-        from: last.s,
-        aim: _atan2(release.vx, release.vs) / k.fullAimAngle,
-        start: last.x / g.laneHalfWidth,
-        fold: fold,
-        spin: spin,
-        skid: (hitch - k.hitchAllowance) * k.skidGain))
+        power: (speed - k.slowest) / (k.fastest - k.slowest),
+        aim: aim, start: line, fold: fold,
+        spin: aSide / unitAccel / k.fullSpin,
+        skid: skid))
 }
+

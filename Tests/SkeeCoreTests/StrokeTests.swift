@@ -2,96 +2,104 @@ import Foundation
 import Testing
 @testable import SkeeCore
 
-/// A lane like the Duo's inner display: crease at y = 445. For tests, lane
-/// metres map linearly to the screen at 260 pt/m (the shell does the real
-/// perspective mapping).
-let duoLane = StrokeGeometry(creaseY: 445, laneHalfWidth: 0.31)
-let ptPerM = 260.0
-func screenY(_ s: Double) -> Double { 840 - s * ptPerM }
+/// Inner display: crease at y = 445, lane centred at x = 313, ~260 pt either side.
+let duoLane = FlickGeometry(creaseY: 445, laneCenterX: 313, laneHalfWidth: 260)
 
-/// A thumb slide sampled at 120 Hz. `speed(t)` is the ball's speed up the
-/// lane in m/s while held; `drift(t)` its sideways speed.
-func slide(from s0: Double = 0.05, x0: Double = 0, seconds: Double,
-           speed: (Double) -> Double, drift: (Double) -> Double = { _ in 0 }) -> [StrokeSample] {
-    var out: [StrokeSample] = []
-    var x = x0, s = s0, t = 0.0
+/// A natural flick: minimum-jerk motion (the standard model of a human
+/// reach) over `distance` points in `duration` seconds, lifted at `lift`
+/// of the way through the movement, sampled at 120 Hz.
+func flick(distance: Double = 220, duration: Double = 0.16, lift: Double = 0.8,
+           from y0: Double = 820, x0: Double = 313, lateral: (Double) -> Double = { _ in 0 },
+           wobble: Double = 0) -> [FlickSample] {
+    var out: [FlickSample] = []
     let dt = 1.0 / 120
-    while t <= seconds {
-        out.append(StrokeSample(t: t, screenX: 313 + x * ptPerM, screenY: screenY(s), x: x, s: s))
-        s += speed(t) * dt
-        x += drift(t) * dt
+    var t = 0.0
+    while t <= duration * lift + 1e-9 {
+        let u = t / duration
+        let d = distance * (10 * pow(u, 3) - 15 * pow(u, 4) + 6 * pow(u, 5))
+        let w = wobble * sin(t * 90)
+        out.append(FlickSample(t: t, x: x0 + lateral(u), y: y0 - d - w))
         t += dt
     }
     return out
 }
 
-@Suite("Thumb stroke")
-struct StrokeTests {
-    @Test func theThrowCarriesTheBallsSpeedAtRelease() {
-        // Thumb builds from 1 to ~3.4 m/s.
-        let s = slide(seconds: 0.4) { t in 1 + 6 * t }
-        guard case .release(let l) = analyzeStroke(s, in: duoLane) else { Issue.record("not a throw"); return }
-        let tuning = StrokeTuning.standard
-        // Thumb speed on the glass at release, times metres per point.
-        #expect(abs(l.speed - (1 + 6 * 0.4) * ptPerM * tuning.metersPerPoint) < 0.1)
-        #expect(abs(l.from - s.last!.s) < 0.01)
+func launch(_ s: [FlickSample]) -> Launch? {
+    if case .release(let l) = analyzeFlick(s, in: duoLane) { return l }
+    return nil
+}
+
+@Suite("Flick")
+struct FlickTests {
+    @Test func aNaturalFlickIsClean() {
+        let l = launch(flick())!
         #expect(l.skid < 0.15)
-        #expect(abs(l.aim) < 0.05 && abs(l.spin) < 0.1)
+        #expect(abs(l.aim) < 0.05)
+        #expect(abs(l.spin) < 0.1)
+        #expect(l.from == 0)
     }
 
-    @Test func fasterThumbFasterBall() {
-        guard case .release(let a) = analyzeStroke(slide(seconds: 0.35) { t in 1 + 3 * t }, in: duoLane),
-              case .release(let b) = analyzeStroke(slide(seconds: 0.35) { t in 1 + 7 * t }, in: duoLane)
-        else { Issue.record("not throws"); return }
-        #expect(b.speed > a.speed + 1)
+    @Test func aQuickerFlickThrowsHarder() {
+        let slow = launch(flick(duration: 0.24))!
+        let fast = launch(flick(duration: 0.12))!
+        #expect(fast.power > slow.power + 0.15)
     }
 
-    @Test func aStopAndGoSlideSkids() {
-        let s = slide(seconds: 0.35) { t in 1.6 + 1.2 * sin(t * 50) }
-        guard case .release(let l) = analyzeStroke(s, in: duoLane) else { Issue.record("not a throw"); return }
-        #expect(l.skid > 0.4)
+    @Test func aLongerFlickThrowsHarder() {
+        #expect(launch(flick(distance: 300))!.power > launch(flick(distance: 150))!.power + 0.1)
     }
 
-    @Test func curvingAtTheReleaseSpins() {
-        let s = slide(seconds: 0.35, speed: { t in 1 + 6 * t }, drift: { t in t > 0.22 ? 30 * (t - 0.22) : 0 })
-        guard case .release(let l) = analyzeStroke(s, in: duoLane) else { Issue.record("not a throw"); return }
+    @Test func easingOffBeforeLettingGoCostsSpeed() {
+        // Same motion; one lets go mid-stroke at speed, one rides it out to
+        // nearly a stop before lifting.
+        let snap = launch(flick(lift: 0.6))!
+        let lazy = launch(flick(lift: 0.97))!
+        #expect(snap.power > lazy.power)
+    }
+
+    @Test func aShakyFlickSkids() {
+        #expect(launch(flick(wobble: 9))!.skid > 0.4)
+    }
+
+    @Test func hookingTheThumbAtTheEndSpins() {
+        let l = launch(flick(lateral: { u in u > 0.55 ? 90 * pow(u - 0.55, 2) * 10 : 0 }))!
         #expect(l.spin > 0.3)
-        #expect(l.aim > 0)
     }
 
-    @Test func farPastTheCreaseIsAFoul() {
-        let s = slide(seconds: 0.5) { _ in 3.5 }   // ends ~1.8 m up: screenY ~370
-        #expect(analyzeStroke(s, in: duoLane) == .foul)
+    @Test func flickingRightAimsRight() {
+        #expect(launch(flick(lateral: { u in 40 * u }))!.aim > 0.2)
     }
 
-    @Test func dippingIntoTheCreaseIsNotAFoul() {
-        // The thumb sinks into the fold as it lets go: that's the feel we
-        // want, not a foul. Ends ~30 pt past the crease, inside the give.
-        let s = slide(from: 0.3, seconds: 0.5) { t in 1 + 6.5 * t }
-        #expect(s.last!.screenY < duoLane.creaseY)
-        #expect(s.last!.screenY > duoLane.foulY)
-        guard case .release = analyzeStroke(s, in: duoLane) else { Issue.record("dip counted as foul"); return }
+    @Test func whereYouFlickSetsTheLine() {
+        #expect(launch(flick(x0: 120))!.start < -0.4)
+    }
+
+    @Test func liftingOffJustPastTheCreaseIsFine() {
+        // Natural flicks overshoot. 820 - 400 = 420: 25 pt past the crease.
+        #expect(launch(flick(distance: 520, duration: 0.2)) != nil)
+    }
+
+    @Test func draggingFarPastTheCreaseIsAFoul() {
+        let s = flick(distance: 700, duration: 0.5, lift: 1.0)
+        #expect(s.last!.y < duoLane.foulY)
+        #expect(analyzeFlick(s, in: duoLane) == .foul)
+    }
+
+    @Test func startingAboveTheCreaseIsNotAThrow() {
+        #expect(analyzeFlick(flick(from: 400), in: duoLane) == .none)
     }
 
     @Test func aTapIsNotAThrow() {
-        let s = [StrokeSample(t: 0, screenX: 300, screenY: 800, x: 0, s: 0.1), StrokeSample(t: 0.05, screenX: 300, screenY: 799, x: 0, s: 0.101)]
-        #expect(analyzeStroke(s, in: duoLane) == .none)
+        #expect(analyzeFlick(flick(distance: 8, duration: 0.1), in: duoLane) == .none)
     }
 
-    @Test func pullingBackIsNotAThrow() {
-        let s = slide(from: 0.8, seconds: 0.2) { _ in -2 }
-        #expect(analyzeStroke(s, in: duoLane) == .none)
+    @Test func pullingDownIsNotAThrow() {
+        #expect(analyzeFlick(flick(distance: -200, from: 500), in: duoLane) == .none)
     }
 
-    @Test func releasePointSetsTheStartingLine() {
-        let s = slide(x0: -0.25, seconds: 0.3) { t in 1 + 6 * t }
-        guard case .release(let l) = analyzeStroke(s, in: duoLane) else { Issue.record("not a throw"); return }
-        #expect(l.start < -0.7)
-    }
-
-    @Test func analysisIsDeterministic() {
-        let s = slide(seconds: 0.3) { t in 1.6 + 0.9 * sin(t * 30) }
-        #expect(analyzeStroke(s, in: duoLane) == analyzeStroke(s, in: duoLane))
+    @Test func deterministic() {
+        let s = flick(wobble: 4)
+        #expect(analyzeFlick(s, in: duoLane) == analyzeFlick(s, in: duoLane))
     }
 }
 
@@ -107,18 +115,10 @@ struct ReleaseTests {
         let json = #"{"power":0.6,"aim":0,"start":0,"fold":0}"#
         let l = try JSONDecoder().decode(Launch.self, from: Data(json.utf8))
         #expect(l == Launch(power: 0.6, aim: 0))
-        let round = try JSONDecoder().decode(Launch.self, from: JSONEncoder().encode(Launch(speed: 3, from: 1, aim: 0.2)))
-        #expect(round == Launch(speed: 3, from: 1, aim: 0.2))
     }
 
     @Test func aShotStartsWhereItWasLetGo() {
         let r = simulateShot(Launch(speed: 3, from: 0.8, aim: 0), on: .standard)
         #expect(abs(r.path.first!.along - 0.8) < 1e-9)
-    }
-
-    @Test func letGoFurtherUpAtTheSameSpeedFliesFurther() {
-        let near = simulateShot(Launch(speed: 3.2, from: 0, aim: 0), on: .standard)
-        let far = simulateShot(Launch(speed: 3.2, from: 1.0, aim: 0), on: .standard)
-        #expect(far.hingeSpeed! > near.hingeSpeed!)
     }
 }

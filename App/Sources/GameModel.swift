@@ -79,7 +79,6 @@ final class GameModel {
     @ObservationIgnored private var link: CADisplayLink?
     @ObservationIgnored private let haptics = Haptics()
     @ObservationIgnored private var autoplay: [Launch] = []
-    @ObservationIgnored private var stroke: [StrokeSample] = []
 
     init() {
         let args = LaunchArguments()
@@ -146,11 +145,15 @@ final class GameModel {
             return CGPoint(x: CGFloat(f.x) * size.width, y: CGFloat(f.y) * size.height)
         }, center: CGPoint(x: size.width / 2, y: size.height * 0.2),
            selectedOffer: selectedOffer, selectedCharm: selectedCharm, screen: screen)
+        hud.trail = trail
     }
 
     // MARK: thumb
 
-    var geometry: StrokeGeometry { presenter.strokeGeometry(size: viewSize) }
+    @ObservationIgnored private var flickSamples: [FlickSample] = []
+    @ObservationIgnored private var trailPoints: [(CGPoint, CFTimeInterval)] = []
+
+    var geometry: FlickGeometry { presenter.flickGeometry(size: viewSize) }
     var busy: Bool { stage.with { $0.isBusy } }
     var canThrow: Bool {
         if screen != .game || busy { return false }
@@ -158,43 +161,33 @@ final class GameModel {
         return false
     }
 
-    /// A touch on the glass, mapped onto the lane. The ball sits just above
-    /// the thumb so it stays visible.
-    func sample(t: Double, x: Double, y: Double) -> StrokeSample? {
-        let f = SIMD2(Float(x / viewSize.width), Float((y - 34) / viewSize.height))
-        guard let p = presenter.lanePoint(screen: f, aspect: Float(viewSize.width / viewSize.height)) else { return nil }
-        let lane = presenter.laneCoordinates(p)
-        return StrokeSample(t: t, screenX: x, screenY: y, x: lane.x, s: lane.s)
-    }
-
+    /// The ball waits at the line; the flick is read whole after lift-off.
     func touchBegan(t: Double, x: Double, y: Double) {
         if busy { stage.with { $0.skip() }; return }
-        guard canThrow, y > geometry.creaseY, let s = sample(t: t, x: x, y: y) else { return }
-        stroke = [s]
-        holdBall(s)
+        guard canThrow, y > geometry.creaseY else { return }
+        flickSamples = [FlickSample(t: t, x: x, y: y)]
+        trailPoints = [(CGPoint(x: x, y: y), CACurrentMediaTime())]
     }
 
     func touchMoved(_ touches: [(t: Double, x: Double, y: Double)]) {
-        guard !stroke.isEmpty else { return }
-        let samples = touches.compactMap { sample(t: $0.t, x: $0.x, y: $0.y) }
-        stroke += samples
-        if crossedCrease(samples, in: geometry) {
-            // Well past the crease: foul, right now, like stepping over the line.
-            stroke = []
-            stage.setHeld(nil)
+        guard !flickSamples.isEmpty else { return }
+        let new = touches.map { FlickSample(t: $0.t, x: $0.x, y: $0.y) }
+        flickSamples += new
+        let now = CACurrentMediaTime()
+        trailPoints += new.map { (CGPoint(x: $0.x, y: $0.y), now) }
+        if crossedFoulLine(new, in: geometry) {
+            // Dragged well past the crease: foul.
+            flickSamples = []
             haptics.foul()
             send(.foul)
-            return
         }
-        if let last = samples.last { holdBall(last) }
     }
 
     func touchEnded(_ touches: [(t: Double, x: Double, y: Double)]) {
-        guard !stroke.isEmpty else { return }
-        stroke += touches.compactMap { sample(t: $0.t, x: $0.x, y: $0.y) }
-        let outcome = analyzeStroke(stroke, in: geometry, fold: fold)
-        stroke = []
-        stage.setHeld(nil)
+        guard !flickSamples.isEmpty else { return }
+        flickSamples += touches.map { FlickSample(t: $0.t, x: $0.x, y: $0.y) }
+        let outcome = analyzeFlick(flickSamples, in: geometry, fold: fold)
+        flickSamples = []
         switch outcome {
         case .none: break
         case .foul: haptics.foul(); send(.foul)
@@ -202,11 +195,12 @@ final class GameModel {
         }
     }
 
-    func touchCancelled() { stroke = []; stage.setHeld(nil) }
+    func touchCancelled() { flickSamples = [] }
 
-    private func holdBall(_ s: StrokeSample) {
-        let w = cabinet.world
-        stage.setHeld(w.lane(x: s.x, s: s.s) + w.laneNormal * w.ballRadius)
+    var trail: [(CGPoint, Double)] {
+        let now = CACurrentMediaTime()
+        trailPoints.removeAll { now - $0.1 > 0.35 }
+        return trailPoints.map { ($0.0, (now - $0.1) / 0.35) }
     }
 
     /// A tap on the board while a stamp, gild or purge is selected.

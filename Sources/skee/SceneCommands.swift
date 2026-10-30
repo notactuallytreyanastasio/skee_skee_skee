@@ -20,7 +20,7 @@ func sceneCommand() {
     }
     print("camera", cab.camera.simdPosition, "fov", cab.camera.camera!.fieldOfView)
     let s = newRun(seed: UInt64(flag("seed") ?? "7") ?? 7)
-    for h in Hole.allCases where h != .gutter { cab.setPlate(h, s.showing(h)) }
+    for h in Hole.allCases where h != .gutter { cab.setReel(h, s.showing(h), turn: 0, glow: h == .ring30 ? 1 : (h == .pocketRight ? 2 : 0), pulse: 1) }
 
     cab.setWaiting(8)
     guard let img = snapshot(cab, size: CGSize(width: size.width * 2, height: size.height * 2)) else { fail("no Metal device") }
@@ -110,29 +110,24 @@ func frameCommand() {
     print(out)
 }
 
-/// skee thumbprobe: how thumb movement on screen maps to lane metres, and
-/// which release speeds score from a typical release point.
-@MainActor
-func thumbProbe() {
-    let size = CGSize(width: 626, height: 890)
-    let a = Float(size.width / size.height)
-    let cab = Cabinet()
-    let pr = ScenePresenter(cabinet: cab, aspect: a)
-    let g = pr.strokeGeometry(size: size)
-    print("crease at y =", Int(g.creaseY), "pt; foul above", Int(g.foulY))
-    var prev: Double?
-    for y in stride(from: 860.0, through: 450, by: -50) {
-        let p = pr.lanePoint(screen: SIMD2(0.5, Float(y / size.height)), aspect: a)!
-        let s = pr.laneCoordinates(p).s
-        if let prev { print("y \(Int(y)): s = \(f2(s)) m  (\(String(format: "%.1f", (s - prev) / 50 * 1000)) mm per pt)") } else { print("y \(Int(y)): s = \(f2(s)) m") }
-        prev = s
+/// skee flickprobe: synthetic human flicks (minimum-jerk reaches) through
+/// the analyser: what it measures, what it throws, where the ball goes.
+func flickProbe() {
+    let g = FlickGeometry(creaseY: 445, laneCenterX: 313, laneHalfWidth: 260)
+    func flick(_ D: Double, _ T: Double, lift: Double = 0.8, wobble: Double = 0) -> [FlickSample] {
+        var out: [FlickSample] = [], t = 0.0
+        while t <= T * lift { let u = t / T
+            out.append(FlickSample(t: t, x: 313, y: 820 - D * (10 * pow(u, 3) - 15 * pow(u, 4) + 6 * pow(u, 5)) - wobble * sin(t * 90)))
+            t += 1.0 / 120 }
+        return out
     }
-    for from in [1.2, 1.7, 2.1] {
-        var line = "from \(f2(from)) m:"
-        for sp in stride(from: 1.5, through: 4.5, by: 0.15) {
-            let h = simulateShot(Launch(speed: sp, from: from, aim: 0), on: .standard).hole
-            line += " \(f2(sp)):\(h.faceValue)"
-        }
-        print(line)
+    print("dist  dur   lift wob | peak  release jerk  snap | power skid -> hole")
+    for (D, T, lift, w) in [(150.0, 0.2, 0.8, 0.0), (220, 0.16, 0.8, 0), (220, 0.12, 0.8, 0), (300, 0.14, 0.7, 0), (220, 0.16, 0.6, 0),
+                            (220, 0.16, 0.97, 0), (220, 0.16, 0.8, 4), (220, 0.16, 0.8, 9), (380, 0.18, 0.75, 0)] {
+        let s = flick(D, T, lift: lift, wobble: w)
+        guard case .release(let l) = analyzeFlick(s, in: g), let m = lastMetrics else { print("\(D) \(T): no throw"); continue }
+        let h = simulateShot(l, on: .standard).hole
+        print(String(format: "%4.0f  %.2f  %.2f %3.0f | %5.0f %6.0f  %5.1f %5.2f | %.2f  %.2f -> %@",
+                     D, T, lift, w, m.peak, m.release, m.jerk, m.snap, l.power, l.skid, "\(h.faceValue)"))
     }
 }

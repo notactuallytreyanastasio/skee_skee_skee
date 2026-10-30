@@ -38,6 +38,19 @@ public struct HUDState: Sendable {
     public var selectedCharm: Int?
     public var busy = false
     public var firstThrow = false
+    /// Plain-words explanation of the slot right now.
+    public var hint: Hint?
+    /// Recent throws: power 0...1 and where they went, newest last.
+    public var throwsMeter: [ThrowMark] = []
+    /// The thumb's recent path, for a fading trail. Age 0...1.
+    public var trail: [(CGPoint, Double)] = []
+
+    public struct Hint: Sendable {
+        public var text: String
+        public var symbol: Symbol?
+        public var after: String = ""
+        public var hot = false
+    }
 
     public struct Tally: Sendable { public var chips: Int; public var mult: Double; public var label: String }
     public struct Banner: Sendable { public var title: String; public var sub: String; public var progress: Double }
@@ -83,6 +96,8 @@ public struct HUDState: Sendable {
         h.score = score; h.target = s.round.target
 
         if let (t, sub, u) = p.banner { h.banner = Banner(title: t, sub: sub, progress: u) }
+        h.throwsMeter = p.recentThrows
+        if !p.isBusy, case .throwing = s.phase { h.hint = hint(for: s.round.currentBalls.map(\.symbol)) }
         h.popups = p.popups.map { pop in
             let at: CGPoint = switch pop.anchor {
             case .hole(let hole): holeOnScreen(hole)
@@ -91,6 +106,24 @@ public struct HUDState: Sendable {
             return ScreenPopup(text: pop.text, kind: pop.kind, at: at, age: pop.age)
         }
         return h
+    }
+
+    /// What the slot needs next, in words.
+    public static func hint(for have: [Symbol]) -> Hint {
+        let line = Payline.evaluate(have)
+        switch (have.count, line) {
+        case (0, _):
+            return Hint(text: "3 balls = 1 spin · match symbols for MULT")
+        case (1, _):
+            if have[0] == .blank { return Hint(text: "gutter · the next two can still pair") }
+            return Hint(text: "match the", symbol: have[0].isWild ? nil : have[0], after: "· glowing rings pair it")
+        case (2, .pair(let s)):
+            return Hint(text: "PAIR! one more", symbol: s, after: "= ×\(num(1 + s.tripleMult))", hot: true)
+        case (2, _):
+            return Hint(text: "no match yet · glowing rings pair")
+        default:
+            return Hint(text: "")
+        }
     }
 
     public static func fold<S: Sequence>(_ steps: S) -> (Int, Double) where S.Element == ScoreStep {

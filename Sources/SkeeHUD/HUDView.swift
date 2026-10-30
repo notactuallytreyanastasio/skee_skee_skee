@@ -109,14 +109,16 @@ public struct HUDView: View {
                     .allowsHitTesting(false)
 
                     sideTrays(geo.size)
+                    meter(geo.size)
+                    trail()
 
                     if let t = state.tally { TallyView(tally: t).position(x: geo.size.width / 2, y: geo.size.height * 0.27).allowsHitTesting(false) }
                     ForEach(Array(state.popups.enumerated()), id: \.offset) { _, p in popup(p) }
                     if let b = state.banner { BannerView(banner: b).position(x: geo.size.width / 2, y: geo.size.height * 0.3).allowsHitTesting(false) }
                     if state.firstThrow && !state.busy && state.counter == nil {
                         VStack(spacing: 2) {
-                            CelText(text: "slide the ball up", size: 18)
-                            CelText(text: "let go before the crease", size: 18, fill: Ink.butter)
+                            CelText(text: "flick up the lane", size: 20)
+                            CelText(text: "don't drag past the crease", size: 15, fill: Ink.butter)
                         }
                         .position(x: geo.size.width / 2, y: geo.size.height * 0.62)
                         .allowsHitTesting(false)
@@ -187,7 +189,53 @@ public struct HUDView: View {
                 if state.fever { CelText(text: "FEVER", size: 11, fill: Ink.butter) }
             }
             CelText(text: "FRAME \(state.frameNumber)/\(state.framesTotal)  ·  \(state.ballsLeft) BALLS", size: 11)
+            if let h = state.hint, !h.text.isEmpty {
+                HStack(spacing: 4) {
+                    CelText(text: h.text, size: h.hot ? 15 : 12, fill: h.hot ? Ink.butter : Ink.cream)
+                    if let sym = h.symbol { SymbolImage(symbol: sym).frame(width: h.hot ? 26 : 20, height: h.hot ? 26 : 20) }
+                    if !h.after.isEmpty { CelText(text: h.after, size: h.hot ? 15 : 12, fill: h.hot ? Ink.butter : Ink.cream) }
+                }
+                .padding(.horizontal, 10).padding(.vertical, 3)
+                .background(Capsule().fill(Ink.ink.opacity(0.55)))
+            }
         }
+    }
+
+    /// Where your last flicks landed on the power scale, so the flick can be
+    /// learned: a thin gauge with a tick per throw, coloured by the result.
+    func meter(_ size: CGSize) -> some View {
+        let h = size.height * 0.3
+        return ZStack(alignment: .bottom) {
+            Capsule().fill(Ink.ink.opacity(0.35)).frame(width: 8, height: h)
+            ForEach(Array(state.throwsMeter.enumerated()), id: \.offset) { i, m in
+                let newest = i == state.throwsMeter.count - 1
+                let c: Color = switch m.hole {
+                case .gutter: Ink.mult
+                case .ring50, .pocketLeft, .pocketRight: Ink.butter
+                case .ring40, .ring30: Ink.mint
+                default: Ink.sky
+                }
+                Capsule().fill(c).overlay(Capsule().stroke(Ink.ink, lineWidth: 1.5))
+                    .frame(width: newest ? 22 : 14, height: newest ? 6 : 4)
+                    .offset(y: -CGFloat(m.power) * h)
+                    .opacity(newest ? 1 : 0.7)
+            }
+        }
+        .frame(height: h, alignment: .bottom)
+        .position(x: size.width - 14, y: size.height * 0.62)
+        .allowsHitTesting(false)
+    }
+
+    func trail() -> some View {
+        Canvas { ctx, _ in
+            for (a, b) in zip(state.trail, state.trail.dropFirst()) {
+                var p = Path(); p.move(to: a.0); p.addLine(to: b.0)
+                let fade = 1 - b.1
+                ctx.stroke(p, with: .color(Ink.ink.opacity(0.5 * fade)), style: StrokeStyle(lineWidth: 16 * fade + 2, lineCap: .round))
+                ctx.stroke(p, with: .color(Ink.butter.opacity(0.9 * fade)), style: StrokeStyle(lineWidth: 10 * fade + 1, lineCap: .round))
+            }
+        }
+        .allowsHitTesting(false)
     }
 
     /// Charms down the left edge, specialty balls down the right, clear of
@@ -338,8 +386,8 @@ struct TitleCard: View {
                 Spacer()
                 Pill(fill: Ink.mint, radius: 22) { CelText(text: "TAP TO PLAY", size: 28) }
                 VStack(spacing: 2) {
-                    CelText(text: "slide the ball up the lane", size: 15)
-                    CelText(text: "let go before the crease", size: 15, fill: Ink.butter)
+                    CelText(text: "flick the ball up the lane", size: 15)
+                    CelText(text: "don't drag past the crease", size: 15, fill: Ink.butter)
                     CelText(text: "fold the phone for a steeper ramp", size: 13)
                 }
                 Spacer().frame(height: 120)

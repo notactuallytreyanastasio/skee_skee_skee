@@ -71,6 +71,6 @@ case "settleprobe": settleProbe()
 case "scene": MainActor.assumeIsolated { sceneCommand() }
 case "scenefilm": MainActor.assumeIsolated { sceneFilmCommand() }
 case "frame": MainActor.assumeIsolated { frameCommand() }
-case "thumbprobe": MainActor.assumeIsolated { thumbProbe() }
+case "flickprobe": flickProbe()
 default: print(usage); exit(1)
 }

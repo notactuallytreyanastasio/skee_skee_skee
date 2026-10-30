@@ -109,18 +109,22 @@ public final class ScenePresenter: @unchecked Sendable {
         cabinet.ball.simdOrientation = orientation
         cabinet.ball.simdScale = SIMD3(repeating: scale)
 
-        // Reel plates: show whatever symbol each reel is passing through.
+        // Ring reels: each ring shows the symbol its reel is on, orbiting
+        // while it spins. Rings that would pair or finish the line glow.
+        let have = (p.tallyProgress == nil && !p.isBusy) ? s.round.currentBalls.map(\.symbol) : []
+        let lineNow = Payline.evaluate(have).addedMult
+        let pulse = Float(0.6 + 0.4 * sin(p.clock * 7))
         for hole in BoardSetup.reelHoles {
             let reel = s.setup.reel(hole)
             let pos = p.reelPositions[hole] ?? 0
             let idx = ((Int(pos.rounded()) % reel.count) + reel.count) % reel.count
             let sym = reel[idx]
-            if shownPlates[hole] != sym {
-                cabinet.setPlate(hole, sym)
-                shownPlates[hole] = sym
+            var glow: Float = 0
+            if !have.isEmpty && have.count < 3 && s.phase == .throwing {
+                let gain = Payline.evaluate(have + [sym]).addedMult - lineNow
+                if gain > 0 { glow = (have.count == 2) ? 2 : 1 }
             }
-            let spinning = abs(pos - pos.rounded()) > 0.02
-            cabinet.plates[hole]?.simdScale = SIMD3(repeating: spinning ? 1.12 : 1)
+            cabinet.setReel(hole, sym, turn: pos, glow: glow, pulse: pulse)
         }
 
         // Balls waiting in the tray.
@@ -158,12 +162,14 @@ public final class ScenePresenter: @unchecked Sendable {
         return hit + n * world.ballRadius
     }
 
-    /// Where the crease is on screen, for stroke analysis.
-    public func strokeGeometry(size: CGSize) -> StrokeGeometry {
+    /// Where the crease and the lane are on screen, for flick analysis.
+    public func flickGeometry(size: CGSize) -> FlickGeometry {
         let aspect = Float(size.width / size.height)
-        let hump = world.lane(x: 0, s: world.table.lane.length)
-        let crease = Double(rig.project(hump, aspect: aspect).y) * Double(size.height)
-        return StrokeGeometry(creaseY: crease, laneHalfWidth: world.table.lane.width / 2)
+        let crease = Double(rig.project(world.lane(x: 0, s: world.table.lane.length), aspect: aspect).y) * Double(size.height)
+        let l = rig.project(world.lane(x: -world.table.lane.width / 2, s: 0.2), aspect: aspect)
+        let r = rig.project(world.lane(x: world.table.lane.width / 2, s: 0.2), aspect: aspect)
+        return FlickGeometry(creaseY: crease, laneCenterX: Double(l.x + r.x) / 2 * Double(size.width),
+                             laneHalfWidth: Double(r.x - l.x) / 2 * Double(size.width))
     }
 
     /// Physics lane coordinates (x across, s up the lane) of a scene point

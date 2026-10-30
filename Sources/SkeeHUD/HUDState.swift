@@ -48,6 +48,8 @@ public struct HUDState: Sendable {
     public var throwsMeter: [ThrowMark] = []
     /// Winnings and the prize shelf, kept between runs; the shop overlay.
     public var wallet = Wallet()
+    /// The walkthrough's card for this moment, if one is running.
+    public var coach: CoachCard?
     public var shopOpen = false
     /// The thumb's recent path, for a fading trail. Age 0...1.
     public var trail: [(CGPoint, Double)] = []

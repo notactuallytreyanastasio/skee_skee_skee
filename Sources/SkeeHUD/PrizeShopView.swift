@@ -123,3 +123,46 @@ struct StarShape: Shape {
         return p
     }
 }
+
+/// The walkthrough's coach: what to do now, in a sentence or two. Only its
+/// buttons take touches, so a flick that starts under it still throws.
+struct CoachView: View {
+    let card: CoachCard
+    let skip: () -> Void
+    let gotIt: () -> Void
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                CelText(text: card.title, size: 20, fill: Ink.butter)
+                Spacer()
+                Button(action: skip) {
+                    CelText(text: "SKIP", size: 13)
+                        .padding(.horizontal, 10).padding(.vertical, 4)
+                        .background(Capsule().fill(Ink.ink.opacity(0.5)))
+                }
+                .buttonStyle(.plain)
+            }
+            Text(card.body)
+                .font(.system(size: 15, weight: .bold, design: .rounded))
+                .foregroundStyle(Ink.cream)
+                .fixedSize(horizontal: false, vertical: true)
+                .allowsHitTesting(false)
+            if card.needsTap {
+                Button(action: gotIt) {
+                    Pill(fill: Ink.mint, radius: 16) { CelText(text: "GOT IT", size: 18) }
+                }
+                .buttonStyle(.plain)
+                .frame(maxWidth: .infinity)
+            }
+        }
+        .padding(12)
+        .background {
+            ZStack {
+                RoundedRectangle(cornerRadius: 16).fill(Ink.ink).offset(y: 4)
+                RoundedRectangle(cornerRadius: 16).fill(Ink.violet.opacity(0.94))
+                RoundedRectangle(cornerRadius: 16).strokeBorder(Ink.butter, lineWidth: 3)
+            }
+            .allowsHitTesting(false)
+        }
+    }
+}

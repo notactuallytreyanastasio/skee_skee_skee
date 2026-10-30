@@ -74,6 +74,10 @@ final class GameModel {
     /// Winnings and the prize shelf, across runs.
     var wallet = WalletStore.load()
     var shopOpen = false
+    /// The coached practice warm-up, while it runs. The real run waits in
+    /// `parked` and comes back when the walkthrough ends or is skipped.
+    var walkthrough: Walkthrough?
+    @ObservationIgnored private var parked: (seed: UInt64, actions: [Action], state: RunState)?
 
     @ObservationIgnored let cabinet = Cabinet()
     @ObservationIgnored let presenter: ScenePresenter
@@ -114,6 +118,9 @@ final class GameModel {
         self.stage = stage
         self.driver = RenderDriver(stage: stage, presenter: presenter)
         self.screen = args.skipTitle || !actions.isEmpty || !args.autoplay.isEmpty ? .game : .title
+        // First time in this version: show the title, whose TAP TO PLAY
+        // starts the walkthrough.
+        if !WalkthroughStore.done && args.autoplay.isEmpty && !args.skipTitle { self.screen = .title }
         if let f = args.fold { fold = f }
         self.autoplay = args.autoplay
     }
@@ -167,6 +174,10 @@ final class GameModel {
         hud.trail = trail
         hud.wallet = wallet
         hud.shopOpen = shopOpen
+        if let w = walkthrough, !w.finished {
+            hud.coach = w.card
+            hud.over = nil   // the last card says it instead
+        }
     }
 
     // MARK: thumb
@@ -252,7 +263,19 @@ final class GameModel {
             else if case .prizeCounter = state.phase { selectedCharm = i; haptics.tap() }
         }
         a.arm = { [weak self] i in self?.send(.arm(i)) }
-        a.start = { [weak self] in self?.screen = .game; self?.haptics.tap() }
+        a.start = { [weak self] in
+            guard let self else { return }
+            if WalkthroughStore.done { screen = .game } else { startWalkthrough() }
+            haptics.tap()
+        }
+        a.howToPlay = { [weak self] in self?.startWalkthrough(); self?.haptics.tap() }
+        a.skipWalkthrough = { [weak self] in self?.endWalkthrough(); self?.haptics.tap() }
+        a.gotIt = { [weak self] in
+            guard let self else { return }
+            walkthrough?.gotIt()
+            if walkthrough?.finished == true { endWalkthrough() }
+            haptics.tap()
+        }
         a.newRun = { [weak self] in self?.newGame() }
         a.openShop = { [weak self] in self?.shopOpen = true; self?.haptics.tap() }
         a.closeShop = { [weak self] in self?.shopOpen = false; self?.haptics.tap() }
@@ -276,6 +299,12 @@ final class GameModel {
             state = step.state
             actions.append(action)
             stage.with { $0.enqueue(step) }
+            if walkthrough != nil {
+                // Practice: no save, no winnings, just the coach.
+                walkthrough?.observe(step.events)
+                if case .throwBall = action { haptics.launch() } else { haptics.tap() }
+                return
+            }
             RunStore.save(seed: seed, actions: actions)
             // A finished run pays its winnings to the shelf, once.
             for e in step.events {
@@ -286,6 +315,36 @@ final class GameModel {
                 }
             }
             if case .throwBall = action { haptics.launch() } else { haptics.tap() }
+        }
+    }
+
+    /// Park the real run and play the coached practice warm-up.
+    func startWalkthrough() {
+        if walkthrough == nil { parked = (seed, actions, state) }
+        walkthrough = Walkthrough()
+        state = practiceRun()
+        actions = []
+        let fresh = Presentation(state: state)
+        stage.with { $0 = fresh }
+        selectedOffer = nil; selectedCharm = nil; shopOpen = false
+        screen = .game
+    }
+
+    /// Done or skipped: never shown again unless asked for, and the real
+    /// run comes back as it was (a fresh one if it had ended).
+    func endWalkthrough() {
+        walkthrough = nil
+        WalkthroughStore.done = true
+        guard let p = parked else { newGame(); return }
+        parked = nil
+        switch p.state.phase {
+        case .lost, .won: newGame()
+        default:
+            seed = p.seed; actions = p.actions; state = p.state
+            let fresh = Presentation(state: state)
+            stage.with { $0 = fresh }
+            selectedOffer = nil; selectedCharm = nil
+            screen = .game
         }
     }
 
@@ -334,6 +393,14 @@ struct LaunchArguments {
             guard n.count >= 2 else { return nil }
             return Launch(power: n[0], aim: n[1], start: n.count > 2 ? n[2] : 0)
         }
+    }
+}
+
+/// Whether the walkthrough has been seen (finished or skipped).
+enum WalkthroughStore {
+    static var done: Bool {
+        get { UserDefaults.standard.bool(forKey: "walkthroughDone") }
+        set { UserDefaults.standard.set(newValue, forKey: "walkthroughDone") }
     }
 }
 

@@ -68,7 +68,7 @@ func sceneFilmCommand() {
 /// One full app frame: the 3D scene with the SwiftUI HUD on top.
 @MainActor
 func composeFrame(_ p: Presentation, cab: Cabinet, presenter: ScenePresenter, size: CGSize, scale: CGFloat = 2,
-                  screen: HUDState.Screen = .game, selectedOffer: Int? = nil, wallet: Wallet? = nil) -> CGImage? {
+                  screen: HUDState.Screen = .game, selectedOffer: Int? = nil, wallet: Wallet? = nil, coach: CoachCard? = nil) -> CGImage? {
     guard let scene3D = snapshot(cab, size: CGSize(width: size.width * scale, height: size.height * scale)) else { return nil }
     let a = Float(size.width / size.height)
     var hud = HUDState.make(p, holeOnScreen: { hole in
@@ -77,6 +77,7 @@ func composeFrame(_ p: Presentation, cab: Cabinet, presenter: ScenePresenter, si
         return CGPoint(x: CGFloat(f.x) * size.width, y: CGFloat(f.y) * size.height)
     }, center: CGPoint(x: size.width / 2, y: size.height * 0.2), selectedOffer: selectedOffer, screen: screen)
     if let wallet { hud.wallet = wallet; hud.shopOpen = screen == .game }
+    hud.coach = coach
     let renderer = ImageRenderer(content: HUDView(state: hud).frame(width: size.width, height: size.height))
     renderer.scale = scale
     guard let overlay = renderer.cgImage else { return scene3D }
@@ -107,7 +108,9 @@ func frameCommand() {
     guard let img = composeFrame(p, cab: cab, presenter: presenter, size: size, screen: has("title") ? .title : .game,
                                  selectedOffer: flag("select").flatMap(Int.init),
                                  // --shop: the prize shop with a sample shelf (on the title with --title).
-                                 wallet: has("shop") ? Wallet(balance: 1340, lifetime: 2000, owned: [.sticker, .rubberDuck, .yoyo]) : nil)
+                                 wallet: has("shop") ? Wallet(balance: 1340, lifetime: 2000, owned: [.sticker, .rubberDuck, .yoyo]) : nil,
+                                 // --coach 0...6: the walkthrough card for that step.
+                                 coach: flag("coach").flatMap(Int.init).flatMap(WalkthroughStep.init).map { Walkthrough(step: $0).card })
             else { fail("render failed") }
     try? FileManager.default.createDirectory(atPath: (out as NSString).deletingLastPathComponent, withIntermediateDirectories: true)
     writePNG(img, out)

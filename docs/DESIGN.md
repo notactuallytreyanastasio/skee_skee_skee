@@ -204,6 +204,23 @@ to 3100 pt/s effective speed (lift-off and peak speed weighted evenly); smooth f
 10-15. A gauge on the right of the lane marks each recent throw's power,
 coloured by where it went, so the flick can be learned.
 
+## The walkthrough
+
+The first TAP TO PLAY starts a coached practice warm-up (fixed seed, target
+60) instead of a run. A card over the ball tray says what to do, and waits
+until you have done it: flick (a foul keeps you here and says why), see a
+ball take its hole's symbol, finish a three-ball line, try the top slot
+(moves on after a match or two throws), beat the target, visit the prize
+counter, then a last card with GOT IT. SKIP on every card ends it. Your real
+run is parked while it plays and comes back as it was. Practice pays no
+winnings and is never saved. HOW TO PLAY on the title replays it.
+
+It is a warm-up you play rather than slides you read because each rule is
+abstract until a ball shows it: "the ball takes the hole's symbol" means
+nothing until a cherry lands in the reel. `Walkthrough` is a pure state
+machine over `GameEvent`s (SkeeCore/Meta/Walkthrough.swift, 8 tests);
+`skee frame --coach N` renders step N's card.
+
 ## The top slot
 
 A three-reel slot sits on top of the cabinet and spins after every throw,

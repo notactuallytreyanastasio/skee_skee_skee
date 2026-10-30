@@ -16,6 +16,9 @@ public struct HUDActions {
     public var openShop: () -> Void = {}
     public var closeShop: () -> Void = {}
     public var buyPrize: (Prize) -> Void = { _ in }
+    public var skipWalkthrough: () -> Void = {}
+    public var gotIt: () -> Void = {}
+    public var howToPlay: () -> Void = {}
     public init() {}
 }
 
@@ -125,7 +128,7 @@ public struct HUDView: View {
         GeometryReader { geo in
             ZStack {
                 if state.screen == .title {
-                    TitleCard(start: actions.start, shop: actions.openShop, wallet: state.wallet)
+                    TitleCard(start: actions.start, shop: actions.openShop, howToPlay: actions.howToPlay, wallet: state.wallet)
                 } else {
                     VStack(spacing: 6) {
                         topBar
@@ -148,7 +151,7 @@ public struct HUDView: View {
                     if let t = state.tally { TallyView(tally: t).position(x: geo.size.width / 2, y: geo.size.height * 0.27).allowsHitTesting(false) }
                     ForEach(Array(state.popups.enumerated()), id: \.offset) { _, p in popup(p) }
                     if let b = state.banner { BannerView(banner: b).position(x: geo.size.width / 2, y: geo.size.height * 0.3).allowsHitTesting(false) }
-                    if state.firstThrow && !state.busy && state.counter == nil {
+                    if state.firstThrow && !state.busy && state.counter == nil && state.coach == nil {
                         VStack(spacing: 2) {
                             CelText(text: "flick up the lane", size: 20)
                             CelText(text: "don't drag past the crease", size: 15, fill: Ink.butter)
@@ -166,6 +169,18 @@ public struct HUDView: View {
                                      newRun: actions.newRun, shop: actions.openShop)
                             .position(x: geo.size.width / 2, y: geo.size.height * 0.5)
                     }
+                }
+                if state.screen == .game, let card = state.coach, !state.busy {
+                    // Low over the ball tray, out of the flick's path; high
+                    // when the prize counter fills the bottom half.
+                    VStack {
+                        if !card.high { Spacer() }
+                        CoachView(card: card, skip: actions.skipWalkthrough, gotIt: actions.gotIt)
+                            .frame(width: min(geo.size.width - 24, 420))
+                        if card.high { Spacer() }
+                    }
+                    .padding(.vertical, card.high ? geo.size.height * 0.12 : 14)
+                    .frame(width: geo.size.width, height: geo.size.height)
                 }
                 if state.shopOpen {
                     PrizeShopView(wallet: state.wallet, buy: actions.buyPrize, close: actions.closeShop)
@@ -436,6 +451,7 @@ struct BannerView: View {
 struct TitleCard: View {
     let start: () -> Void
     let shop: () -> Void
+    let howToPlay: () -> Void
     let wallet: Wallet
     var body: some View {
         ZStack {
@@ -459,10 +475,16 @@ struct TitleCard: View {
                     CelText(text: "fold the phone for a steeper ramp", size: 13)
                 }
                 .allowsHitTesting(false)
-                Button(action: shop) {
-                    Pill(fill: Ink.butter, radius: 18) { CelText(text: "PRIZE SHOP · \(wallet.balance)", size: 18) }
+                HStack(spacing: 10) {
+                    Button(action: shop) {
+                        Pill(fill: Ink.butter, radius: 18) { CelText(text: "PRIZE SHOP · \(wallet.balance)", size: 18) }
+                    }
+                    .buttonStyle(.plain)
+                    Button(action: howToPlay) {
+                        Pill(fill: Ink.sky, radius: 18) { CelText(text: "HOW TO PLAY", size: 18) }
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
                 PrizeShelfStrip(owned: wallet.owned).allowsHitTesting(false)
                 Spacer().frame(height: 60)
             }

@@ -14,7 +14,7 @@ skee — play and measure Skee Skee Skee from the terminal
   skee windows [--ante n] [--boss name] [--fold f]
       Widest power window per hole: the forgiveness of each target.
   skee play <save.json> <command...>
-      Persistent run. Commands: new [seed] | show | throw <power> <aim> [start] [fold]
+      Persistent run. Commands: new [seed] | show | throw <power> <aim> [start] [fold] [--hand skill]
       | arm <i> | buy <i> [hole] | reroll | sell <i> | leave
   skee balance [--runs n] [--skill expert|regular|novice|perfect|all] [--seed s]
       Monte Carlo bot runs with fun metrics.

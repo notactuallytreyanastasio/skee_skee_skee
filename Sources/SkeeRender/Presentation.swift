@@ -50,6 +50,9 @@ public struct Presentation: Sendable {
     /// The last ball's landing, kept on the board briefly.
     public private(set) var restingBall: (sample: PathSample, until: Double)?
     public private(set) var style: ArtStyle
+    /// Power and result of recent throws, newest last: the lane gauge
+    /// shows them so players can calibrate their flick.
+    public private(set) var recentThrows: [ThrowMark] = []
     /// Points already counted up on screen but not yet in `shown`.
     public private(set) var talliedBonus = 0
 
@@ -177,6 +180,8 @@ public struct Presentation: Sendable {
         switch beat {
         case .roll(let r, let b):
             if let last = r.path.last { restingBall = (last, clock + 0.6) }
+            recentThrows.append(ThrowMark(power: r.launch.power, hole: b.hole))
+            if recentThrows.count > 6 { recentThrows.removeFirst() }
             trail = []
             let text = b.hole == .gutter ? "GUTTER" : "+\(b.chips)"
             popups.append(Popup(text: text, anchor: .hole(b.hole), kind: b.hole == .gutter ? .bad : .chips))
@@ -242,6 +247,11 @@ public struct Presentation: Sendable {
         guard case .banner(let a, let b, let s) = beats.first else { return nil }
         return (a, b, beatTime / s)
     }
+}
+
+public struct ThrowMark: Hashable, Sendable {
+    public var power: Double
+    public var hole: Hole
 }
 
 public struct Popup: Hashable, Sendable {

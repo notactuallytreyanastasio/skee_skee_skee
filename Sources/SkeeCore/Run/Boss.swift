@@ -35,7 +35,8 @@ public enum Boss: String, Hashable, Sendable, Codable, CaseIterable {
             t.board.lipHeight *= 1.6
             t.board.lipBand += 0.2
         case .slickLane:
-            t.lane.rollingFriction *= 0.3
+            t.lane.rollingFriction = 0
+            t.hinge.carry = 1.04
         case .crosswind:
             t.board.wind = Vec2(0.4, 0)
         case .tightPockets:

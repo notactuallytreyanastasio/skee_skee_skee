@@ -81,6 +81,7 @@ struct SceneDrawer {
         drawBoard()
         drawHinge()
         drawLane()
+        powerGauge()
         drawBall()
         if ui.screen == .title {
             title()
@@ -369,6 +370,36 @@ struct SceneDrawer {
             let a = 0.5 + 0.5 * sin(p.clock * 4)
             pen.text("FLICK UP OVER THE HINGE", at: CGPoint(x: layout.size.width / 2, y: at.y - 46), size: 18,
                      color: pal.text.mix(pal.tickets, CGFloat(a)), align: .center)
+        }
+    }
+
+    /// A thin vertical gauge at the lane's right edge: one tick per recent
+    /// throw at the height of its power, coloured by result, and a live
+    /// marker for the swipe in progress. Swipe speed is invisible otherwise.
+    func powerGauge() {
+        guard ui.screen == .game else { return }
+        let lr = layout.laneRect
+        let track = CGRect(x: lr.maxX - 10, y: lr.minY + 16, width: 6, height: lr.height - 32)
+        ctx.setFillColor(pal.textDim.cg(0.3)); ctx.fill(track)
+        func y(_ power: Double) -> CGFloat { track.maxY - CGFloat(power) * track.height }
+        for (i, m) in p.recentThrows.enumerated() {
+            let age = CGFloat(p.recentThrows.count - i)
+            let color: RGB = switch m.hole {
+            case .gutter: pal.bad
+            case .ring50, .pocketLeft, .pocketRight: pal.tickets
+            case .ring40, .ring30: pal.good
+            default: pal.chips
+            }
+            let w: CGFloat = age == 1 ? 18 : 12
+            ctx.setFillColor(color.cg(age == 1 ? 1 : 0.55))
+            ctx.fill(CGRect(x: track.maxX - w, y: y(m.power) - 1.5, width: w, height: 3))
+        }
+        if let a = ui.dragStart, let b = ui.dragNow, b.y < a.y {
+            // Live estimate from distance so far; the real power comes from
+            // release speed, so this is a hint, not a promise.
+            let est = Double(min(1, (a.y - b.y) / (lr.height * 0.9)))
+            ctx.setFillColor(pal.text.cg(0.8))
+            ctx.fill(CGRect(x: track.minX - 6, y: y(est) - 1, width: 16, height: 2))
         }
     }
 

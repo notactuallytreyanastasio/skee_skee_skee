@@ -74,7 +74,16 @@ func playCommand() {
     case "show": action = nil
     case "throw":
         guard let power = num(0), let aim = num(1) else { fail("throw <power> <aim> [start] [fold]") }
-        action = .throwBall(Launch(power: power, aim: aim, start: num(2) ?? 0, fold: num(3) ?? 0))
+        var launch = Launch(power: power, aim: aim, start: num(2) ?? 0, fold: num(3) ?? 0)
+        if let hand = flag("hand"), let skill = Skill.all.first(where: { $0.name == hand }) {
+            // A thumb is not a keyboard: wobble the throw like a player of
+            // this skill would. Seeded by position in the run, and the
+            // wobbled launch is what gets saved, so replays stay exact.
+            var rng = SplitMix64(seed: file.seed &+ UInt64(file.actions.count) &* 7919)
+            launch = skill.perturb(launch, rng: &rng)
+            print("hand (\(hand)): power \(f2(launch.power)) aim \(f2(launch.aim))")
+        }
+        action = .throwBall(launch)
     case "arm": action = .arm(Int(rest.first ?? "") ?? -1)
     case "buy":
         let hole = rest.count > 1 ? parseHole(rest[1]) : nil

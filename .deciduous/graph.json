@@ -220,6 +220,16 @@
       "to_change_id": "f56ae8f1-55a7-4e8b-8293-27b3e57e0178",
       "weight": 1.0
     },
+    "3e68a39605680b3a144e": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T17:16:50.490802-04:00",
+      "edge_id": "3e68a39605680b3a144e",
+      "edge_type": "leads_to",
+      "from_change_id": "58025ef7-e154-40ed-9ce3-db111ac495bf",
+      "rationale": "approach",
+      "to_change_id": "1a1e1f41-c265-438d-bd52-66b72504c694",
+      "weight": 1.0
+    },
     "3f9c452b4e9c594838b3": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T09:34:48.517146-04:00",
@@ -288,6 +298,16 @@
       "from_change_id": "aa95f3c9-ec6c-40e6-b3d1-38490fec8434",
       "rationale": "chosen",
       "to_change_id": "1b730ae0-f224-4ff9-a7e2-dcd3c1dbcfa6",
+      "weight": 1.0
+    },
+    "5dcb45603092dbad75a1": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T17:20:05.192252-04:00",
+      "edge_id": "5dcb45603092dbad75a1",
+      "edge_type": "leads_to",
+      "from_change_id": "b366c17e-d75c-4365-8c6d-dd6e27394c7d",
+      "rationale": "implementation",
+      "to_change_id": "422bc003-1535-4084-b9cc-90ab97f96aa6",
       "weight": 1.0
     },
     "5def00e4f7c82a8d12c0": {
@@ -650,6 +670,16 @@
       "to_change_id": "0c054b82-d51c-4f94-955f-aff5648d5200",
       "weight": 1.0
     },
+    "b4dc182be7316ca54125": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T17:20:05.430137-04:00",
+      "edge_id": "b4dc182be7316ca54125",
+      "edge_type": "leads_to",
+      "from_change_id": "422bc003-1535-4084-b9cc-90ab97f96aa6",
+      "rationale": "result",
+      "to_change_id": "50f6ba77-976f-4a37-9d13-3078c82578d4",
+      "weight": 1.0
+    },
     "b7121b1ebab461c77b4e": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T10:32:15.366016-04:00",
@@ -670,6 +700,16 @@
       "to_change_id": "eb182f5e-5636-4d11-9268-d292a500d748",
       "weight": 1.0
     },
+    "b758010a433e2e8ed512": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T17:16:50.988938-04:00",
+      "edge_id": "b758010a433e2e8ed512",
+      "edge_type": "leads_to",
+      "from_change_id": "1a1e1f41-c265-438d-bd52-66b72504c694",
+      "rationale": "chosen",
+      "to_change_id": "b366c17e-d75c-4365-8c6d-dd6e27394c7d",
+      "weight": 1.0
+    },
     "b7e96e7f3fa401a5f2b8": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:13:19.930240-04:00",
@@ -688,6 +728,16 @@
       "from_change_id": "cf7cf4c1-aa43-4dc6-8b54-289bd2647939",
       "rationale": "result",
       "to_change_id": "51015eb2-8210-40ba-8c20-48e1c92ab04d",
+      "weight": 1.0
+    },
+    "bbf6b63a3440ca1e9fe2": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T17:16:50.744132-04:00",
+      "edge_id": "bbf6b63a3440ca1e9fe2",
+      "edge_type": "leads_to",
+      "from_change_id": "58025ef7-e154-40ed-9ce3-db111ac495bf",
+      "rationale": "approach",
+      "to_change_id": "f5787b78-b411-413d-b9be-205a35f2a41d",
       "weight": 1.0
     },
     "bd2ad4930f4bff42f16e": {
@@ -1061,6 +1111,19 @@
       "title": "iPhone Duo inner display is 669x951pt portrait; hinge runs horizontally across the middle; UIHingeInteraction reports hinge angle (iOS 27.1)",
       "updated_at": "2026-10-30T08:02:53.577656-04:00"
     },
+    "1a1e1f41-c265-438d-bd52-66b72504c694": {
+      "author": "Bobby Grayson",
+      "change_id": "1a1e1f41-c265-438d-bd52-66b72504c694",
+      "created_at": "2026-10-30T17:16:50.375060-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 80
+      },
+      "node_type": "option",
+      "status": "pending",
+      "title": "Practice run with low target; pure Walkthrough state machine advances on game events (flick, symbols, line, top slot, target, counter, prizes); coach card per step with SKIP; auto on first launch, HOW TO PLAY on title",
+      "updated_at": "2026-10-30T17:16:50.375060-04:00"
+    },
     "1afb7e6c-31de-41fa-b093-dec2f9bcde14": {
       "author": "Bobby Grayson",
       "change_id": "1afb7e6c-31de-41fa-b093-dec2f9bcde14",
@@ -1210,6 +1273,20 @@
       "title": "Redo the presentation layer: must look and feel like real skee-ball, holes in every ring, good graphics",
       "updated_at": "2026-10-30T09:02:17.040862-04:00"
     },
+    "422bc003-1535-4084-b9cc-90ab97f96aa6": {
+      "author": "Bobby Grayson",
+      "change_id": "422bc003-1535-4084-b9cc-90ab97f96aa6",
+      "created_at": "2026-10-30T17:20:05.063251-04:00",
+      "metadata": {
+        "branch": "main",
+        "commit": "fd94a63ce341c6e6af0ad9239aec9cd4f37e221a",
+        "confidence": 85
+      },
+      "node_type": "action",
+      "status": "pending",
+      "title": "Walkthrough state machine + practiceRun in core, CoachView over ball tray with SKIP/GOT IT, parks and restores real run, HOW TO PLAY on title",
+      "updated_at": "2026-10-30T17:20:05.063251-04:00"
+    },
     "42862e1f-5d1d-432b-9ed8-e3750779fb5c": {
       "author": "Bobby Grayson",
       "change_id": "42862e1f-5d1d-432b-9ed8-e3750779fb5c",
@@ -1305,6 +1382,19 @@
       "title": "Pure stroke analysis: release velocity->power/aim, sideways change->spin, hitches->skid, crease crossing->foul",
       "updated_at": "2026-10-30T09:09:11.565542-04:00"
     },
+    "50f6ba77-976f-4a37-9d13-3078c82578d4": {
+      "author": "Bobby Grayson",
+      "change_id": "50f6ba77-976f-4a37-9d13-3078c82578d4",
+      "created_at": "2026-10-30T17:20:05.317086-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 75
+      },
+      "node_type": "outcome",
+      "status": "pending",
+      "title": "124 core tests pass; cards render out of the flick path; installed and launched on Duo; not played through on device",
+      "updated_at": "2026-10-30T17:20:05.317086-04:00"
+    },
     "51015eb2-8210-40ba-8c20-48e1c92ab04d": {
       "author": "Bobby Grayson",
       "change_id": "51015eb2-8210-40ba-8c20-48e1c92ab04d",
@@ -1371,6 +1461,20 @@
       "status": "pending",
       "title": "Flick: ball waits at the release line; shot fires after lift-off from the whole stroke curve (peak/release velocity, acceleration, jerk); foul only on a long drag far past the crease",
       "updated_at": "2026-10-30T10:32:13.961288-04:00"
+    },
+    "58025ef7-e154-40ed-9ce3-db111ac495bf": {
+      "author": "Bobby Grayson",
+      "change_id": "58025ef7-e154-40ed-9ce3-db111ac495bf",
+      "created_at": "2026-10-30T17:16:50.244611-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 80,
+        "prompt": "make a walkthrough of how the game works as a warm up round you can ipt out of"
+      },
+      "node_type": "goal",
+      "status": "pending",
+      "title": "Walkthrough as an opt-out warm-up round",
+      "updated_at": "2026-10-30T17:16:50.244611-04:00"
     },
     "5819bd39-c604-4318-9154-188e376f542d": {
       "author": "Bobby Grayson",
@@ -1816,6 +1920,19 @@
       "title": "Top slot machine that spins every throw and combos with what you hit",
       "updated_at": "2026-10-30T17:01:19.584184-04:00"
     },
+    "b366c17e-d75c-4365-8c6d-dd6e27394c7d": {
+      "author": "Bobby Grayson",
+      "change_id": "b366c17e-d75c-4365-8c6d-dd6e27394c7d",
+      "created_at": "2026-10-30T17:16:50.874060-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 80
+      },
+      "node_type": "decision",
+      "status": "pending",
+      "title": "Learn by doing: coach cards that wait for the player to do each thing in a real warm-up",
+      "updated_at": "2026-10-30T17:16:50.874060-04:00"
+    },
     "b5ae3392-3f1a-4090-9e24-d9c4ed3aa280": {
       "author": "Bobby Grayson",
       "change_id": "b5ae3392-3f1a-4090-9e24-d9c4ed3aa280",
@@ -2078,6 +2195,19 @@
       "status": "pending",
       "title": "New build installed on the user's Duo; runs in simulator; awaiting the user's feel test (stroke tuning untested on a real thumb)",
       "updated_at": "2026-10-30T09:26:02.639912-04:00"
+    },
+    "f5787b78-b411-413d-b9be-205a35f2a41d": {
+      "author": "Bobby Grayson",
+      "change_id": "f5787b78-b411-413d-b9be-205a35f2a41d",
+      "created_at": "2026-10-30T17:16:50.628369-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 30
+      },
+      "node_type": "option",
+      "status": "pending",
+      "title": "Static slideshow of rules before the first run",
+      "updated_at": "2026-10-30T17:16:50.628369-04:00"
     },
     "fb8961bc-ce84-4d5d-93aa-53441619dd83": {
       "author": "Bobby Grayson",

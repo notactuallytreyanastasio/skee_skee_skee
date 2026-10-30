@@ -46,6 +46,9 @@ public struct HUDState: Sendable {
     public var hint: Hint?
     /// Recent throws: power 0...1 and where they went, newest last.
     public var throwsMeter: [ThrowMark] = []
+    /// Winnings and the prize shelf, kept between runs; the shop overlay.
+    public var wallet = Wallet()
+    public var shopOpen = false
     /// The thumb's recent path, for a fading trail. Age 0...1.
     public var trail: [(CGPoint, Double)] = []
 

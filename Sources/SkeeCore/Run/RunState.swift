@@ -58,6 +58,8 @@ public struct RunStats: Hashable, Sendable, Codable {
     public var jackpots = 0
     public var rattles = 0
     public var bestFrame = 0
+    /// Every frame's total, all run.
+    public var points = 0
     public var roundsCleared = 0
 }
 

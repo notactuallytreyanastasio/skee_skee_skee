@@ -109,6 +109,7 @@ private func finishBall(_ s0: RunState, _ events0: [GameEvent]) -> Step {
     s.fever = false
     if frame.isJackpot { s.stats.jackpots += 1 }
     s.stats.bestFrame = max(s.stats.bestFrame, frame.total)
+    s.stats.points += frame.total
     events.append(.frameScored(frame))
     if s.heat >= s.config.feverHeat {
         s.heat -= s.config.feverHeat

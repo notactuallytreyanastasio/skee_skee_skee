@@ -71,6 +71,9 @@ final class GameModel {
     var selectedOffer: Int?
     var selectedCharm: Int?
     var fold: Double = 0
+    /// Winnings and the prize shelf, across runs.
+    var wallet = WalletStore.load()
+    var shopOpen = false
 
     @ObservationIgnored let cabinet = Cabinet()
     @ObservationIgnored let presenter: ScenePresenter
@@ -162,6 +165,8 @@ final class GameModel {
         }, center: CGPoint(x: size.width / 2, y: size.height * 0.2),
            selectedOffer: selectedOffer, selectedCharm: selectedCharm, screen: screen)
         hud.trail = trail
+        hud.wallet = wallet
+        hud.shopOpen = shopOpen
     }
 
     // MARK: thumb
@@ -172,7 +177,7 @@ final class GameModel {
     var geometry: FlickGeometry { presenter.flickGeometry(size: viewSize) }
     var busy: Bool { stage.with { $0.isBusy } }
     var canThrow: Bool {
-        if screen != .game || busy { return false }
+        if screen != .game || busy || shopOpen { return false }
         if case .throwing = state.phase { return true }
         return false
     }
@@ -249,6 +254,15 @@ final class GameModel {
         a.arm = { [weak self] i in self?.send(.arm(i)) }
         a.start = { [weak self] in self?.screen = .game; self?.haptics.tap() }
         a.newRun = { [weak self] in self?.newGame() }
+        a.openShop = { [weak self] in self?.shopOpen = true; self?.haptics.tap() }
+        a.closeShop = { [weak self] in self?.shopOpen = false; self?.haptics.tap() }
+        a.buyPrize = { [weak self] p in
+            guard let self else { return }
+            switch wallet.buy(p) {
+            case .success(let w): wallet = w; WalletStore.save(w); haptics.prize()
+            case .failure: haptics.reject()
+            }
+        }
         return a
     }
 
@@ -263,6 +277,14 @@ final class GameModel {
             actions.append(action)
             stage.with { $0.enqueue(step) }
             RunStore.save(seed: seed, actions: actions)
+            // A finished run pays its winnings to the shelf, once.
+            for e in step.events {
+                switch e {
+                case .roundFailed: wallet.credit(winnings(stats: state.stats, won: false)); WalletStore.save(wallet)
+                case .runWon: wallet.credit(winnings(stats: state.stats, won: true)); WalletStore.save(wallet)
+                default: break
+                }
+            }
             if case .throwBall = action { haptics.launch() } else { haptics.tap() }
         }
     }
@@ -315,6 +337,20 @@ struct LaunchArguments {
     }
 }
 
+/// Winnings and prizes, outside any run.
+enum WalletStore {
+    static var url: URL {
+        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("wallet.json")
+    }
+    static func save(_ w: Wallet) {
+        if let data = try? JSONEncoder().encode(w) { try? data.write(to: url) }
+    }
+    static func load() -> Wallet {
+        guard let data = try? Data(contentsOf: url), let w = try? JSONDecoder().decode(Wallet.self, from: data) else { return Wallet() }
+        return w
+    }
+}
+
 /// The run on disk is the seed and the actions; replaying rebuilds it.
 enum RunStore {
     struct File: Codable { var seed: UInt64; var actions: [Action] }
@@ -341,6 +377,7 @@ final class Haptics {
     func launch() { rigid.impactOccurred(intensity: 0.7) }
     func reject() { note.notificationOccurred(.warning) }
     func foul() { note.notificationOccurred(.error) }
+    func prize() { note.notificationOccurred(.success) }
 
     /// Light taps timed to the ball: the hump, rattles, the drop.
     func cue(_ c: Cue) {

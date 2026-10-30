@@ -68,14 +68,15 @@ func sceneFilmCommand() {
 /// One full app frame: the 3D scene with the SwiftUI HUD on top.
 @MainActor
 func composeFrame(_ p: Presentation, cab: Cabinet, presenter: ScenePresenter, size: CGSize, scale: CGFloat = 2,
-                  screen: HUDState.Screen = .game, selectedOffer: Int? = nil) -> CGImage? {
+                  screen: HUDState.Screen = .game, selectedOffer: Int? = nil, wallet: Wallet? = nil) -> CGImage? {
     guard let scene3D = snapshot(cab, size: CGSize(width: size.width * scale, height: size.height * scale)) else { return nil }
     let a = Float(size.width / size.height)
-    let hud = HUDState.make(p, holeOnScreen: { hole in
+    var hud = HUDState.make(p, holeOnScreen: { hole in
         let w = cab.world
         let f = presenter.rig.project(w.board(w.table.board.holeCenter(hole)), aspect: a)
         return CGPoint(x: CGFloat(f.x) * size.width, y: CGFloat(f.y) * size.height)
     }, center: CGPoint(x: size.width / 2, y: size.height * 0.2), selectedOffer: selectedOffer, screen: screen)
+    if let wallet { hud.wallet = wallet; hud.shopOpen = screen == .game }
     let renderer = ImageRenderer(content: HUDView(state: hud).frame(width: size.width, height: size.height))
     renderer.scale = scale
     guard let overlay = renderer.cgImage else { return scene3D }
@@ -104,7 +105,10 @@ func frameCommand() {
     while clock < t && (p.isBusy || clock < 0.05) { p.advance(1.0 / 60); presenter.update(p, held: nil, dt: 1.0 / 60); clock += 1.0 / 60 }
     presenter.update(p, held: nil, dt: 0)
     guard let img = composeFrame(p, cab: cab, presenter: presenter, size: size, screen: has("title") ? .title : .game,
-                                 selectedOffer: flag("select").flatMap(Int.init)) else { fail("render failed") }
+                                 selectedOffer: flag("select").flatMap(Int.init),
+                                 // --shop: the prize shop with a sample shelf (on the title with --title).
+                                 wallet: has("shop") ? Wallet(balance: 1340, lifetime: 2000, owned: [.sticker, .rubberDuck, .yoyo]) : nil)
+            else { fail("render failed") }
     try? FileManager.default.createDirectory(atPath: (out as NSString).deletingLastPathComponent, withIntermediateDirectories: true)
     writePNG(img, out)
     print(out)

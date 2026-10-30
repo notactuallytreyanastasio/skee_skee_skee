@@ -13,6 +13,9 @@ public struct HUDActions {
     public var arm: (Int) -> Void = { _ in }
     public var start: () -> Void = {}
     public var newRun: () -> Void = {}
+    public var openShop: () -> Void = {}
+    public var closeShop: () -> Void = {}
+    public var buyPrize: (Prize) -> Void = { _ in }
     public init() {}
 }
 
@@ -122,7 +125,7 @@ public struct HUDView: View {
         GeometryReader { geo in
             ZStack {
                 if state.screen == .title {
-                    TitleCard(start: actions.start)
+                    TitleCard(start: actions.start, shop: actions.openShop, wallet: state.wallet)
                 } else {
                     VStack(spacing: 6) {
                         topBar
@@ -159,9 +162,13 @@ public struct HUDView: View {
                             .position(x: geo.size.width / 2, y: geo.size.height * 0.75)
                     }
                     if let over = state.over {
-                        GameOverView(won: over.won, stats: over.stats, ante: state.ante, newRun: actions.newRun)
+                        GameOverView(won: over.won, stats: over.stats, ante: state.ante, wallet: state.wallet,
+                                     newRun: actions.newRun, shop: actions.openShop)
                             .position(x: geo.size.width / 2, y: geo.size.height * 0.5)
                     }
+                }
+                if state.shopOpen {
+                    PrizeShopView(wallet: state.wallet, buy: actions.buyPrize, close: actions.closeShop)
                 }
             }
         }
@@ -428,8 +435,12 @@ struct BannerView: View {
 
 struct TitleCard: View {
     let start: () -> Void
+    let shop: () -> Void
+    let wallet: Wallet
     var body: some View {
-        Button(action: start) {
+        ZStack {
+            // Tap anywhere to play; the shop button sits on top of that.
+            Color.clear.contentShape(Rectangle()).onTapGesture(perform: start)
             VStack(spacing: 18) {
                 Spacer().frame(height: 60)
                 VStack(spacing: -10) {
@@ -438,19 +449,25 @@ struct TitleCard: View {
                     CelText(text: "SKEE", size: 72, fill: Ink.sky)
                 }
                 .rotationEffect(.degrees(-6))
+                .allowsHitTesting(false)
                 Spacer()
                 Pill(fill: Ink.mint, radius: 22) { CelText(text: "TAP TO PLAY", size: 28) }
+                    .allowsHitTesting(false)
                 VStack(spacing: 2) {
                     CelText(text: "flick the ball up the lane", size: 15)
                     CelText(text: "don't drag past the crease", size: 15, fill: Ink.butter)
                     CelText(text: "fold the phone for a steeper ramp", size: 13)
                 }
-                Spacer().frame(height: 120)
+                .allowsHitTesting(false)
+                Button(action: shop) {
+                    Pill(fill: Ink.butter, radius: 18) { CelText(text: "PRIZE SHOP · \(wallet.balance)", size: 18) }
+                }
+                .buttonStyle(.plain)
+                PrizeShelfStrip(owned: wallet.owned).allowsHitTesting(false)
+                Spacer().frame(height: 60)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 
@@ -458,7 +475,9 @@ struct GameOverView: View {
     let won: Bool
     let stats: RunStats
     let ante: Int
+    let wallet: Wallet
     let newRun: () -> Void
+    let shop: () -> Void
     var body: some View {
         Pill(fill: won ? Ink.mint : Ink.pink, radius: 26) {
             VStack(spacing: 10) {
@@ -466,10 +485,17 @@ struct GameOverView: View {
                 CelText(text: "ANTE \(ante)", size: 18)
                 CelText(text: "BEST FRAME \(stats.bestFrame)", size: 16)
                 CelText(text: "JACKPOTS \(stats.jackpots)  ·  RATTLES \(stats.rattles)", size: 14)
-                Button(action: newRun) {
-                    Pill(fill: Ink.butter, radius: 18) { CelText(text: "NEW RUN", size: 24) }
+                CelText(text: "+\(winnings(stats: stats, won: won)) WINNINGS", size: 20, fill: Ink.butter)
+                HStack(spacing: 10) {
+                    Button(action: newRun) {
+                        Pill(fill: Ink.butter, radius: 18) { CelText(text: "NEW RUN", size: 22) }
+                    }
+                    .buttonStyle(.plain)
+                    Button(action: shop) {
+                        Pill(fill: Ink.sky, radius: 18) { CelText(text: "PRIZES \(wallet.balance)", size: 18) }
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
                 .padding(.top, 6)
             }
             .padding(16)

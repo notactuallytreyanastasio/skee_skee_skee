@@ -224,6 +224,23 @@ Bots ignore it and still score 10-30% more in the middle antes from chance
 matches; players who aim for it will score more than that. Targets have not
 been retuned for it.
 
+## The prize shop
+
+A finished run pays winnings: a twentieth of every point scored, 20 per
+round cleared, 500 for beating the arcade. They carry between runs
+(`wallet.json` beside the run save) and buy prizes for a shelf: ten of
+them, a gold star sticker at 50 up to a golden skee trophy at 10,000. The
+shelf shows on the title screen.
+
+Prizes do nothing. That is the point: tickets are the in-run currency and
+buy charms that change scoring; winnings are the out-of-run currency and
+buy things to look at. If the shelf made runs easier, the arcade's targets
+would have to assume it, and a new player would face a game tuned for a
+full shelf. Prizes you can afford show in colour; the rest are silhouettes,
+the way a prize counter shows the big bear on the top shelf.
+
+`skee frame --shop` renders the shop with a sample shelf.
+
 ## The slot, on the board
 
 The rings are the reels. Each ring shows the symbol its reel is on, four to

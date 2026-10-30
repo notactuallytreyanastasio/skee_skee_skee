@@ -46,10 +46,10 @@ public enum StrokeOutcome: Hashable, Sendable {
 
 public struct FlickTuning: Hashable, Sendable, Codable {
     /// Effective flick speeds (pt/s) that map to power 0 and power 1.
-    public var slowest = 600.0
-    public var fastest = 4200.0
+    public var slowest = 300.0
+    public var fastest = 3100.0
     /// Weight of lift-off speed against peak speed.
-    public var releaseWeight = 0.65
+    public var releaseWeight = 0.5
     /// Snap: release acceleration, in units of peak speed per flick
     /// duration, that changes speed by `snapGain`.
     public var snapGain = 0.06

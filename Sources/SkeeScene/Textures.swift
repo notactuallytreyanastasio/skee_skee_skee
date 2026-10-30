@@ -108,6 +108,21 @@ public enum Textures {
         }
     }
 
+    /// The symbol on a cream coin with a thick ink rim, for the board: the
+    /// rings are saturated pastels, and a bare symbol on them reads as noise
+    /// from the far end of the lane. A blank is an empty grey coin.
+    public static func coin(_ s: Symbol) -> CGImage {
+        cached("coin-\(s.rawValue)") {
+            let n = 256
+            let c = context(n, n)
+            let disk = CGRect(x: 10, y: 10, width: n - 20, height: n - 20)
+            c.setFillColor((s == .blank ? RGB(0xB9AEC2) : RGB(0xFFFBF2)).cg()); c.fillEllipse(in: disk)
+            c.setStrokeColor(ink.cg()); c.setLineWidth(16); c.strokeEllipse(in: disk.insetBy(dx: 4, dy: 4))
+            drawSymbol(s, in: CGRect(x: 44, y: 44, width: n - 88, height: n - 88), c)
+            return c.makeImage()!
+        }
+    }
+
     /// The symbol alone on transparent, for the marquee reels.
     public static func symbol(_ s: Symbol) -> CGImage {
         cached("sym-\(s.rawValue)") {

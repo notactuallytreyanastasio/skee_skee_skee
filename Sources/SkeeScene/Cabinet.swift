@@ -308,7 +308,7 @@ public final class Cabinet: @unchecked Sendable {
         func reel(_ hole: Hole, center: SIMD2<Float>, radius: Float, count: Int, size: Float,
                   phase: Float = .pi / 2, band: (Double, Double)) {
             let pivot = SCNNode()
-            pivot.simdPosition = SIMD3(center.x, center.y, 0.006)
+            pivot.simdPosition = SIMD3(center.x, center.y, 0.02)
             board.addChildNode(pivot)
             let tube = SCNTube(innerRadius: CGFloat(band.0), outerRadius: CGFloat(band.1), height: 0.001)
             tube.radialSegmentCount = 96
@@ -328,28 +328,33 @@ public final class Cabinet: @unchecked Sendable {
             var decals: [SCNNode] = []
             for _ in 0..<count {
                 let g = SCNPlane(width: CGFloat(size), height: CGFloat(size))
-                let m = Toon.material(Textures.symbol(.blank))
+                let m = Toon.material(Textures.coin(.blank))
                 m.transparencyMode = .aOne
                 m.isDoubleSided = false
                 g.materials = [m]
                 let n = SCNNode(geometry: g)
                 n.castsShadow = false
+                // Face the camera: the board leans back 50 degrees, and a
+                // decal lying on it is foreshortened to half its height.
+                let face = SCNBillboardConstraint()
+                face.freeAxes = .all
+                n.constraints = [face]
                 pivot.addChildNode(n)
                 decals.append(n)
             }
             reelsOnBoard[hole] = RingReel(pivot: pivot, decals: decals, radius: radius, phase: phase, halo: halo)
         }
         let cc = SIMD2(Float(c.x), Float(c.y))
-        reel(.ring10, center: cc, radius: Float(w[2] + w[3]) / 2, count: 10, size: 0.058, band: (w[2] + 0.008, w[3] - 0.008))
-        reel(.ring20, center: cc, radius: Float(w[1] + w[2]) / 2, count: 8, size: 0.054, band: (w[1] + 0.008, w[2] - 0.008))
-        reel(.ring30, center: cc, radius: Float(w[0] + w[1]) / 2, count: 6, size: 0.052, band: (w[0] + 0.008, w[1] - 0.008))
-        reel(.ring40, center: cc, radius: Float(w[0]) * 0.62, count: 2, size: 0.046, phase: 0, band: (0.0, w[0] - 0.008))
+        reel(.ring10, center: cc, radius: Float(w[2] + w[3]) / 2, count: 7, size: 0.074, band: (w[2] + 0.008, w[3] - 0.008))
+        reel(.ring20, center: cc, radius: Float(w[1] + w[2]) / 2, count: 6, size: 0.07, band: (w[1] + 0.008, w[2] - 0.008))
+        reel(.ring30, center: cc, radius: Float(w[0] + w[1]) / 2, count: 4, size: 0.066, band: (w[0] + 0.008, w[1] - 0.008))
+        reel(.ring40, center: cc, radius: Float(w[0]) * 0.62, count: 2, size: 0.056, phase: 0, band: (0.0, w[0] - 0.008))
         let fifty = b.holeCenter(.ring50)
-        reel(.ring50, center: SIMD2(Float(fifty.x), Float(fifty.y)), radius: 0, count: 1, size: 0.05,
+        reel(.ring50, center: SIMD2(Float(fifty.x), Float(fifty.y)), radius: 0, count: 1, size: 0.066,
              band: (b.centerHoleRadius + 0.008, b.centerHoleRadius + 0.02))
         for p in [Hole.pocketLeft, .pocketRight] {
             let pc = b.holeCenter(p)
-            reel(p, center: SIMD2(Float(pc.x), Float(pc.y) + 0.07), radius: 0, count: 1, size: 0.06,
+            reel(p, center: SIMD2(Float(pc.x), Float(pc.y) + 0.07), radius: 0, count: 1, size: 0.08,
                  band: (b.pockets[0].radius + 0.008, b.pockets[0].radius + 0.022))
         }
     }
@@ -370,7 +375,7 @@ public final class Cabinet: @unchecked Sendable {
             if r.radius == 0 { d.simdPosition.y = 0; d.simdScale = SIMD3(repeating: 1 + 0.25 * glow * pulse) }
             else { d.simdScale = SIMD3(repeating: 1 + 0.18 * glow * pulse) }
             let m = d.geometry!.firstMaterial!
-            if r.shown != symbol { m.diffuse.contents = Textures.symbol(symbol) }
+            if r.shown != symbol { m.diffuse.contents = Textures.coin(symbol) }
             m.emission.contents = glow > 0
                 ? PlatformColor(red: CGFloat(0.55 * pulse), green: CGFloat((glow > 1 ? 0.45 : 0.3) * pulse), blue: CGFloat(glow > 1 ? 0 : 0.25 * pulse), alpha: 1)
                 : PlatformColor.black

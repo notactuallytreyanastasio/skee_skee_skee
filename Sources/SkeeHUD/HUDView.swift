@@ -101,7 +101,6 @@ public struct HUDView: View {
                 } else {
                     VStack(spacing: 6) {
                         topBar
-                        slot
                         if state.isBoss { CelText(text: state.bossBlurb, size: 12, fill: Ink.butter).padding(.horizontal, 20) }
                         Spacer()
                     }
@@ -111,6 +110,11 @@ public struct HUDView: View {
                     sideTrays(geo.size)
                     meter(geo.size)
                     trail()
+                    // The slot sits on the backboard under the rings: up top
+                    // it hid the pockets and the 50, the symbols that matter most.
+                    VStack(spacing: 4) { slot; hint }
+                        .position(x: geo.size.width / 2, y: geo.size.height * 0.445)
+                        .allowsHitTesting(false)
 
                     if let t = state.tally { TallyView(tally: t).position(x: geo.size.width / 2, y: geo.size.height * 0.27).allowsHitTesting(false) }
                     ForEach(Array(state.popups.enumerated()), id: \.offset) { _, p in popup(p) }
@@ -176,7 +180,7 @@ public struct HUDView: View {
                         if let s = state.frame[i] { SymbolImage(symbol: s).padding(5) }
                         RoundedRectangle(cornerRadius: 10).strokeBorder(Ink.ink, lineWidth: 3)
                     }
-                    .frame(width: 46, height: 46)
+                    .frame(width: 44, height: 44)
                 }
             }
             HStack(spacing: 3) {
@@ -187,17 +191,21 @@ public struct HUDView: View {
                         .frame(width: 9, height: 9)
                 }
                 if state.fever { CelText(text: "FEVER", size: 11, fill: Ink.butter) }
+                CelText(text: "  FRAME \(state.frameNumber)/\(state.framesTotal) · \(state.ballsLeft) BALLS", size: 11)
             }
-            CelText(text: "FRAME \(state.frameNumber)/\(state.framesTotal)  ·  \(state.ballsLeft) BALLS", size: 11)
-            if let h = state.hint, !h.text.isEmpty {
-                HStack(spacing: 4) {
-                    CelText(text: h.text, size: h.hot ? 15 : 12, fill: h.hot ? Ink.butter : Ink.cream)
-                    if let sym = h.symbol { SymbolImage(symbol: sym).frame(width: h.hot ? 26 : 20, height: h.hot ? 26 : 20) }
-                    if !h.after.isEmpty { CelText(text: h.after, size: h.hot ? 15 : 12, fill: h.hot ? Ink.butter : Ink.cream) }
-                }
-                .padding(.horizontal, 10).padding(.vertical, 3)
-                .background(Capsule().fill(Ink.ink.opacity(0.55)))
+        }
+    }
+
+    /// What the slot wants next, in words.
+    @ViewBuilder var hint: some View {
+        if let h = state.hint, !h.text.isEmpty {
+            HStack(spacing: 5) {
+                CelText(text: h.text, size: h.hot ? 18 : 14, fill: h.hot ? Ink.butter : Ink.cream)
+                if let sym = h.symbol { SymbolImage(symbol: sym).frame(width: h.hot ? 34 : 28, height: h.hot ? 34 : 28) }
+                if !h.after.isEmpty { CelText(text: h.after, size: h.hot ? 18 : 14, fill: h.hot ? Ink.butter : Ink.cream) }
             }
+            .padding(.horizontal, 12).padding(.vertical, 4)
+            .background(Capsule().fill(Ink.ink.opacity(0.6)))
         }
     }
 

@@ -199,15 +199,19 @@ line; after your thumb lifts, the shot fires from the whole motion
   **Line**: where across the lane you flicked.
 - **foul**: only a drag 140 pt past the crease. Flicks overshoot naturally.
 
-Calibrated with `skee flickprobe` on minimum-jerk flicks: power runs from 600
-to 4200 pt/s effective speed; smooth flicks measure jerk 2-8, shaky ones
+Calibrated with `skee flickprobe` on minimum-jerk flicks: power runs from 300
+to 3100 pt/s effective speed (lift-off and peak speed weighted evenly); smooth flicks measure jerk 2-8, shaky ones
 10-15. A gauge on the right of the lane marks each recent throw's power,
 coloured by where it went, so the flick can be learned.
 
 ## The slot, on the board
 
-The rings are the reels. Each ring shows the symbol its reel is on, many
-times around the band, big enough to read from the far end of the alley.
+The rings are the reels. Each ring shows the symbol its reel is on, four to
+seven times around the band, each on a cream coin with an ink rim that turns
+to face the camera. Drawn flat on the board, the symbols were foreshortened
+to half height by its 50 degree lean and lost against the ring colours. The
+HUD slot sits on the backboard under the rings; at the top of the screen it
+hid the pockets and the 50, the symbols that matter most.
 Between balls the symbols orbit the ring like a carousel and land on the
 new ones. Once a ball is in, rings that would pair your line pulse with a
 halo; with a pair in, the ones that would complete it glow gold. The HUD

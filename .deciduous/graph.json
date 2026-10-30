@@ -20,6 +20,16 @@
       "to_change_id": "55d9e3ac-0ed9-4e68-ab03-8025a0feed2c",
       "weight": 1.0
     },
+    "0c06b7863976b41f3bdf": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T09:42:32.673490-04:00",
+      "edge_id": "0c06b7863976b41f3bdf",
+      "edge_type": "leads_to",
+      "from_change_id": "baa13187-35d5-4b46-bf7c-2c01e4b0e369",
+      "rationale": "velocity carry",
+      "to_change_id": "89ce6e47-d9c9-4c86-afa2-648418fef3c8",
+      "weight": 1.0
+    },
     "147eccdcc92bf3993d0d": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:03:20.678906-04:00",
@@ -110,6 +120,26 @@
       "to_change_id": "bcf6ef5b-59ca-42f8-b01e-15c2eb897184",
       "weight": 1.0
     },
+    "35326733150326516420": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T09:34:48.125858-04:00",
+      "edge_id": "35326733150326516420",
+      "edge_type": "leads_to",
+      "from_change_id": "bc6b7206-254a-4b57-abfd-52a79338e5ba",
+      "rationale": "refines the thumb throw",
+      "to_change_id": "baa13187-35d5-4b46-bf7c-2c01e4b0e369",
+      "weight": 1.0
+    },
+    "3818d208572f4efaa6fc": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T09:32:41.338611-04:00",
+      "edge_id": "3818d208572f4efaa6fc",
+      "edge_type": "leads_to",
+      "from_change_id": "f56ae8f1-55a7-4e8b-8293-27b3e57e0178",
+      "rationale": "user played the build on the Duo",
+      "to_change_id": "22f859a8-4e44-4362-876e-ba4a830bc753",
+      "weight": 1.0
+    },
     "39a151798cf9995fb53d": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:03:18.526091-04:00",
@@ -128,6 +158,16 @@
       "from_change_id": "1187b69d-9291-4845-a869-324a21b36cce",
       "rationale": "result",
       "to_change_id": "f56ae8f1-55a7-4e8b-8293-27b3e57e0178",
+      "weight": 1.0
+    },
+    "3f9c452b4e9c594838b3": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T09:34:48.517146-04:00",
+      "edge_id": "3f9c452b4e9c594838b3",
+      "edge_type": "leads_to",
+      "from_change_id": "baa13187-35d5-4b46-bf7c-2c01e4b0e369",
+      "rationale": "why the current throw cannot carry velocity",
+      "to_change_id": "59d4ea6a-5d26-42ae-8a82-1d36e744bd42",
       "weight": 1.0
     },
     "4a563b1e3f6607b0c7d3": {
@@ -380,6 +420,16 @@
       "to_change_id": "1187b69d-9291-4845-a869-324a21b36cce",
       "weight": 1.0
     },
+    "a70e25b0dfe33a052f43": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T09:42:32.980980-04:00",
+      "edge_id": "a70e25b0dfe33a052f43",
+      "edge_type": "leads_to",
+      "from_change_id": "89ce6e47-d9c9-4c86-afa2-648418fef3c8",
+      "rationale": "result",
+      "to_change_id": "c807069d-e911-4d48-985f-93d912cec18a",
+      "weight": 1.0
+    },
     "a90810101b5fb79488d6": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T09:09:11.691503-04:00",
@@ -468,6 +518,16 @@
       "from_change_id": "4b68f760-81f5-4aa1-b5c9-60a714238ba0",
       "rationale": "rejected",
       "to_change_id": "0477e2ee-f304-44f9-914d-a38324e2d568",
+      "weight": 1.0
+    },
+    "caf960d37d4f81221377": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T09:42:32.527855-04:00",
+      "edge_id": "caf960d37d4f81221377",
+      "edge_type": "leads_to",
+      "from_change_id": "22f859a8-4e44-4362-876e-ba4a830bc753",
+      "rationale": "playtest fixes",
+      "to_change_id": "89ce6e47-d9c9-4c86-afa2-648418fef3c8",
       "weight": 1.0
     },
     "cbb8a0bc0259d9623ac7": {
@@ -743,6 +803,20 @@
       "title": "Slot reward as a separate spin after each round",
       "updated_at": "2026-10-30T08:03:19.954501-04:00"
     },
+    "22f859a8-4e44-4362-876e-ba4a830bc753": {
+      "author": "Bobby Grayson",
+      "change_id": "22f859a8-4e44-4362-876e-ba4a830bc753",
+      "created_at": "2026-10-30T09:32:41.097046-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 85,
+        "prompt": "the holes need to be nore visible wirk on the grapgics and also the ball rolling isnt smooth and the hinge dip should have more give fir fouls"
+      },
+      "node_type": "goal",
+      "status": "pending",
+      "title": "Playtest feedback: holes more visible + graphics polish, smooth ball roll, more give at the crease before a foul",
+      "updated_at": "2026-10-30T09:32:41.097046-04:00"
+    },
     "2e90e1ad-4339-42bb-8140-8ffc0cdafdc0": {
       "author": "Bobby Grayson",
       "change_id": "2e90e1ad-4339-42bb-8140-8ffc0cdafdc0",
@@ -894,6 +968,19 @@
       "title": "Balance run 1: expert bot 77% 50s, 46 jackpots/run, median score 10x target, 2% nail-biters",
       "updated_at": "2026-10-30T08:25:39.551748-04:00"
     },
+    "59d4ea6a-5d26-42ae-8a82-1d36e744bd42": {
+      "author": "Bobby Grayson",
+      "change_id": "59d4ea6a-5d26-42ae-8a82-1d36e744bd42",
+      "created_at": "2026-10-30T09:34:48.328482-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 85
+      },
+      "node_type": "observation",
+      "status": "pending",
+      "title": "Launch speed was a separate screen-speed mapping and physics restarted at s=0, so release was discontinuous with the held ball",
+      "updated_at": "2026-10-30T09:34:48.328482-04:00"
+    },
     "6addc45a-99c3-483b-a867-a296f0740369": {
       "author": "Bobby Grayson",
       "change_id": "6addc45a-99c3-483b-a867-a296f0740369",
@@ -993,6 +1080,20 @@
       "status": "pending",
       "title": "Ported toon.js to SceneKit shader modifiers; built 3D cabinet with holes in every ring; solved camera so hump sits on crease; rolling ball presenter; removed 2D renderer",
       "updated_at": "2026-10-30T09:20:50.017371-04:00"
+    },
+    "89ce6e47-d9c9-4c86-afa2-648418fef3c8": {
+      "author": "Bobby Grayson",
+      "change_id": "89ce6e47-d9c9-4c86-afa2-648418fef3c8",
+      "created_at": "2026-10-30T09:42:32.343535-04:00",
+      "metadata": {
+        "branch": "main",
+        "commit": "859107a1c87e5675a20c905617d0a3438b21d29d",
+        "confidence": 80
+      },
+      "node_type": "action",
+      "status": "pending",
+      "title": "Lip arcs cut at holes, pit/rim/badge holes, ball shadow, bulbs; render-thread scene updates + 120Hz paths; 40pt foul give; Launch speed/from with glass-speed carry; save compatibility",
+      "updated_at": "2026-10-30T09:42:32.343535-04:00"
     },
     "8a0c0787-8e53-414d-abb3-7a21bb4db862": {
       "author": "Bobby Grayson",
@@ -1163,6 +1264,20 @@
       "title": "No emoji; several graphical styles that change between levels (pixel, cel-shaded, 3D, ...)",
       "updated_at": "2026-10-30T08:13:18.805808-04:00"
     },
+    "baa13187-35d5-4b46-bf7c-2c01e4b0e369": {
+      "author": "Bobby Grayson",
+      "change_id": "baa13187-35d5-4b46-bf7c-2c01e4b0e369",
+      "created_at": "2026-10-30T09:34:47.928169-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 85,
+        "prompt": "there should be a concept of building velocity that carries in for the throws, the thumb moves faster as it swipes, and si shiukd the vaall roll"
+      },
+      "node_type": "goal",
+      "status": "pending",
+      "title": "Building velocity: ball rolls faster as the thumb speeds up and carries that exact velocity into the throw",
+      "updated_at": "2026-10-30T09:34:47.928169-04:00"
+    },
     "bc6b7206-254a-4b57-abfd-52a79338e5ba": {
       "author": "Bobby Grayson",
       "change_id": "bc6b7206-254a-4b57-abfd-52a79338e5ba",
@@ -1204,6 +1319,20 @@
       "status": "pending",
       "title": "Balance pass: novice 2% / regular 16% / expert 22% win; pockets exploit fixed; bot nondeterminism fixed",
       "updated_at": "2026-10-30T08:31:03.405363-04:00"
+    },
+    "c807069d-e911-4d48-985f-93d912cec18a": {
+      "author": "Bobby Grayson",
+      "change_id": "c807069d-e911-4d48-985f-93d912cec18a",
+      "created_at": "2026-10-30T09:42:32.831505-04:00",
+      "description": "Perspective made lane-metre speed 4x harder near the crease; switched to glass speed. Old saves failed to decode; fixed.",
+      "metadata": {
+        "branch": "main",
+        "confidence": 75
+      },
+      "node_type": "outcome",
+      "status": "pending",
+      "title": "Installed and launched on the Duo; 96 tests pass; scoring thumb speed 640-940 pt/s at release",
+      "updated_at": "2026-10-30T09:42:32.831505-04:00"
     },
     "cd85c89d-0479-4651-bd70-ff0a181a3038": {
       "author": "Bobby Grayson",

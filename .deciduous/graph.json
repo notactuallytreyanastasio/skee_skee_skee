@@ -300,6 +300,18 @@
       "to_change_id": "0477e2ee-f304-44f9-914d-a38324e2d568",
       "weight": 1.0
     },
+    "cbb8a0bc0259d9623ac7": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T08:55:56.140270-04:00",
+      "deleted_at": "2026-10-30T08:56:23.468573-04:00",
+      "deleted_with": "f2688b2e-0cb1-454b-b272-5723aeb69126@2026-10-30T08:56:23.468573-04:00",
+      "edge_id": "cbb8a0bc0259d9623ac7",
+      "edge_type": "leads_to",
+      "from_change_id": "067bae9a-b27a-440e-abe6-cb95c2d438c9",
+      "rationale": "user report from device",
+      "to_change_id": "f2688b2e-0cb1-454b-b272-5723aeb69126",
+      "weight": 1.0
+    },
     "cdc1de9de6acf787d515": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:13:18.945671-04:00",
@@ -847,6 +859,22 @@
       "status": "pending",
       "title": "Build in native Swift with functional core / imperative shell split",
       "updated_at": "2026-10-30T08:03:18.766901-04:00"
+    },
+    "f2688b2e-0cb1-454b-b272-5723aeb69126": {
+      "author": "Bobby Grayson",
+      "change_id": "f2688b2e-0cb1-454b-b272-5723aeb69126",
+      "created_at": "2026-10-30T08:55:55.997643-04:00",
+      "deleted_at": "2026-10-30T08:56:23.467678-04:00",
+      "description": "Same 1.42 aspect. Tray rects were laid out for 669 wide: at 626 the power-up slots overlap the charm slots.",
+      "metadata": {
+        "branch": "main",
+        "confidence": 90,
+        "prompt": "not an iphone duo screen: nativeBounds 1878x2670 role UIWindowSceneSessionRoleApplication"
+      },
+      "node_type": "observation",
+      "status": "pending",
+      "title": "Real device screen is 1878x2670 px (626x890 pt @3x), not the simulator's 669x951 inner display",
+      "updated_at": "2026-10-30T08:55:55.997643-04:00"
     },
     "fb8961bc-ce84-4d5d-93aa-53441619dd83": {
       "author": "Bobby Grayson",

@@ -74,6 +74,42 @@ struct PresentationTests {
         #expect(p.ball!.along < 0.9)
     }
 
+    @Test func shotEventsBecomeTimedCues() {
+        let s = newRun(seed: 3)
+        var p = Presentation(state: s)
+        p.enqueue(throwOnce(s))
+        var cues: [Cue] = []
+        while p.isBusy { p.advance(1 / 60); cues += p.cues }
+        #expect(cues.contains(.hump))
+        #expect(cues.contains { if case .drop = $0 { true } else { false } } || cues.contains(.gutter))
+        #expect(cues.contains(.reelStop))
+        let hump = cues.firstIndex(of: .hump)!
+        let land = cues.firstIndex { if case .drop = $0 { true } else { $0 == .gutter } }!
+        #expect(hump < land)
+    }
+
+    @Test func aPairWithTheThirdBallInTheAirSlowsTime() {
+        var s = newRun(seed: 3)
+        s.round.currentBalls = [BallRecord(hole: .ring30, symbol: .bell, chips: 30),
+                                BallRecord(hole: .ring30, symbol: .bell, chips: 30)]
+        var p = Presentation(state: s)
+        p.enqueue(throwOnce(s))
+        var sawSlow = false, sawAnticipation = false
+        while p.isBusy {
+            p.advance(1 / 60)
+            if p.timeScale < 1 { sawSlow = true }
+            if p.anticipation > 0 { sawAnticipation = true }
+        }
+        #expect(sawSlow && sawAnticipation)
+    }
+
+    @Test func noPairNoSlowMotion() {
+        let s = newRun(seed: 3)
+        var p = Presentation(state: s)
+        p.enqueue(throwOnce(s))
+        while p.isBusy { p.advance(1 / 60); #expect(p.timeScale == 1) }
+    }
+
     @Test func samplingInterpolates() {
         let path = [PathSample(t: 0, phase: .lane, x: 0, along: 0, height: 0),
                     PathSample(t: 1, phase: .lane, x: 0, along: 2, height: 0)]

@@ -254,6 +254,25 @@ public enum Textures {
         }
     }
 
+    /// A fat five-point star, cream with an ink edge, for drop bursts.
+    public static var star: CGImage {
+        cached("star") {
+            let n = 128
+            let c = context(n, n)
+            let p = CGMutablePath()
+            for i in 0..<10 {
+                let r: CGFloat = i % 2 == 0 ? 56 : 26
+                let a = CGFloat(i) / 10 * 2 * .pi - .pi / 2
+                let pt = CGPoint(x: 64 + cos(a) * r, y: 64 + sin(a) * r)
+                i == 0 ? p.move(to: pt) : p.addLine(to: pt)
+            }
+            p.closeSubpath()
+            c.addPath(p); c.setFillColor(RGB(0xFFFFFF).cg()); c.fillPath()
+            c.addPath(p); c.setStrokeColor(ink.cg()); c.setLineWidth(7); c.setLineJoin(.round); c.strokePath()
+            return c.makeImage()!
+        }
+    }
+
     /// Soft round shadow for under the ball.
     public static var blob: CGImage {
         cached("blob") {

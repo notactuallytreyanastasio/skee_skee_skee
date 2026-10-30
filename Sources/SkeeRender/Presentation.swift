@@ -20,7 +20,7 @@ public enum Beat: Hashable, Sendable {
         switch self {
         case .roll(let r, _): r.path.last.map { $0.t * Presentation.rollSpeed } ?? 0
         case .spin: 0.75
-        case .tally(let f): Double(f.steps.count) * 0.22 + 0.9
+        case .tally(let f): Double(f.steps.count) * Presentation.tallyStep + 0.6
         case .banner(_, _, let s): s
         case .commit: 0
         case .restyle: 1.6
@@ -35,6 +35,10 @@ public enum Beat: Hashable, Sendable {
 public struct Presentation: Sendable {
     /// Slow motion factor applied to recorded shot time (1 = real time).
     public static let rollSpeed = 1.0
+    /// Seconds per revealed tally step.
+    public static let tallyStep = 0.15
+    /// How slow time runs while a line-completing ball is in the air.
+    public static let anticipationScale = 0.4
 
     public private(set) var shown: RunState
     public private(set) var beats: [Beat] = []
@@ -109,9 +113,32 @@ public struct Presentation: Sendable {
     /// Beats that finished during the last `advance`, for the shell's
     /// haptics and sound. Cleared at the start of each advance.
     public private(set) var finished: [Beat] = []
+    /// Moments that happened during the last `advance`, timed to the frame:
+    /// the ball hitting the hump, rattling a lip, dropping; reels ticking;
+    /// tally steps. Sound and effects hang off these.
+    public private(set) var cues: [Cue] = []
+    var lastTick = 0.0
+    var shownSteps = 0
+
+    /// 1 while a ball that could complete a pair into three of a kind is in
+    /// the air: the slot's "will it land" moment.
+    public var anticipation: Double {
+        guard case .roll(let r, _) = beats.first else { return 0 }
+        let have = shown.round.currentBalls.map(\.symbol)
+        guard have.count == 2, case .pair = Payline.evaluate(have) else { return 0 }
+        guard let b = ball, b.along > Table.standard.lane.length else { return 0 }
+        let dropT = zip(r.events, r.eventTimes).first { e, _ in
+            if case .dropped = e { true } else { e == .gutter }
+        }?.1 ?? .infinity
+        return beatTime / Self.rollSpeed + (r.path.first?.t ?? 0) < dropT - 0.02 ? 1 : 0
+    }
+
+    /// How fast presentation time runs right now (slow motion < 1).
+    public var timeScale: Double { anticipation > 0 ? Self.anticipationScale : 1 }
 
     public mutating func advance(_ dt: Double) {
         finished = []
+        cues = []
         clock += dt
         flash = max(0, flash - dt * 2.5)
         shake = max(0, shake - dt * 3)
@@ -122,15 +149,18 @@ public struct Presentation: Sendable {
         var remaining = dt
         while let beat = beats.first {
             if beatTime == 0 { begin(beat) }
+            let scale = timeScale
             let left = beat.duration - beatTime
-            if remaining < left {
-                beatTime += remaining
-                during(beat)
+            if remaining * scale < left {
+                let before = beatTime
+                beatTime += remaining * scale
+                during(beat, from: before)
                 return
             }
-            remaining -= max(left, 0)
+            remaining -= max(left, 0) / scale
+            let before = beatTime
             beatTime = beat.duration
-            during(beat)
+            during(beat, from: before)
             finish(beat)
             finished.append(beat)
             beats.removeFirst()
@@ -147,19 +177,38 @@ public struct Presentation: Sendable {
 
     mutating func begin(_ beat: Beat) {
         switch beat {
-        case .roll: trail = []
+        case .roll: trail = []; cues.append(.launch)
         case .spin:
             spinFrom = reelPositions
-        case .tally(let f):
-            if f.isJackpot { flash = 1; shake = 1 }
-        case .banner: flash = max(flash, 0.4)
+            lastTick = 0
+            cues.append(.reelTick)
+        case .tally:
+            shownSteps = 0
+        case .banner(let t, _, _):
+            flash = max(flash, 0.4)
+            cues.append(t == "FOUL" ? .foul : .banner(t))
         case .commit, .restyle: break
         }
     }
 
-    mutating func during(_ beat: Beat) {
+    mutating func during(_ beat: Beat, from before: Double) {
         switch beat {
         case .roll(let r, _):
+            // Shot events whose moment passed this frame.
+            let t0 = r.path.first?.t ?? 0
+            let a = before / Self.rollSpeed + t0, b = beatTime / Self.rollSpeed + t0
+            for (e, et) in zip(r.events, r.eventTimes) where et > a && et <= b || (before == 0 && et == t0 && et <= b) {
+                switch e {
+                case .launched: cues.append(.hump)
+                case .lip: cues.append(.lip)
+                case .backwall: cues.append(.backwall)
+                case .landed: cues.append(.landed)
+                case .dropped(let h): cues.append(.drop(h))
+                case .gutter: cues.append(.gutter)
+                case .rail: cues.append(.rail)
+                case .dud, .settled: break
+                }
+            }
             let t = beatTime / Self.rollSpeed
             let sample = Self.sample(r.path, at: t)
             if let sample {
@@ -167,6 +216,7 @@ public struct Presentation: Sendable {
                 if trail.count > 14 { trail.removeFirst(trail.count - 14) }
             }
         case .spin(let to):
+            if beatTime - lastTick > 0.07 && beatTime < beat.duration * 0.8 { lastTick = beatTime; cues.append(.reelTick) }
             let u = min(1, beatTime / beat.duration)
             let eased = 1 - pow(1 - u, 3)
             for hole in BoardSetup.reelHoles {
@@ -177,7 +227,17 @@ public struct Presentation: Sendable {
                 while target < start + 2 * n { target += n }
                 reelPositions[hole] = start + (target - start) * eased
             }
-        case .tally, .banner, .commit, .restyle:
+        case .tally(let f):
+            let k = min(f.steps.count, Int(beatTime / Self.tallyStep) + 1)
+            while shownSteps < k {
+                let st = f.steps[shownSteps]
+                switch st.effect {
+                case .mult, .timesMult: cues.append(.tallyMult(shownSteps))
+                default: cues.append(.tallyChips(shownSteps))
+                }
+                shownSteps += 1
+            }
+        case .banner, .commit, .restyle:
             break
         }
     }
@@ -194,6 +254,7 @@ public struct Presentation: Sendable {
             if r.rattles > 0 { shake = max(shake, 0.35) }
         case .spin(let to):
             reelPositions = to.mapValues(Double.init)
+            cues.append(.reelStop)
         case .tally(let f):
             let line: String
             switch f.payline {
@@ -202,6 +263,7 @@ public struct Presentation: Sendable {
             case .triple(let s): line = f.isJackpot ? "JACKPOT  \(f.total)" : "THREE \(s.rawValue.uppercased())S  \(f.total)"
             }
             popups.append(Popup(text: line, anchor: .center, kind: f.isJackpot ? .jackpot : .mult, life: 1.6))
+            cues.append(f.isJackpot ? .jackpot : (f.payline == .none ? .frameDone : .lineWon))
             talliedBonus += f.total
         case .commit(let s):
             shown = s
@@ -256,13 +318,21 @@ public struct Presentation: Sendable {
     /// The frame being tallied and how many of its steps are revealed.
     public var tallyProgress: (FrameScore, Int)? {
         guard case .tally(let f) = beats.first else { return nil }
-        return (f, min(f.steps.count, Int(beatTime / 0.22) + 1))
+        return (f, min(f.steps.count, Int(beatTime / Self.tallyStep) + 1))
     }
 
     public var banner: (String, String, Double)? {
         guard case .banner(let a, let b, let s) = beats.first else { return nil }
         return (a, b, beatTime / s)
     }
+}
+
+/// A moment worth a sound or an effect.
+public enum Cue: Hashable, Sendable {
+    case launch, rail, hump, lip, backwall, landed, drop(Hole), gutter
+    case reelTick, reelStop
+    case tallyChips(Int), tallyMult(Int), frameDone, lineWon, jackpot
+    case banner(String), foul
 }
 
 public struct ThrowMark: Hashable, Sendable {

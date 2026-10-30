@@ -73,9 +73,12 @@ public final class Cabinet: @unchecked Sendable {
         let laneW = Float(w.table.lane.width)
 
         // Floor and a back wall so the cabinet stands somewhere.
-        let floor = SCNFloor(); floor.reflectivity = 0
+        // A big plane, not SCNFloor: SCNFloor sets up a reflection pass that
+        // logs an error every frame when reflectivity is zero.
+        let floor = SCNPlane(width: 30, height: 30)
         floor.materials = [Toon.material(hex(0xE7B8D9))]
         let floorNode = SCNNode(geometry: floor)
+        floorNode.simdEulerAngles.x = -.pi / 2
         floorNode.position = v3(0, -0.45, 0)
         root.addChildNode(floorNode)
 

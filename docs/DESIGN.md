@@ -184,20 +184,48 @@ built for 3D yet. Every ante is cel for now.
 
 ## The throw
 
-Thumb slide, as on a real alley. The ball sits under your thumb. Slide it up
-the lane and let go before you feel the crease:
+A flick, the way anyone flicks on a phone. The ball waits at the release
+line; after your thumb lifts, the shot fires from the whole motion
+(`analyzeFlick`, `SkeeCore/Input/Stroke.swift`):
 
-- release speed sets power, release direction sets aim, release point sets
-  the starting line
-- a thumb that curves as it lets go puts side spin on the ball, and it hooks
-  on the lane
-- a stroke that speeds up and slows down skids the ball (up to 12% speed lost);
-  a smooth, accelerating slide is clean
-- touching past the crease is a **foul**: the ball is spent and scores
-  nothing
+- **speed**: mostly the speed at lift-off, partly the peak, so letting go at
+  speed beats riding out to a stop. Accelerating through the release adds a
+  little; easing off costs a little.
+- **skid**: jerk, normalised by the flick's size and duration and measured
+  against a minimum-jerk reach (how people move when they move smoothly). A
+  shaky flick skids and loses up to 12% speed.
+- **aim**: the speed-weighted direction near release. **Spin**: sideways
+  acceleration at release, so a thumb that hooks makes the ball hook.
+  **Line**: where across the lane you flicked.
+- **foul**: only a drag 140 pt past the crease. Flicks overshoot naturally.
 
-This is `analyzeStroke` in `SkeeCore/Input/Stroke.swift`, a pure function of
-the touch samples.
+Calibrated with `skee flickprobe` on minimum-jerk flicks: power runs from 600
+to 4200 pt/s effective speed; smooth flicks measure jerk 2-8, shaky ones
+10-15. A gauge on the right of the lane marks each recent throw's power,
+coloured by where it went, so the flick can be learned.
+
+## The slot, on the board
+
+The rings are the reels. Each ring shows the symbol its reel is on, many
+times around the band, big enough to read from the far end of the alley.
+Between balls the symbols orbit the ring like a carousel and land on the
+new ones. Once a ball is in, rings that would pair your line pulse with a
+halo; with a pair in, the ones that would complete it glow gold. The HUD
+says it in words under the three reels: "match the bell, glowing rings pair
+it", then "PAIR! one more bell = x5".
+
+## Fun
+
+- **Anticipation:** with a pair in and the third ball in the air, time slows
+  to 40%, the camera leans toward the target, the bulbs race and a drum roll
+  plays until it lands.
+- **Payoff:** stars burst from the hole, the ring flashes, a thunk and a bell
+  pitched by the hole's value. Tallies count up in rising blips; a jackpot is
+  an arpeggio, bells and a shower of sparkle clicks.
+- **Sound** is all synthesised (`App/Sources/Sound.swift`): rolling rumble
+  that follows the ball's speed, wood knock on the hump, rim rattles, reel
+  ticks, ticket chatter on a clear, a buzzer on a foul.
+- **Pace:** tally steps are 0.15 s; any tap skips an animation.
 
 ## What makes it fun (the bets)
 

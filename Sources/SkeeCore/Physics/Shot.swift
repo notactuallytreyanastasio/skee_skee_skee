@@ -38,6 +38,8 @@ public struct ShotResult: Hashable, Sendable, Codable {
     public var launch: Launch
     public var hole: Hole
     public var events: [ShotEvent]
+    /// When each event happened, seconds from release; parallel to `events`.
+    public var eventTimes: [Double] = []
     public var path: [PathSample]
     /// Speed along the lane at the ridge, nil for a dud.
     public var hingeSpeed: Double?

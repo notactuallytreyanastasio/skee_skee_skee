@@ -15,8 +15,10 @@ public final class ScenePresenter: @unchecked Sendable {
     var orientation = simd_quatf(angle: 0, axis: SIMD3(1, 0, 0))
     var lastCenter: SIMD3<Float>?
     var spinRate = SIMD3<Float>(repeating: 0)   // axis * radians/s, kept through flight
-    var shownPlates: [Hole: Symbol] = [:]
     var baseCamera: SIMD3<Float>
+    /// Seconds since each hole last took a ball, for its flash.
+    var flashAge: [Hole: Float] = [:]
+    var lean: Float = 0
 
     public init(cabinet: Cabinet, aspect: Float) {
         self.cabinet = cabinet
@@ -101,13 +103,20 @@ public final class ScenePresenter: @unchecked Sendable {
         sn.simdScale = SIMD3(repeating: scale * (0.7 + 0.3 * fade))
         sn.opacity = CGFloat(fade)
 
-        // Bulbs: idle twinkle, a fast chase on fever, jackpots and banners.
-        let excited = p.flash > 0.05 || s.fever || p.banner != nil
+        // Bulbs: idle twinkle, a fast chase on fever, jackpots, banners and
+        // while a jackpot-chance ball is in the air.
+        let excited = p.flash > 0.05 || s.fever || p.banner != nil || p.anticipation > 0
         let rate = excited ? 14.0 : 2.0
         cabinet.lightBulbs(phase: Int(p.clock * rate), level: excited ? 0.9 : 0.35)
         cabinet.ball.simdPosition = center
         cabinet.ball.simdOrientation = orientation
         cabinet.ball.simdScale = SIMD3(repeating: scale)
+
+        // Drops: stars burst from the hole and its ring flashes.
+        for cue in p.cues {
+            if case .drop(let hole) = cue { burst(at: hole, big: hole.faceValue >= 50); flashAge[hole] = 0 }
+        }
+        for k in flashAge.keys { flashAge[k]! += Float(dt) }
 
         // Ring reels: each ring shows the symbol its reel is on, orbiting
         // while it spins. Rings that would pair or finish the line glow.
@@ -124,7 +133,9 @@ public final class ScenePresenter: @unchecked Sendable {
                 let gain = Payline.evaluate(have + [sym]).addedMult - lineNow
                 if gain > 0 { glow = (have.count == 2) ? 2 : 1 }
             }
-            cabinet.setReel(hole, sym, turn: pos, glow: glow, pulse: pulse)
+            if let age = flashAge[hole], age < 0.6 { glow = max(glow, 2); }
+            cabinet.setReel(hole, sym, turn: pos, glow: glow,
+                            pulse: flashAge[hole].map { $0 < 0.6 ? 1 - $0 / 0.6 + 0.3 : pulse } ?? pulse)
         }
 
         // Balls waiting in the tray.
@@ -132,13 +143,47 @@ public final class ScenePresenter: @unchecked Sendable {
         let inHand = (held != nil || inFlight || (!p.isBusy && s.phase == .throwing)) ? 1 : 0
         cabinet.setWaiting(max(0, s.round.ballsLeft - inHand))
 
-        // Shake.
+        // Camera: lean toward the target while a jackpot-chance ball flies,
+        // and shake on big moments.
+        let want = Float(p.anticipation)
+        lean += (want - lean) * min(1, Float(dt) * (want > lean ? 5 : 2.5))
+        let focus = world.board(Vec2(0, world.table.board.ringCenter.y))
         let k = Float(p.shake) * 0.012
         let t = Float(p.clock)
-        cabinet.camera.simdPosition = baseCamera + SIMD3(sin(t * 71) * k, cos(t * 53) * k, 0)
+        let pos = baseCamera + (focus - baseCamera) * (0.2 * lean)
+        cabinet.camera.simdPosition = pos + SIMD3(sin(t * 71) * k, cos(t * 53) * k, 0)
+        cabinet.camera.simdLook(at: rig.target + (focus - rig.target) * (0.45 * lean))
     }
 
     func isRoll(_ b: Beat) -> Bool { if case .roll = b { true } else { false } }
+
+    /// Stars out of a hole.
+    func burst(at hole: Hole, big: Bool) {
+        let ps = SCNParticleSystem()
+        ps.particleImage = Textures.star
+        ps.birthRate = big ? 900 : 450
+        ps.emissionDuration = 0.06
+        ps.loops = false
+        ps.particleLifeSpan = 0.7
+        ps.particleLifeSpanVariation = 0.25
+        ps.particleVelocity = big ? 0.9 : 0.6
+        ps.particleVelocityVariation = 0.35
+        ps.spreadingAngle = 70
+        ps.emittingDirection = SCNVector3(world.boardNormal)
+        ps.particleSize = 0.022
+        ps.particleSizeVariation = 0.01
+        ps.particleAngularVelocity = 360
+        ps.particleAngularVelocityVariation = 360
+        ps.acceleration = SCNVector3(SIMD3<Float>(0, -2.2, 0))
+        ps.particleColor = hex(0xFFE066)
+        ps.particleColorVariation = SCNVector4(SIMD4<Float>(0.4, 0.2, 0.2, 0))
+        ps.blendMode = .alpha
+        ps.isLightingEnabled = false
+        let at = world.board(world.table.board.holeCenter(hole), z: 0.02)
+        var m = matrix_identity_float4x4
+        m.columns.3 = SIMD4(at, 1)
+        cabinet.scene.addParticleSystem(ps, transform: SCNMatrix4(m))
+    }
 
     // MARK: thumb
 

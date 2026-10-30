@@ -47,10 +47,15 @@ private struct ShotSim {
         }
     }
 
+    var eventTimes: [Double] = []
+    mutating func emit(_ e: ShotEvent) { events.append(e); eventTimes.append(t) }
+
     mutating func finish(_ hole: Hole) -> ShotResult {
-        ShotResult(launch: launch, hole: hole, events: events, path: path,
-                   hingeSpeed: hingeSpeed, firstLanding: firstLanding,
-                   peakHeight: peak, duration: t)
+        var r = ShotResult(launch: launch, hole: hole, events: events, path: path,
+                           hingeSpeed: hingeSpeed, firstLanding: firstLanding,
+                           peakHeight: peak, duration: t)
+        r.eventTimes = eventTimes
+        return r
     }
 
     mutating func run() -> ShotResult {
@@ -76,20 +81,20 @@ private struct ShotSim {
             if abs(x) > halfLane {
                 x = x > 0 ? halfLane : -halfLane
                 vx = -vx * lane.railRestitution
-                events.append(.rail)
+                emit(.rail)
             }
             t += dt; step += 1
-            if vs <= 0 && !events.contains(.dud) { events.append(.dud) }
+            if vs <= 0 && !events.contains(.dud) { emit(.dud) }
             if events.contains(.dud) && (s <= 0 || t >= table.maxDuration) {
                 record(.lane, x, max(s, 0), 0, force: true)
-                events.append(.gutter)
+                emit(.gutter)
                 return finish(.gutter)
             }
         }
 
         // Phase 2 + 3: over the hinge, onto the board.
         hingeSpeed = vs
-        events.append(.launched)
+        emit(.launched)
         let beta = table.hinge.launchAngle(fold: launch.fold)
         let carried = vs * table.hinge.carry
         var p = Vec2(x, 0)
@@ -121,14 +126,14 @@ private struct ShotSim {
                     z = board.lipHeight
                     vz = fall * board.lipBounce
                     v = v + outward * (board.lipKick * fall)
-                    events.append(.lip(ring: ring))
+                    emit(.lip(ring: ring))
                 }
 
                 if z <= 0 {
                     z = 0
                     if firstLanding == nil {
                         firstLanding = p
-                        events.append(.landed)
+                        emit(.landed)
                     }
                     vz = -vz * board.bounce
                     v = v * board.landingGrip
@@ -152,19 +157,19 @@ private struct ShotSim {
                 p.y = back
                 v.y = -abs(v.y) * board.backwallRestitution
                 touchedWall = true
-                events.append(.backwall)
+                emit(.backwall)
             }
             t += dt; step += 1
 
             if z < r * 0.5, v.length <= board.captureSpeed, let hole = holeUnder(p, cleanFlight: firstLanding == nil && !touchedWall) {
                 if firstLanding == nil { firstLanding = p }
                 record(.board, p.x, lane.length + p.y, 0, force: true)
-                events.append(.dropped(hole))
+                emit(.dropped(hole))
                 return finish(hole)
             }
             if p.y < -r {
                 record(.board, p.x, lane.length + p.y, z, force: true)
-                events.append(.gutter)
+                emit(.gutter)
                 return finish(.gutter)
             }
             if !airborne && v.length < 0.05 {
@@ -190,7 +195,7 @@ private struct ShotSim {
 
         record(.board, p.x, lane.length + p.y, z, force: true)
         let hole = board.zone(at: p)
-        events.append(hole == .gutter ? .gutter : .settled(hole))
+        emit(hole == .gutter ? .gutter : .settled(hole))
         return finish(hole)
     }
 

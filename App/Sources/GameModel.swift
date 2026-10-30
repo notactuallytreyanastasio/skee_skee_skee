@@ -18,6 +18,7 @@ final class Stage: @unchecked Sendable {
     private let lock = NSLock()
     private var presentation: Presentation
     private var finished: [Beat] = []
+    private var cues: [Cue] = []
     private var held: SIMD3<Float>?
     private var lastRender: TimeInterval?
 
@@ -34,11 +35,13 @@ final class Stage: @unchecked Sendable {
         lastRender = time
         presentation.advance(dt)
         finished += presentation.finished
+        cues += presentation.cues
         return (presentation, held, dt)
     }
 
     /// Main thread: beats finished since last asked, for haptics.
     func takeFinished() -> [Beat] { lock.lock(); defer { lock.unlock() }; let f = finished; finished = []; return f }
+    func takeCues() -> [Cue] { lock.lock(); defer { lock.unlock() }; let c = cues; cues = []; return c }
 }
 
 /// SceneKit calls this on its render thread before every frame. Moving the
@@ -78,6 +81,8 @@ final class GameModel {
     @ObservationIgnored private var actions: [Action] = []
     @ObservationIgnored private var link: CADisplayLink?
     @ObservationIgnored private let haptics = Haptics()
+    @ObservationIgnored private let sound = SoundEngine()
+    @ObservationIgnored private var lastBall: (along: Double, x: Double, t: CFTimeInterval)?
     @ObservationIgnored private var autoplay: [Launch] = []
 
     init() {
@@ -128,7 +133,18 @@ final class GameModel {
 
     fileprivate func tick() {
         for beat in stage.takeFinished() { haptics.play(beat) }
+        for cue in stage.takeCues() { sound.play(cue); haptics.cue(cue) }
         let p = stage.snapshot
+        // Rumble follows the ball while it rolls; silent in the air.
+        let now = CACurrentMediaTime()
+        if let b = p.ball, b.phase != .air || b.height < 0.003 {
+            if let l = lastBall, now > l.t {
+                let speed = abs(b.along - l.along) / (now - l.t)
+                sound.setRumble(Float(min(1, speed / 4)) * (p.isBusy ? 1 : 0))
+            }
+            lastBall = (b.along, b.x, now)
+        } else { sound.setRumble(0); lastBall = nil }
+        sound.setDrumRoll(p.anticipation > 0)
         refreshHUD(p)
         if !p.isBusy, case .throwing = state.phase, !autoplay.isEmpty {
             send(.throwBall(autoplay.removeFirst()))
@@ -326,12 +342,21 @@ final class Haptics {
     func reject() { note.notificationOccurred(.warning) }
     func foul() { note.notificationOccurred(.error) }
 
+    /// Light taps timed to the ball: the hump, rattles, the drop.
+    func cue(_ c: Cue) {
+        switch c {
+        case .hump: rigid.impactOccurred(intensity: 0.6)
+        case .lip: light.impactOccurred(intensity: 0.8)
+        case .drop(let h): heavy.impactOccurred(intensity: min(1, 0.45 + CGFloat(h.faceValue) / 110))
+        case .reelStop: light.impactOccurred(intensity: 0.4)
+        default: break
+        }
+    }
+
     func play(_ beat: Beat) {
         switch beat {
-        case .roll(let r, let b):
+        case .roll(_, let b):
             if b.hole == .gutter { note.notificationOccurred(.error) }
-            else { heavy.impactOccurred(intensity: min(1, 0.4 + CGFloat(b.hole.faceValue) / 120)) }
-            if r.rattles > 0 { rigid.impactOccurred() }
         case .tally(let f):
             if f.isJackpot { note.notificationOccurred(.success) } else { light.impactOccurred() }
         case .banner(let t, _, _) where t == "CLEARED":

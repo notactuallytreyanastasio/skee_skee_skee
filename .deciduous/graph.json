@@ -30,6 +30,16 @@
       "to_change_id": "43a5276f-85c8-4c9d-a21f-498506d74a17",
       "weight": 1.0
     },
+    "1a8fa2420cecc9155989": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T09:26:02.395829-04:00",
+      "edge_id": "1a8fa2420cecc9155989",
+      "edge_type": "leads_to",
+      "from_change_id": "bc6b7206-254a-4b57-abfd-52a79338e5ba",
+      "rationale": "thumb throw in app",
+      "to_change_id": "1187b69d-9291-4845-a869-324a21b36cce",
+      "weight": 1.0
+    },
     "2027936827bf5a41b7d0": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:03:20.203005-04:00",
@@ -40,6 +50,16 @@
       "to_change_id": "212544ce-6851-480c-9842-78d18bf43b6e",
       "weight": 1.0
     },
+    "210ac6dc38317e0b0871": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T09:03:50.031049-04:00",
+      "edge_id": "210ac6dc38317e0b0871",
+      "edge_type": "leads_to",
+      "from_change_id": "40d6c012-87f0-4cff-b9ad-0b793c9a1df6",
+      "rationale": "input redesign",
+      "to_change_id": "bc6b7206-254a-4b57-abfd-52a79338e5ba",
+      "weight": 1.0
+    },
     "225fef3af8553d20e549": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:16:16.170077-04:00",
@@ -48,6 +68,26 @@
       "from_change_id": "9dc303fc-554c-4bcd-b787-ff8b5317e328",
       "rationale": "result",
       "to_change_id": "710749f0-3d87-44cd-ab2d-a6b60dd88852",
+      "weight": 1.0
+    },
+    "2722d282a65666e366ef": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T09:20:50.270943-04:00",
+      "edge_id": "2722d282a65666e366ef",
+      "edge_type": "leads_to",
+      "from_change_id": "a288fb15-4cf7-49f5-a576-26b2dae7df2b",
+      "rationale": "port",
+      "to_change_id": "7664f313-91e5-48dc-8aba-c5bbbc8ecf7b",
+      "weight": 1.0
+    },
+    "2eb1baa7857c5cd6ef0d": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T09:03:50.899859-04:00",
+      "edge_id": "2eb1baa7857c5cd6ef0d",
+      "edge_type": "leads_to",
+      "from_change_id": "a6e5c0ac-620d-4e88-a1ab-3b68dbd4eb81",
+      "rationale": "option",
+      "to_change_id": "e973e3a0-0155-45e1-b132-b9ea909c7cfb",
       "weight": 1.0
     },
     "2f1fff41bad058e78d35": {
@@ -80,6 +120,16 @@
       "to_change_id": "04665092-244c-4c16-9160-39cfed52723a",
       "weight": 1.0
     },
+    "3c337efc351d31aef394": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T09:26:02.749602-04:00",
+      "edge_id": "3c337efc351d31aef394",
+      "edge_type": "leads_to",
+      "from_change_id": "1187b69d-9291-4845-a869-324a21b36cce",
+      "rationale": "result",
+      "to_change_id": "f56ae8f1-55a7-4e8b-8293-27b3e57e0178",
+      "weight": 1.0
+    },
     "4a563b1e3f6607b0c7d3": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:52:45.313887-04:00",
@@ -110,6 +160,16 @@
       "to_change_id": "ab4273c0-5d08-4b71-95a3-c6977e085485",
       "weight": 1.0
     },
+    "51ef996ef2143bc182e8": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T09:05:15.581828-04:00",
+      "edge_id": "51ef996ef2143bc182e8",
+      "edge_type": "leads_to",
+      "from_change_id": "a6e5c0ac-620d-4e88-a1ab-3b68dbd4eb81",
+      "rationale": "user-specified cel look",
+      "to_change_id": "a288fb15-4cf7-49f5-a576-26b2dae7df2b",
+      "weight": 1.0
+    },
     "5ef801381a44daef01eb": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:50:00.927055-04:00",
@@ -128,6 +188,26 @@
       "from_change_id": "d87f55c7-5f1e-4843-80d8-f84980174af9",
       "rationale": "result",
       "to_change_id": "52c21135-67e9-4a2e-9433-966bf3896ffd",
+      "weight": 1.0
+    },
+    "601419ccbb61f0732b10": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T08:57:39.823761-04:00",
+      "edge_id": "601419ccbb61f0732b10",
+      "edge_type": "leads_to",
+      "from_change_id": "6fece280-91d6-4254-a580-91bf22a0ed1d",
+      "rationale": "device deployment",
+      "to_change_id": "a9541e57-0848-4e11-b5a2-25c6fe6a5c46",
+      "weight": 1.0
+    },
+    "630561d7b3ea21d9b167": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T09:07:36.700290-04:00",
+      "edge_id": "630561d7b3ea21d9b167",
+      "edge_type": "leads_to",
+      "from_change_id": "4067a26c-4d2f-4921-ba29-7d629748a1ff",
+      "rationale": "result",
+      "to_change_id": "02fb2fc0-a2ef-4611-b398-dd2e76e68e42",
       "weight": 1.0
     },
     "6717f314f98db5c39427": {
@@ -150,6 +230,16 @@
       "to_change_id": "fb8961bc-ce84-4d5d-93aa-53441619dd83",
       "weight": 1.0
     },
+    "72b08a1291600457115a": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T09:03:51.158485-04:00",
+      "edge_id": "72b08a1291600457115a",
+      "edge_type": "leads_to",
+      "from_change_id": "a6e5c0ac-620d-4e88-a1ab-3b68dbd4eb81",
+      "rationale": "option",
+      "to_change_id": "ffb74d6b-a9b7-47d3-ab06-3e0eb81fc138",
+      "weight": 1.0
+    },
     "7b9a3ac559eb256a9f1f": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:13:19.796692-04:00",
@@ -168,6 +258,16 @@
       "from_change_id": "0c054b82-d51c-4f94-955f-aff5648d5200",
       "rationale": "playtest on the built game",
       "to_change_id": "4ca441b6-4ee9-4f9f-a534-0ebde029b0ac",
+      "weight": 1.0
+    },
+    "7ff1eb72eae347b89385": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T09:05:15.829432-04:00",
+      "edge_id": "7ff1eb72eae347b89385",
+      "edge_type": "leads_to",
+      "from_change_id": "a288fb15-4cf7-49f5-a576-26b2dae7df2b",
+      "rationale": "what is being ported",
+      "to_change_id": "9f963a61-4d45-4921-8f9c-364634501027",
       "weight": 1.0
     },
     "8080dc9201fc958418e0": {
@@ -200,6 +300,26 @@
       "to_change_id": "8a6ded27-d5f1-4a94-870d-8ecfd683c44a",
       "weight": 1.0
     },
+    "85079b1a598a5cb5bf93": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T09:03:51.440644-04:00",
+      "edge_id": "85079b1a598a5cb5bf93",
+      "edge_type": "leads_to",
+      "from_change_id": "e973e3a0-0155-45e1-b132-b9ea909c7cfb",
+      "rationale": "chosen",
+      "to_change_id": "d659e919-a722-48f5-b681-a782478d41b1",
+      "weight": 1.0
+    },
+    "85a58a52a46326fa8c52": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T09:07:36.305523-04:00",
+      "edge_id": "85a58a52a46326fa8c52",
+      "edge_type": "leads_to",
+      "from_change_id": "bc6b7206-254a-4b57-abfd-52a79338e5ba",
+      "rationale": "core support for thumb throw and holes",
+      "to_change_id": "4067a26c-4d2f-4921-ba29-7d629748a1ff",
+      "weight": 1.0
+    },
     "8e5bb1c558160ecc5836": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:03:19.371602-04:00",
@@ -220,6 +340,16 @@
       "to_change_id": "6e9758f5-ac60-4e1f-983e-cb924c2c40f0",
       "weight": 1.0
     },
+    "90a7821ccda118873e8b": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T09:03:51.570211-04:00",
+      "edge_id": "90a7821ccda118873e8b",
+      "edge_type": "leads_to",
+      "from_change_id": "8d9b699b-2e6e-4bbc-89df-47e12526989e",
+      "rationale": "rejected",
+      "to_change_id": "d659e919-a722-48f5-b681-a782478d41b1",
+      "weight": 1.0
+    },
     "9bed6c9e5181c48d7e41": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:13:19.377151-04:00",
@@ -228,6 +358,36 @@
       "from_change_id": "b5ae3392-3f1a-4090-9e24-d9c4ed3aa280",
       "rationale": "approach",
       "to_change_id": "fe0bcf09-ee25-451f-b2cc-25d43517866e",
+      "weight": 1.0
+    },
+    "a51ce9c51b27568e733a": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T09:03:51.708312-04:00",
+      "edge_id": "a51ce9c51b27568e733a",
+      "edge_type": "leads_to",
+      "from_change_id": "ffb74d6b-a9b7-47d3-ab06-3e0eb81fc138",
+      "rationale": "rejected",
+      "to_change_id": "d659e919-a722-48f5-b681-a782478d41b1",
+      "weight": 1.0
+    },
+    "a5aaf9f96ca1e837e335": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T09:26:02.510437-04:00",
+      "edge_id": "a5aaf9f96ca1e837e335",
+      "edge_type": "leads_to",
+      "from_change_id": "d659e919-a722-48f5-b681-a782478d41b1",
+      "rationale": "presentation in app",
+      "to_change_id": "1187b69d-9291-4845-a869-324a21b36cce",
+      "weight": 1.0
+    },
+    "a90810101b5fb79488d6": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T09:09:11.691503-04:00",
+      "edge_id": "a90810101b5fb79488d6",
+      "edge_type": "leads_to",
+      "from_change_id": "bc6b7206-254a-4b57-abfd-52a79338e5ba",
+      "rationale": "implementation",
+      "to_change_id": "507c3835-0072-449a-9abd-a769aa100f50",
       "weight": 1.0
     },
     "abc9973c957530811f76": {
@@ -278,6 +438,16 @@
       "from_change_id": "fe0bcf09-ee25-451f-b2cc-25d43517866e",
       "rationale": "rejected",
       "to_change_id": "8b016f98-5074-41f0-8a95-258570885fa3",
+      "weight": 1.0
+    },
+    "bd2ad4930f4bff42f16e": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T09:20:50.147240-04:00",
+      "edge_id": "bd2ad4930f4bff42f16e",
+      "edge_type": "leads_to",
+      "from_change_id": "d659e919-a722-48f5-b681-a782478d41b1",
+      "rationale": "implementation",
+      "to_change_id": "7664f313-91e5-48dc-8aba-c5bbbc8ecf7b",
       "weight": 1.0
     },
     "c2488f237e8fda86d024": {
@@ -332,6 +502,16 @@
       "to_change_id": "1193e010-180a-479c-80ca-e49adc3d6281",
       "weight": 1.0
     },
+    "d33d686c4b9e70224075": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T09:03:51.029491-04:00",
+      "edge_id": "d33d686c4b9e70224075",
+      "edge_type": "leads_to",
+      "from_change_id": "a6e5c0ac-620d-4e88-a1ab-3b68dbd4eb81",
+      "rationale": "option",
+      "to_change_id": "8d9b699b-2e6e-4bbc-89df-47e12526989e",
+      "weight": 1.0
+    },
     "d7757d667fcc049abf09": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:46:37.518211-04:00",
@@ -342,6 +522,26 @@
       "to_change_id": "6da7921c-b88d-477d-8b71-561b96144fad",
       "weight": 1.0
     },
+    "d821229cc97c8fa408b7": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T09:20:50.521414-04:00",
+      "edge_id": "d821229cc97c8fa408b7",
+      "edge_type": "leads_to",
+      "from_change_id": "7664f313-91e5-48dc-8aba-c5bbbc8ecf7b",
+      "rationale": "result",
+      "to_change_id": "553cac50-4d7f-48c7-804c-4fb20006d5ed",
+      "weight": 1.0
+    },
+    "d8c0e7fd8313abb14a3b": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T09:02:17.182186-04:00",
+      "edge_id": "d8c0e7fd8313abb14a3b",
+      "edge_type": "leads_to",
+      "from_change_id": "067bae9a-b27a-440e-abe6-cb95c2d438c9",
+      "rationale": "user rejected first presentation",
+      "to_change_id": "40d6c012-87f0-4cff-b9ad-0b793c9a1df6",
+      "weight": 1.0
+    },
     "dab31e373ffb18e73d1e": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:52:45.037238-04:00",
@@ -350,6 +550,16 @@
       "from_change_id": "067bae9a-b27a-440e-abe6-cb95c2d438c9",
       "rationale": "document everything",
       "to_change_id": "37b6071b-f2b2-45ab-a9ce-7cbba2ac6049",
+      "weight": 1.0
+    },
+    "e44222948949652871bb": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T09:03:50.351907-04:00",
+      "edge_id": "e44222948949652871bb",
+      "edge_type": "leads_to",
+      "from_change_id": "40d6c012-87f0-4cff-b9ad-0b793c9a1df6",
+      "rationale": "visual direction",
+      "to_change_id": "a6e5c0ac-620d-4e88-a1ab-3b68dbd4eb81",
       "weight": 1.0
     },
     "e79e6535aaf0daf0c599": {
@@ -401,9 +611,32 @@
       "rationale": "implementation",
       "to_change_id": "6addc45a-99c3-483b-a867-a296f0740369",
       "weight": 1.0
+    },
+    "f7e4de811521700e3746": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-10-30T09:07:36.431196-04:00",
+      "edge_id": "f7e4de811521700e3746",
+      "edge_type": "leads_to",
+      "from_change_id": "40d6c012-87f0-4cff-b9ad-0b793c9a1df6",
+      "rationale": "holes in every ring",
+      "to_change_id": "4067a26c-4d2f-4921-ba29-7d629748a1ff",
+      "weight": 1.0
     }
   },
   "nodes": {
+    "02fb2fc0-a2ef-4611-b398-dd2e76e68e42": {
+      "author": "Bobby Grayson",
+      "change_id": "02fb2fc0-a2ef-4611-b398-dd2e76e68e42",
+      "created_at": "2026-10-30T09:07:36.576217-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 85
+      },
+      "node_type": "outcome",
+      "status": "pending",
+      "title": "82 core tests pass; every scoring ball drops through a hole; balance unchanged (regular 15%)",
+      "updated_at": "2026-10-30T09:07:36.576217-04:00"
+    },
     "04665092-244c-4c16-9160-39cfed52723a": {
       "author": "Bobby Grayson",
       "change_id": "04665092-244c-4c16-9160-39cfed52723a",
@@ -456,6 +689,20 @@
       "status": "pending",
       "title": "App runs in iPhone Duo simulator (outer display) across pixel/depth/neon eras; closed-hinge-as-max-fold bug found and fixed",
       "updated_at": "2026-10-30T08:46:37.145170-04:00"
+    },
+    "1187b69d-9291-4845-a869-324a21b36cce": {
+      "author": "Bobby Grayson",
+      "change_id": "1187b69d-9291-4845-a869-324a21b36cce",
+      "created_at": "2026-10-30T09:26:02.266408-04:00",
+      "metadata": {
+        "branch": "main",
+        "commit": "c85648eae02f8dbe733a4a467c67f72bb8eeb44f",
+        "confidence": 75
+      },
+      "node_type": "action",
+      "status": "pending",
+      "title": "App shell rebuilt: SCNView cabinet + ThrowPad (coalesced touches -> analyzeStroke, instant foul past crease, held ball) + SwiftUI cel HUD; installed on Duo",
+      "updated_at": "2026-10-30T09:26:02.266408-04:00"
     },
     "1193e010-180a-479c-80ca-e49adc3d6281": {
       "author": "Bobby Grayson",
@@ -524,6 +771,34 @@
       "title": "Wrote docs: README, DESIGN, ARCHITECTURE, PHYSICS, TOOLS, BALANCE, PLAYTEST with rendered screenshots",
       "updated_at": "2026-10-30T08:52:44.894021-04:00"
     },
+    "4067a26c-4d2f-4921-ba29-7d629748a1ff": {
+      "author": "Bobby Grayson",
+      "change_id": "4067a26c-4d2f-4921-ba29-7d629748a1ff",
+      "created_at": "2026-10-30T09:07:36.175993-04:00",
+      "metadata": {
+        "branch": "main",
+        "commit": "63dab7c6dc6303b51cf17533a2eb926f91dd44d4",
+        "confidence": 85
+      },
+      "node_type": "action",
+      "status": "pending",
+      "title": "Core: ring holes with drop events, stall nudge, Launch spin/skid, foul action (TDD)",
+      "updated_at": "2026-10-30T09:07:36.175993-04:00"
+    },
+    "40d6c012-87f0-4cff-b9ad-0b793c9a1df6": {
+      "author": "Bobby Grayson",
+      "change_id": "40d6c012-87f0-4cff-b9ad-0b793c9a1df6",
+      "created_at": "2026-10-30T09:02:17.040862-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 80,
+        "prompt": "this is not at all a good first draft\n\nit doesnt even feel like skeetball or have holes in all the rings\n\nthe graphics are abhorrent\n\nredo all of this, you can keep the game logic and stuff but the presentation layer is fucked"
+      },
+      "node_type": "goal",
+      "status": "pending",
+      "title": "Redo the presentation layer: must look and feel like real skee-ball, holes in every ring, good graphics",
+      "updated_at": "2026-10-30T09:02:17.040862-04:00"
+    },
     "43a5276f-85c8-4c9d-a21f-498506d74a17": {
       "author": "Bobby Grayson",
       "change_id": "43a5276f-85c8-4c9d-a21f-498506d74a17",
@@ -564,6 +839,20 @@
       "title": "Hand playtest: jackpot via pocket gamble felt great; exact keyboard throws unrealistic; Slick Lane boss had no bite; swipe power invisible",
       "updated_at": "2026-10-30T08:50:00.455353-04:00"
     },
+    "507c3835-0072-449a-9abd-a769aa100f50": {
+      "author": "Bobby Grayson",
+      "change_id": "507c3835-0072-449a-9abd-a769aa100f50",
+      "created_at": "2026-10-30T09:09:11.565542-04:00",
+      "metadata": {
+        "branch": "main",
+        "commit": "fc9fec173ca518144d3335c833a4d05d85637277",
+        "confidence": 80
+      },
+      "node_type": "action",
+      "status": "pending",
+      "title": "Pure stroke analysis: release velocity->power/aim, sideways change->spin, hitches->skid, crease crossing->foul",
+      "updated_at": "2026-10-30T09:09:11.565542-04:00"
+    },
     "52c21135-67e9-4a2e-9433-966bf3896ffd": {
       "author": "Bobby Grayson",
       "change_id": "52c21135-67e9-4a2e-9433-966bf3896ffd",
@@ -576,6 +865,20 @@
       "status": "pending",
       "title": "Slick Lane shifts the 50 from power 0.63 to 0.56; gauge renders; all tests pass",
       "updated_at": "2026-10-30T08:50:01.081378-04:00"
+    },
+    "553cac50-4d7f-48c7-804c-4fb20006d5ed": {
+      "author": "Bobby Grayson",
+      "change_id": "553cac50-4d7f-48c7-804c-4fb20006d5ed",
+      "created_at": "2026-10-30T09:20:50.406589-04:00",
+      "description": "Bugs found by rendering: overexposed pastels (palette darkened, intensities kept), UV flip on lane, unconstrained camera fit cheated, marquee could not fit portrait (moved to HUD).",
+      "metadata": {
+        "branch": "main",
+        "confidence": 80
+      },
+      "node_type": "outcome",
+      "status": "pending",
+      "title": "3D cel cabinet renders headless; scenefilm shows roll, hump, arc, drop into 50, reel spin",
+      "updated_at": "2026-10-30T09:20:50.406589-04:00"
     },
     "55d9e3ac-0ed9-4e68-ab03-8025a0feed2c": {
       "author": "Bobby Grayson",
@@ -677,6 +980,20 @@
       "title": "Docs committed; unverified items listed explicitly (inner display never seen running, hinge angle mapping, swipe calibration)",
       "updated_at": "2026-10-30T08:52:45.183729-04:00"
     },
+    "7664f313-91e5-48dc-8aba-c5bbbc8ecf7b": {
+      "author": "Bobby Grayson",
+      "change_id": "7664f313-91e5-48dc-8aba-c5bbbc8ecf7b",
+      "created_at": "2026-10-30T09:20:50.017371-04:00",
+      "metadata": {
+        "branch": "main",
+        "commit": "494b41ab75f4fb5dc34db1a5b78c24cb5933eb3b",
+        "confidence": 80
+      },
+      "node_type": "action",
+      "status": "pending",
+      "title": "Ported toon.js to SceneKit shader modifiers; built 3D cabinet with holes in every ring; solved camera so hump sits on crease; rolling ball presenter; removed 2D renderer",
+      "updated_at": "2026-10-30T09:20:50.017371-04:00"
+    },
     "8a0c0787-8e53-414d-abb3-7a21bb4db862": {
       "author": "Bobby Grayson",
       "change_id": "8a0c0787-8e53-414d-abb3-7a21bb4db862",
@@ -735,6 +1052,20 @@
       "title": "Procedural CoreGraphics renderer with 4 styles keyed off the ante, transitions between them",
       "updated_at": "2026-10-30T08:13:19.661673-04:00"
     },
+    "8d9b699b-2e6e-4bbc-89df-47e12526989e": {
+      "author": "Bobby Grayson",
+      "change_id": "8d9b699b-2e6e-4bbc-89df-47e12526989e",
+      "created_at": "2026-10-30T09:03:50.631646-04:00",
+      "description": "Modern, but toon outlines and headless macOS rendering are less proven; harder to verify frames.",
+      "metadata": {
+        "branch": "main",
+        "confidence": 45
+      },
+      "node_type": "option",
+      "status": "pending",
+      "title": "RealityKit with CustomMaterial",
+      "updated_at": "2026-10-30T09:03:50.631646-04:00"
+    },
     "9dc303fc-554c-4bcd-b787-ff8b5317e328": {
       "author": "Bobby Grayson",
       "change_id": "9dc303fc-554c-4bcd-b787-ff8b5317e328",
@@ -748,6 +1079,61 @@
       "status": "pending",
       "title": "Implemented payline scoring, 15 charms, bosses, prize counter, fever meter, run reducer (TDD)",
       "updated_at": "2026-10-30T08:16:15.759266-04:00"
+    },
+    "9f963a61-4d45-4921-8f9c-364634501027": {
+      "author": "Bobby Grayson",
+      "change_id": "9f963a61-4d45-4921-8f9c-364634501027",
+      "created_at": "2026-10-30T09:05:15.709452-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 90
+      },
+      "node_type": "observation",
+      "status": "pending",
+      "title": "toon.js = 3-band gradient ramp [150,205,255] + hemisphere fill (sky fff4fb, ground d9c8ff, 1.6) + sun 2.2 + hard rim band smoothstep(.62,.68)*.28 + inverted-hull ink #3a2346 thick*(-z/20) + desat/tint uniforms; grade.js = saturation/noir pass",
+      "updated_at": "2026-10-30T09:05:15.709452-04:00"
+    },
+    "a288fb15-4cf7-49f5-a576-26b2dae7df2b": {
+      "author": "Bobby Grayson",
+      "change_id": "a288fb15-4cf7-49f5-a576-26b2dae7df2b",
+      "created_at": "2026-10-30T09:05:15.442995-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 85,
+        "prompt": "rip the cel shading engine from @../whats_going_through_your_mind/ porting the js to swift"
+      },
+      "node_type": "goal",
+      "status": "pending",
+      "title": "Port the cel-shading engine from whats_going_through_your_mind (three.js toon.js/grade.js) to Swift",
+      "updated_at": "2026-10-30T09:05:15.442995-04:00"
+    },
+    "a6e5c0ac-620d-4e88-a1ab-3b68dbd4eb81": {
+      "author": "Bobby Grayson",
+      "change_id": "a6e5c0ac-620d-4e88-a1ab-3b68dbd4eb81",
+      "created_at": "2026-10-30T09:03:50.194517-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 85,
+        "prompt": "the ball should also be really rolling\nwe want 3d graphics I guess\nbut start cel shaded"
+      },
+      "node_type": "goal",
+      "status": "pending",
+      "title": "Ball visibly rolls; 3D graphics, first era cel-shaded",
+      "updated_at": "2026-10-30T09:03:50.194517-04:00"
+    },
+    "a9541e57-0848-4e11-b5a2-25c6fe6a5c46": {
+      "author": "Bobby Grayson",
+      "change_id": "a9541e57-0848-4e11-b5a2-25c6fe6a5c46",
+      "created_at": "2026-10-30T08:57:39.697777-04:00",
+      "metadata": {
+        "branch": "main",
+        "commit": "c8916b2e1eabb7c0fe67ea9c9e59d9a2cd5709dd",
+        "confidence": 85
+      },
+      "node_type": "action",
+      "status": "pending",
+      "title": "Installed signed Release build on the user's iPhone Duo (iPhone19,4)",
+      "updated_at": "2026-10-30T08:57:39.697777-04:00"
     },
     "ab4273c0-5d08-4b71-95a3-c6977e085485": {
       "author": "Bobby Grayson",
@@ -776,6 +1162,20 @@
       "status": "pending",
       "title": "No emoji; several graphical styles that change between levels (pixel, cel-shaded, 3D, ...)",
       "updated_at": "2026-10-30T08:13:18.805808-04:00"
+    },
+    "bc6b7206-254a-4b57-abfd-52a79338e5ba": {
+      "author": "Bobby Grayson",
+      "change_id": "bc6b7206-254a-4b57-abfd-52a79338e5ba",
+      "created_at": "2026-10-30T09:03:49.886247-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 85,
+        "prompt": "the throwing mechanic should rely on a thumb slide, just like skeeball, it should detect variance in acceleration in the swipe just like a throw would, we wanna replicate throwing the skeeball and letting go when you feel the crease\n\nand going _past_ the crease should make it a foul, no thumb touching past the crease!"
+      },
+      "node_type": "goal",
+      "status": "pending",
+      "title": "Thumb-slide throw: release before the crease, stroke acceleration matters, thumb past the crease is a foul",
+      "updated_at": "2026-10-30T09:03:49.886247-04:00"
     },
     "bcf6ef5b-59ca-42f8-b01e-15c2eb897184": {
       "author": "Bobby Grayson",
@@ -819,6 +1219,19 @@
       "title": "All four styles render correctly from CLI; contact sheets show roll, hinge flight, tally and reel spin",
       "updated_at": "2026-10-30T08:42:56.914404-04:00"
     },
+    "d659e919-a722-48f5-b681-a782478d41b1": {
+      "author": "Bobby Grayson",
+      "change_id": "d659e919-a722-48f5-b681-a782478d41b1",
+      "created_at": "2026-10-30T09:03:51.302015-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 80
+      },
+      "node_type": "decision",
+      "status": "pending",
+      "title": "SceneKit 3D for the presentation; SwiftUI overlay for HUD; core physics gets real ring holes",
+      "updated_at": "2026-10-30T09:03:51.302015-04:00"
+    },
     "d87f55c7-5f1e-4843-80d8-f84980174af9": {
       "author": "Bobby Grayson",
       "change_id": "d87f55c7-5f1e-4843-80d8-f84980174af9",
@@ -846,6 +1259,20 @@
       "status": "pending",
       "title": "Keep fixed symbols and just raise targets",
       "updated_at": "2026-10-30T08:25:40.007700-04:00"
+    },
+    "e973e3a0-0155-45e1-b132-b9ea909c7cfb": {
+      "author": "Bobby Grayson",
+      "change_id": "e973e3a0-0155-45e1-b132-b9ea909c7cfb",
+      "created_at": "2026-10-30T09:03:50.497419-04:00",
+      "description": "Same scene renders headless on macOS so I can inspect frames; mature, not hard-deprecated in iOS 27.1 SDK.",
+      "metadata": {
+        "branch": "main",
+        "confidence": 80
+      },
+      "node_type": "option",
+      "status": "pending",
+      "title": "SceneKit 3D cabinet: procedural geometry, toon shader modifiers + inverted-hull outlines, SCNRenderer offscreen for CLI PNGs",
+      "updated_at": "2026-10-30T09:03:50.497419-04:00"
     },
     "eb182f5e-5636-4d11-9268-d292a500d748": {
       "author": "Bobby Grayson",
@@ -876,6 +1303,19 @@
       "title": "Real device screen is 1878x2670 px (626x890 pt @3x), not the simulator's 669x951 inner display",
       "updated_at": "2026-10-30T08:55:55.997643-04:00"
     },
+    "f56ae8f1-55a7-4e8b-8293-27b3e57e0178": {
+      "author": "Bobby Grayson",
+      "change_id": "f56ae8f1-55a7-4e8b-8293-27b3e57e0178",
+      "created_at": "2026-10-30T09:26:02.639912-04:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 70
+      },
+      "node_type": "outcome",
+      "status": "pending",
+      "title": "New build installed on the user's Duo; runs in simulator; awaiting the user's feel test (stroke tuning untested on a real thumb)",
+      "updated_at": "2026-10-30T09:26:02.639912-04:00"
+    },
     "fb8961bc-ce84-4d5d-93aa-53441619dd83": {
       "author": "Bobby Grayson",
       "change_id": "fb8961bc-ce84-4d5d-93aa-53441619dd83",
@@ -902,6 +1342,20 @@
       "status": "pending",
       "title": "SwiftUI views per style, emoji/SF Symbols for reel symbols",
       "updated_at": "2026-10-30T08:13:19.091131-04:00"
+    },
+    "ffb74d6b-a9b7-47d3-ab06-3e0eb81fc138": {
+      "author": "Bobby Grayson",
+      "change_id": "ffb74d6b-a9b7-47d3-ab06-3e0eb81fc138",
+      "created_at": "2026-10-30T09:03:50.774325-04:00",
+      "description": "User rejected the 2D look and asked for 3D.",
+      "metadata": {
+        "branch": "main",
+        "confidence": 15
+      },
+      "node_type": "option",
+      "status": "pending",
+      "title": "Better hand-drawn 2D CoreGraphics",
+      "updated_at": "2026-10-30T09:03:50.774325-04:00"
     }
   },
   "tags": {},

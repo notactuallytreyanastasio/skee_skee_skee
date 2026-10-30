@@ -11,16 +11,15 @@
              │ AimBook, Skill, playBotRun          (bots for balance)                   │
              └──────────────────────────────────────────────────────────────────────────┘
                      │ Step { state, events }
-             ┌──────────────────────────── SkeeRender (pure + CoreGraphics) ─────────────┐
-             │ Presentation.enqueue(Step) / advance(dt)   -> beats, popups, reel spin  │
-             │ Layout, Projection, Swipe.launch(in:fold:), intent(at:...) -> Intent    │
-             │ Renderer.draw(Presentation, UIState, Layout, CGContext)                 │
-             └───────────────────────────────────────────────────────────────────────────┘
+             ┌── SkeeRender (pure): Presentation.enqueue(Step, releaseAlong) / advance(dt)
+             ├── SkeeScene (SceneKit): Cabinet, toon kit, World mapping, CameraRig fit,
+             │                         ScenePresenter.update(Presentation, held:)
+             └── SkeeHUD (SwiftUI): HUDState.make(Presentation) -> HUDView
                  │                                   │
         ┌────────┴──────── App (iOS) ────────┐   ┌──┴──────── skee (macOS CLI) ──────┐
         │ CADisplayLink -> advance(dt)       │   │ play / map / windows / balance   │
-        │ Canvas -> Renderer.draw            │   │ render / film -> PNG             │
-        │ DragGesture -> Swipe / intent      │   │ save file = seed + actions       │
+        │ SCNView + HUDView overlay          │   │ scene / scenefilm / frame -> PNG │
+        │ ThrowPad -> analyzeStroke          │   │ save file = seed + actions       │
         │ UIHingeInteraction -> fold         │   └──────────────────────────────────┘
         │ haptics, save file                 │
         └────────────────────────────────────┘
@@ -62,15 +61,20 @@ tally and the state commit.
 
 ## Rendering
 
-`Pen` holds the per-style drawing primitives: fill, ink, glow, sphere, panel,
-glyph, text. `SceneDrawer` composes a frame: background, board, hinge, lane,
-power gauge, ball, HUD, tray, tally, popups, counter, banners. Style is data,
-and `Palette.of(style)` holds every colour. The pixel era renders the whole
-scene into a half-resolution bitmap with antialiasing off and scales it up with
-nearest-neighbour sampling.
+`SkeeScene` builds the cabinet from toon parts (`ToonKit.part` over shared
+rounded primitives). `World` maps physics coordinates to scene coordinates;
+the lane is drawn at 0.42 of its length and the board at 1.55x so the target
+reads on a phone, and every position goes through the same mapping. The
+camera is not hand-placed: `Cabinet.fit` searches eye height, distance, aim
+and lens so that the hump lands at 50% of the screen height (the crease).
 
-The context is y-down with a top-left origin. SwiftUI's Canvas already is; the
-CLI flips its bitmap before calling.
+`ScenePresenter` reads a `Presentation` each frame. It places and rolls the
+ball, sinks it into its hole, flips reel plates while they spin, and counts
+the balls left in the tray. `SkeeHUD` turns the same presentation into a
+`HUDState` and draws it in SwiftUI.
+
+The CLI renders identical frames headless: `SCNRenderer` for the scene,
+`ImageRenderer` for the HUD.
 
 ## Testing
 
@@ -84,8 +88,9 @@ CLI flips its bitmap before calling.
   replay exactness, winning and losing.
 - Difficulty: "never impossible" for every boss at ante 8.
 - Bots: determinism, aim book coverage, skill matters.
-- Render: style per ante, layout and projection invariants for every style
-  (lane and board meet at the hinge), swipe mapping, presentation timing.
+- Input: stroke analysis on synthetic strokes (clean slide, hitches, curve,
+  crease crossing, tap, pull back).
+- Presentation timing, including the roll trimmed to the release point.
 
 The work was test-first. Each module's tests were written and failed before the
 implementation existed. Several tests started wrong and the history says so:

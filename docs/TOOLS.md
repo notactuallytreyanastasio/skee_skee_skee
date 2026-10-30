@@ -52,18 +52,15 @@ score/target at p10/p50/p90 per ante.
 ## Pictures
 
 ```
-skee render --save run.json --settle --style neon --out out/neon.png
-skee render --save run.json --t 0.8 --out out/midflight.png
-skee render --save run.json --settle --select 2 --out out/stamp.png   # stamp targeting
-skee render --size outer ...       # the folded 466x678 display
-skee render --title --out out/title.png
-skee film --save run.json --frames 16 --dt 0.25 --scale 0.4 --out out/film.png
+skee scene --out out/cabinet.png                    # the 3D cabinet alone
+skee frame --save run.json --t 0.8 --out out/f.png  # 3D + HUD, mid-throw
+skee frame --save run.json --settle --select 2      # prize counter, stamp selected
+skee frame --title
+skee scenefilm --save run.json --from 0.5 --frames 8 --dt 0.12   # contact sheet
 ```
 
-`film` lays out the last action's animation as a contact sheet: one PNG shows
-a whole throw, from release through the hinge, the flight, the drop and the
-tally. This is how the HUD-score regression and the cut-off depth gradients
-were found.
+The framing, the exposure, the lane UV flip and the tray count were all found
+by looking at these.
 
 ## The simulator
 

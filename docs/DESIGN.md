@@ -157,32 +157,47 @@ playing folded.
 A closed hinge means the player is on the outer display, so it counts as no
 fold. Treating closed as maximum fold was a real bug, found in the simulator.
 
-## Art eras
+## Look and feel
 
-No emoji, no image assets. Every symbol is vector geometry and every pixel-era
-letter comes from a 5×7 bitmap font in code. The style changes every two
-antes, with an iris wipe out of the hinge:
+3D, cel-shaded. The shading is a port of the toon kit from
+`whats_going_through_your_mind` (three.js `engine/render/toon.js`) to SceneKit
+shader modifiers: a 3-band light ramp, hemisphere fill, a hard rim band,
+inverted-hull ink outlines in `#3a2346`. Pastel arcade palette. No emoji and
+no image assets: every texture (maple lane, gored ball, reel symbols,
+numbers) is drawn in code.
 
-| Antes | Era | How it's drawn |
-|-------|-----|----------------|
-| 1-2 | 8-BIT ARCADE | whole scene at half resolution, no antialiasing, nearest-neighbour upscale, small dusty palette |
-| 3-4 | CARTOON ALLEY | flat colours, one hard highlight band, thick black ink, sunburst |
-| 5-6 | THE REAL DEAL | real perspective on lane and board, maple, felt, brass lips, chrome ball |
-| 7-8 | VECTOR NIGHT | black glass, glowing strokes, perspective grid |
+The camera is solved so the hump sits exactly on the screen's midline,
+which is the Duo's crease. The lane is under your thumb, and the target
+stands up past the fold.
 
-| pixel | cel | depth | neon |
-|-------|-----|-------|------|
-| ![](images/era_pixel.png) | ![](images/era_cel.png) | ![](images/era_depth.png) | ![](images/era_neon.png) |
+| title | in play | one throw (`skee scenefilm`) |
+|-------|---------|------------------------------|
+| ![](images/title.png) | ![](images/frame.png) | ![](images/throw.png) |
 
-The prize counter sits on the lane half, so the board stays visible for stamp
-targeting:
+Every ring has its own hole at the bottom: the 50, 40, 30, 20 and 10 holes
+form a column below the centre, as on a real cabinet. A ball that lands in a
+ring rolls down into its hole and drops through. The ball visibly rolls, so
+it turns by distance over radius.
 
-![](images/counter_cel.png)
+Other art eras (the original ask was several styles across levels) are not
+built for 3D yet. Every ante is cel for now.
 
-One throw, from `skee film`: release, over the hinge, into the 50, then the
-tally counting chips × mult:
+## The throw
 
-![](images/film_throw.png)
+Thumb slide, as on a real alley. The ball sits under your thumb. Slide it up
+the lane and let go before you feel the crease:
+
+- release speed sets power, release direction sets aim, release point sets
+  the starting line
+- a thumb that curves as it lets go puts side spin on the ball, and it hooks
+  on the lane
+- a stroke that speeds up and slows down skids the ball (up to 12% speed lost);
+  a smooth, accelerating slide is clean
+- touching past the crease is a **foul**: the ball is spent and scores
+  nothing
+
+This is `analyzeStroke` in `SkeeCore/Input/Stroke.swift`, a pure function of
+the touch samples.
 
 ## What makes it fun (the bets)
 

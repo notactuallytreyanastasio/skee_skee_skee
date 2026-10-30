@@ -1,15 +1,16 @@
 # Skee Skee Skee
 
-A skee-ball roguelike for the iPhone Duo. You flick the ball up the lane on the
-bottom half of the screen; it rolls over the hinge, which is the ramp, and
-flies into the rings on the top half. Each hole carries a slot-machine reel.
+A skee-ball roguelike for the iPhone Duo. You slide the ball up the lane with
+your thumb and let go before the crease; it rolls over the hinge, which is the
+ramp, and flies into the rings on the top half. Touch past the crease and it's
+a foul. Each hole carries a slot-machine reel.
 Every three balls read as a payline. Score chips times mult, beat the target,
 spend tickets at the prize counter, and go on to the next machine.
 
 Half-fold the phone into a little cabinet and the ramp gets steeper.
 
 ```
-swift test -c release -Xswiftc -enable-testing   # or: make test   (89 tests)
+swift test -c release -Xswiftc -enable-testing   # or: make test   (98 tests)
 swift build -c release && .build/release/skee     # the terminal tools
 cd App && xcodegen generate && open SkeeSkeeSkee.xcodeproj
 ```
@@ -19,7 +20,9 @@ cd App && xcodegen generate && open SkeeSkeeSkee.xcodeproj
 | Path | What it is |
 |------|------------|
 | `Sources/SkeeCore` | The functional core. Physics, scoring, run rules, bots. Value types and pure functions only. |
-| `Sources/SkeeRender` | Pure layout, animation timeline, hit testing, and a CoreGraphics renderer with four art styles. Shared by the app and the CLI. |
+| `Sources/SkeeRender` | The pure animation timeline (`Presentation`). |
+| `Sources/SkeeScene` | The 3D cel-shaded cabinet (SceneKit), toon kit ported from whats_going_through_your_mind. |
+| `Sources/SkeeHUD` | The SwiftUI HUD, prize counter, title and game over. |
 | `Sources/skee` | Terminal shell: play a run, map the physics, balance with bots, render PNGs. |
 | `App/` | iOS shell: SwiftUI Canvas, gestures, `UIHingeInteraction`, haptics, save file. |
 | `Tests/` | Swift Testing suites for both libraries. |
@@ -40,8 +43,11 @@ Works:
 - the full run: 8 antes × 3 rounds, 7 boss machines, 15 charms, 5 specialty
   balls, stamps, gilds and purges, ticket economy, fever meter
 - deterministic physics with a tested "never impossible" guarantee
-- four procedural art eras with an iris transition between them
-- the app builds and runs in the iPhone Duo simulator (iOS 27.1)
+- 3D cel-shaded cabinet with a hole in every ring, a ball that rolls, and the
+  hump on the crease
+- thumb-slide throw with spin, skid and fouls
+- the app builds, runs in the iPhone Duo simulator (iOS 27.1), and is installed
+  on a physical Duo
 
 Not done, or not verified:
 - **The unfolded inner display has never been seen running.** The simulator
@@ -50,8 +56,10 @@ Not done, or not verified:
   uses the same renderer at the same size.
 - **The hinge angle mapping is a guess.** `UIHingeInteraction` reports radians;
   the code assumes π is flat open. Unconfirmed on hardware.
-- **Swipe-to-power calibration is untested by a human thumb.** The constants in
-  `Swipe` (400 to 3400 pt/s) are a first guess.
+- **The thumb stroke is untested by a human thumb.** `StrokeTuning` (250 to
+  2600 pt/s for power, the hitch allowance for skid) is a first guess.
+- Only one art style (cel). The several-styles-across-levels idea is not
+  rebuilt in 3D yet.
 - No sound.
 - Balance is a first pass: close rounds are rare (about 4%) and The Miser kills
   too many 50-heavy builds. See [docs/BALANCE.md](docs/BALANCE.md).

@@ -24,8 +24,8 @@ cd App && xcodegen generate && open SkeeSkeeSkee.xcodeproj
 | `Sources/SkeeScene` | The 3D cel-shaded cabinet (SceneKit), toon kit ported from whats_going_through_your_mind. |
 | `Sources/SkeeHUD` | The SwiftUI HUD, prize counter, title and game over. |
 | `Sources/skee` | Terminal shell: play a run, map the physics, balance with bots, render PNGs. |
-| `App/` | iOS shell: SwiftUI Canvas, gestures, `UIHingeInteraction`, haptics, save file. |
-| `Tests/` | Swift Testing suites for both libraries. |
+| `App/` | iOS shell: SCNView + HUD overlay, thumb touch layer, `UIHingeInteraction`, haptics, save file. |
+| `Tests/` | Swift Testing suites for the core and the presentation timeline. |
 | `docs/` | Design, architecture, physics, tools, balance, playtest notes. |
 
 ## Documentation
@@ -50,10 +50,10 @@ Works:
   on a physical Duo
 
 Not done, or not verified:
-- **The unfolded inner display has never been seen running.** The simulator
-  boots folded, `simctl` has no fold command, and the Simulator GUI could not be
-  scripted here. The 669×951 layout is verified only via `skee render`, which
-  uses the same renderer at the same size.
+- **The unfolded inner display has not been seen by me running.** The simulator
+  boots folded and `simctl` cannot unfold it; the build is on a real Duo, but I
+  cannot see its screen. The unfolded frame is verified via `skee frame`, which
+  renders the same scene and HUD at the same size.
 - **The hinge angle mapping is a guess.** `UIHingeInteraction` reports radians;
   the code assumes π is flat open. Unconfirmed on hardware.
 - **The thumb stroke is untested by a human thumb.** `StrokeTuning` (250 to

@@ -19,6 +19,8 @@ public struct HUDActions {
     public var skipWalkthrough: () -> Void = {}
     public var gotIt: () -> Void = {}
     public var howToPlay: () -> Void = {}
+    public var pull: () -> Void = {}
+    public var setBet: (Bet) -> Void = { _ in }
     public init() {}
 }
 
@@ -88,30 +90,6 @@ struct SymbolImage: View {
     }
 }
 
-/// One top-slot reel: the strip scrolls past a window, so a spin reads as
-/// a spin and not a flicker.
-struct SlotReel: View {
-    let position: Double
-    var body: some View {
-        GeometryReader { g in
-            let n = TopSlot.strip.count
-            let base = Int(position.rounded(.down))
-            let frac = position - Double(base)
-            let h = g.size.height
-            ZStack {
-                RoundedRectangle(cornerRadius: 6).fill(Ink.cream)
-                ForEach(-1..<2, id: \.self) { k in
-                    SymbolImage(symbol: TopSlot.strip[((base + k) % n + n) % n])
-                        .padding(3)
-                        .frame(width: g.size.width, height: h)
-                        .offset(y: (Double(k) - frac) * h)
-                }
-                RoundedRectangle(cornerRadius: 6).strokeBorder(Ink.ink, lineWidth: 2)
-            }
-            .clipShape(RoundedRectangle(cornerRadius: 6))
-        }
-    }
-}
 
 // MARK: - HUD
 
@@ -143,6 +121,10 @@ public struct HUDView: View {
                     meter(geo.size)
                     guide()
                     trail()
+                    if let m = state.machine, state.counter == nil, state.over == nil {
+                        MachineView(m: m, pull: actions.pull, setBet: actions.setBet)
+                            .position(x: geo.size.width / 2, y: geo.size.height * 0.74)
+                    }
                     // The slot sits on the backboard under the rings: up top
                     // it hid the pockets and the 50, the symbols that matter most.
                     VStack(spacing: 4) { slot; hint }
@@ -152,7 +134,7 @@ public struct HUDView: View {
                     if let t = state.tally { TallyView(tally: t).position(x: geo.size.width / 2, y: geo.size.height * 0.27).allowsHitTesting(false) }
                     ForEach(Array(state.popups.enumerated()), id: \.offset) { _, p in popup(p) }
                     if let b = state.banner { BannerView(banner: b).position(x: geo.size.width / 2, y: geo.size.height * 0.3).allowsHitTesting(false) }
-                    if state.firstThrow && !state.busy && state.counter == nil && state.coach == nil {
+                    if state.firstThrow && !state.busy && state.counter == nil && state.coach == nil && state.machine == nil {
                         VStack(spacing: 2) {
                             CelText(text: "thumb down on your line", size: 20)
                             CelText(text: "then flick straight up", size: 15, fill: Ink.butter)
@@ -218,19 +200,23 @@ public struct HUDView: View {
         .padding(.horizontal, 12)
     }
 
-    /// The slot on top of the cabinet. It spins after every throw; hit a
-    /// hole showing one of its symbols and the combo climbs.
+    /// The frame's targets, the centre row of its pull. Hit a hole showing
+    /// one of them and the combo climbs.
     var topSlot: some View {
         VStack(spacing: 1) {
             if state.combo > 0 {
                 CelText(text: "COMBO x\(state.combo) · hit one to keep it", size: 11, fill: Ink.butter)
             } else {
-                CelText(text: "TOP SLOT · hit one = combo", size: 10)
+                CelText(text: "TARGETS · hit one = combo", size: 10)
             }
             HStack(spacing: 3) {
                 ForEach(0..<3, id: \.self) { i in
-                    SlotReel(position: state.topSlot.indices.contains(i) ? state.topSlot[i] : 0)
-                        .frame(width: 27, height: 27)
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 6).fill(Ink.cream)
+                        if state.targets[i] != .blank { SymbolImage(symbol: state.targets[i]).padding(3) }
+                        RoundedRectangle(cornerRadius: 6).strokeBorder(Ink.ink, lineWidth: 2)
+                    }
+                    .frame(width: 27, height: 27)
                 }
             }
             .padding(3)

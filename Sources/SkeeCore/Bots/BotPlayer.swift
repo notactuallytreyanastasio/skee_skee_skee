@@ -25,6 +25,9 @@ public func playBotRun(seed: UInt64, skill: Skill, config: RunConfig = .standard
         switch s.phase {
         case .won, .lost:
             return BotRun(final: s, actions: actions, events: events)
+        case .throwing where s.round.pull == nil:
+            // Max bet when it can keep a cushion for the counter.
+            _ = act(.pull(s.tickets >= 8 ? .five : s.tickets >= 4 ? .three : .one))
         case .throwing:
             if s.round.currentBalls.count == 2, !s.powerUps.isEmpty { _ = act(.arm(0)) }
             let t = table(for: s)

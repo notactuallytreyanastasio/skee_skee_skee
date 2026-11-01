@@ -6,11 +6,10 @@ public func newRun(seed: UInt64, config: RunConfig = .standard) -> RunState {
     var s = RunState(
         config: config, rng: rng, seed: seed, ante: 1, boss: boss,
         round: RoundState(kind: .warmup, target: 0, framesTotal: 0),
-        phase: .throwing, setup: .standard, stops: [:], topSlot: TopSlot(stops: [0, 1, 2]), charms: [], powerUps: [],
+        phase: .throwing, setup: .standard, stops: [:], topSlot: .empty, charms: [], powerUps: [],
         tickets: config.startTickets, heat: 0, fever: false, stats: RunStats())
     s.round = freshRound(.warmup, in: s)
     spinReels(&s)
-    s.topSlot = .spin(&s.rng)
     return s
 }
 
@@ -34,6 +33,8 @@ public func table(for s: RunState) -> Table {
 /// rejected with a typed error and the input state is untouched.
 public func apply(_ action: Action, to s: RunState) -> Result<Step, ActionError> {
     switch (action, s.phase) {
+    case (.pull(let bet), .throwing): pull(bet, s)
+    case (.throwBall, .throwing) where s.round.pull == nil, (.foul, .throwing) where s.round.pull == nil: .failure(.needsPull)
     case (.throwBall(let l), .throwing): .success(throwBall(l, s))
     case (.foul, .throwing): .success(foul(s))
     case (.arm(let i), .throwing): arm(i, s)
@@ -43,6 +44,39 @@ public func apply(_ action: Action, to s: RunState) -> Result<Step, ActionError>
     case (.leaveCounter, .prizeCounter): .success(leaveCounter(s))
     default: .failure(.wrongPhase)
     }
+}
+
+// MARK: - The pull
+
+/// Pull the lever: pay the bet, spin, read the window. Its centre row
+/// becomes the frame's targets; line wins wait in the pull until the frame
+/// is scored.
+private func pull(_ bet: Bet, _ s0: RunState) -> Result<Step, ActionError> {
+    guard s0.round.pull == nil else { return .failure(.alreadyPulled) }
+    guard s0.tickets >= bet.cost else { return .failure(.cantAfford) }
+    var s = s0
+    s.tickets -= bet.cost
+    s.round.lastBet = bet
+    return .success(spin(Pull.spin(bet: bet, &s.rng), s))
+}
+
+private func spin(_ p: Pull, _ s0: RunState) -> Step {
+    var s = s0
+    var events: [GameEvent] = [.pulled(p)]
+    s.round.pull = p
+    s.topSlot = TopSlot(symbols: p.targets)
+    s.stats.pulls += 1
+    if p.triggersFreeGames {
+        s.round.freeLeft += Pull.freeGamesAwarded
+        s.round.framesTotal += Pull.freeGamesAwarded
+        s.stats.freeGames += Pull.freeGamesAwarded
+        events.append(.freeGamesWon(Pull.freeGamesAwarded))
+    }
+    if let tier = p.jackpot {
+        s.stats.jackpotTiers[tier, default: 0] += 1
+        events.append(.jackpot(tier))
+    }
+    return Step(state: s, events: events)
 }
 
 // MARK: - Throwing
@@ -61,7 +95,6 @@ private func foul(_ s0: RunState) -> Step {
     s.round.combo = 0
     s.stats.balls += 1
     spinReels(&s)
-    s.topSlot = .spin(&s.rng)
     return finishBall(s, [.fouled])
 }
 
@@ -88,7 +121,6 @@ private func throwBall(_ launch: Launch, _ s0: RunState) -> Step {
     s.stats.holes[shot.hole, default: 0] += 1
     events.append(.shot(shot, record))
     if armed != .hold { spinReels(&s) }
-    s.topSlot = .spin(&s.rng)
     return finishBall(s, events)
 }
 
@@ -100,10 +132,11 @@ private func finishBall(_ s0: RunState, _ events0: [GameEvent]) -> Step {
 
     let context = ScoringContext(
         charms: s.charms, streakBefore: s.round.streak, fever: s.fever,
-        pairsPay: s.round.kind != .boss || s.boss.pairsPay)
+        pairsPay: s.round.kind != .boss || s.boss.pairsPay, pull: s.round.pull)
     let frame = scoreFrame(s.round.currentBalls, context: context)
     s.round.frames.append(frame)
     s.round.currentBalls = []
+    s.round.pull = nil
     s.round.streak = frame.streakAfter
     s.tickets += frame.tickets
     s.fever = false
@@ -117,7 +150,13 @@ private func finishBall(_ s0: RunState, _ events0: [GameEvent]) -> Step {
         events.append(.feverLit)
     }
 
-    guard s.round.frames.count == s.round.framesTotal else { return Step(state: s, events: events) }
+    guard s.round.frames.count == s.round.framesTotal else {
+        // A free game: the machine pulls for you, at the bet that won it.
+        guard s.round.freeLeft > 0 else { return Step(state: s, events: events) }
+        s.round.freeLeft -= 1
+        let step = spin(Pull.spin(bet: s.round.lastBet, free: true, &s.rng), s)
+        return Step(state: step.state, events: events + step.events)
+    }
     return endRound(s, events)
 }
 

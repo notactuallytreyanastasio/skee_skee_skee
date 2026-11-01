@@ -161,7 +161,7 @@ final class GameModel {
         sound.setDrumRoll(p.anticipation > 0)
         refreshHUD(p)
         if !p.isBusy, case .throwing = state.phase, !autoplay.isEmpty {
-            send(.throwBall(autoplay.removeFirst()))
+            if state.round.pull == nil { send(.pull(.one)) } else { send(.throwBall(autoplay.removeFirst())) }
         }
     }
 
@@ -174,7 +174,8 @@ final class GameModel {
             let f = rig.project(w.board(w.table.board.holeCenter(hole)), aspect: a)
             return CGPoint(x: CGFloat(f.x) * size.width, y: CGFloat(f.y) * size.height)
         }, center: CGPoint(x: size.width / 2, y: size.height * 0.2),
-           selectedOffer: selectedOffer, selectedCharm: selectedCharm, screen: screen)
+           selectedOffer: selectedOffer, selectedCharm: selectedCharm, screen: screen, bet: affordableBet)
+        hud.machine?.progressive = wallet.progressive
         hud.trail = trail
         hud.guide = canThrow ? presenter.guide(line: line, size: viewSize) : []
         hud.aiming = aiming
@@ -199,7 +200,7 @@ final class GameModel {
     var busy: Bool { stage.with { $0.isBusy } }
     var canThrow: Bool {
         if screen != .game || busy || shopOpen { return false }
-        if case .throwing = state.phase { return true }
+        if case .throwing = state.phase { return state.round.pull != nil }
         return false
     }
 
@@ -287,6 +288,11 @@ final class GameModel {
             haptics.tap()
         }
         a.howToPlay = { [weak self] in self?.startWalkthrough(); self?.haptics.tap() }
+        a.pull = { [weak self] in
+            guard let self, !busy, state.round.pull == nil else { return }
+            send(.pull(affordableBet))
+        }
+        a.setBet = { [weak self] b in self?.bet = b; self?.haptics.tap() }
         a.skipWalkthrough = { [weak self] in self?.endWalkthrough(); self?.haptics.tap() }
         a.gotIt = { [weak self] in
             guard let self else { return }
@@ -309,6 +315,11 @@ final class GameModel {
 
     // MARK: effects
 
+    /// The bet on the machine, kept between pulls; never more than the
+    /// tickets cover.
+    @ObservationIgnored var bet: Bet = .one
+    var affordableBet: Bet { Bet.allCases.last { $0 <= bet && $0.cost <= state.tickets } ?? .one }
+
     func send(_ action: Action) {
         switch apply(action, to: state) {
         case .failure:
@@ -327,6 +338,7 @@ final class GameModel {
             // A finished run pays its winnings to the shelf, once.
             for e in step.events {
                 switch e {
+                case .pulled(let p): wallet.pulled(p); WalletStore.save(wallet)
                 case .roundFailed: wallet.credit(winnings(stats: state.stats, won: false)); WalletStore.save(wallet)
                 case .runWon: wallet.credit(winnings(stats: state.stats, won: true)); WalletStore.save(wallet)
                 default: break
@@ -512,6 +524,8 @@ final class Haptics {
         case .lip: light.impactOccurred(intensity: 0.8)
         case .drop(let h): heavy.impactOccurred(intensity: min(1, 0.45 + CGFloat(h.faceValue) / 110))
         case .reelStop: light.impactOccurred(intensity: 0.4)
+        case .lever: heavy.impactOccurred(intensity: 0.8)
+        case .pullWin: rigid.impactOccurred(intensity: 0.9)
         case .combo(let n): rigid.impactOccurred(intensity: min(1, 0.5 + CGFloat(n) * 0.1))
         default: break
         }

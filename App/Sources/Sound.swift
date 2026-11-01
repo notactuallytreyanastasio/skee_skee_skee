@@ -170,6 +170,11 @@ final class SoundEngine: @unchecked Sendable {
             case "CLEARED":
                 add(arpeggio([392, 523, 659, 784, 1046], step: 0.08, amp: 0.22, decay: 0.25)
                     + (0..<16).map { i in v(.tri, 1800, amp: 0.08, decay: 0.012, delay: 0.5 + Float(i) * 0.045) })
+            case "FREE GAMES":
+                add(arpeggio([523, 659, 784, 1046, 784, 1046, 1318, 1568], step: 0.07, amp: 0.22, decay: 0.2, wave: .square))
+            case _ where t.hasSuffix("JACKPOT"):
+                add(arpeggio([523, 659, 784, 1046, 1318, 1568, 2093, 2637], step: 0.06, amp: 0.25, decay: 0.35, wave: .tri)
+                    + (0..<40).map { i in v(.tri, 2600 + Float(i % 6) * 350, amp: 0.05, decay: 0.03, delay: 0.5 + Float(i) * 0.04) })
             case "GAME OVER":
                 add(arpeggio([392, 370, 349, 294], step: 0.3, amp: 0.15, decay: 0.4, wave: .square))
             case "FEVER":
@@ -177,6 +182,15 @@ final class SoundEngine: @unchecked Sendable {
             default:
                 add(bell(784, amp: 0.18))
             }
+        case .lever:
+            // Ratchet down, then the clunk of the reels letting go.
+            add((0..<6).map { i in v(.tri, 1200 - Float(i) * 60, amp: 0.1, decay: 0.012, delay: Float(i) * 0.025) }
+                + [v(.sine, 90, to: 60, glide: 0.1, amp: 0.45, decay: 0.12, delay: 0.16), v(.noise, 0, amp: 0.08, decay: 0.05, delay: 0.16)])
+        case .pullWin(let chips):
+            // A coin rattle that runs longer the more it paid.
+            let n = min(30, 6 + chips / 15)
+            add(arpeggio([784, 988, 1175], step: 0.07, amp: 0.2, decay: 0.12)
+                + (0..<n).map { i in v(.tri, 2400 + Float((i * 7) % 5) * 300, amp: 0.06, decay: 0.02, delay: 0.2 + Float(i) * 0.035) })
         case .foul:
             add([v(.square, 110, amp: 0.25, decay: 0.3), v(.square, 104, amp: 0.2, decay: 0.3)])
         }

@@ -3,9 +3,7 @@ import Testing
 
 @Suite("Top slot")
 struct TopSlotTests {
-    func slot(_ a: Symbol, _ b: Symbol, _ c: Symbol) -> TopSlot {
-        TopSlot(stops: [a, b, c].map { s in TopSlot.strip.firstIndex(of: s)! })
-    }
+    func slot(_ a: Symbol, _ b: Symbol, _ c: Symbol) -> TopSlot { TopSlot(symbols: [a, b, c]) }
 
     @Test func countsReelsMatchingTheBall() {
         let t = slot(.bell, .bell, .lemon)
@@ -48,38 +46,41 @@ struct TopSlotTests {
         #expect(f.tickets == TopSlot.jackpotTickets)
     }
 
-    @Test func theSlotSpinsEveryThrowAndFouls() throws {
-        var s = newRun(seed: 3)
-        var seen: Set<[Int]> = [s.topSlot.stops]
-        for _ in 0..<4 {
-            s = try apply(.foul, to: s).get().state
-            seen.insert(s.topSlot.stops)
-        }
-        #expect(seen.count > 2)
-    }
-
     @Test func comboChainsOnHitsAndBreaksOnAMiss() throws {
-        var s = newRun(seed: 1)
+        var s = try apply(.pull(.one), to: newRun(seed: 1)).get().state
         // Force the slot to show what ring30 shows, so the throw hits it.
         let want = s.showing(.ring30)
         s.topSlot = slot(want, .blankFree, .blankFree)
-        var step = try apply(.throwBall(launch(for: .ring30, on: table(for: s))), to: s).get()
+        var step = try play(.throwBall(launch(for: .ring30, on: table(for: s))), to: s).get()
         #expect(step.state.round.combo == 1)
         #expect(step.state.round.currentBalls.last?.slotHits ?? 0 >= 1)
 
         s = step.state
         s.topSlot = slot(s.showing(.ring30), .blankFree, .blankFree)
-        step = try apply(.throwBall(launch(for: .ring30, on: table(for: s))), to: s).get()
+        step = try play(.throwBall(launch(for: .ring30, on: table(for: s))), to: s).get()
         #expect(step.state.round.combo == 2)
         #expect(step.state.round.currentBalls.last?.combo == 2)
 
-        step = try apply(.foul, to: step.state).get()
+        step = try play(.foul, to: step.state).get()
         #expect(step.state.round.combo == 0)
     }
 
-    @Test func sameSeedSameSlot() {
-        #expect(newRun(seed: 9).topSlot == newRun(seed: 9).topSlot)
+    @Test func aWildBallIgnoresBlankTargets() {
+        #expect(slot(.blank, .bar, .blank).hits(.clover) == 1)
     }
+}
+
+/// `apply`, pulling the lever first (one line, free) when a ball needs it,
+/// for tests about balls rather than the pull.
+func play(_ a: Action, to s0: RunState) -> Result<Step, ActionError> {
+    var s = s0
+    if s.round.pull == nil, case .throwing = s.phase {
+        switch a {
+        case .throwBall, .foul: s = (try? apply(.pull(.one), to: s).get().state) ?? s
+        default: break
+        }
+    }
+    return apply(a, to: s)
 }
 
 extension Symbol {

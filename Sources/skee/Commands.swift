@@ -84,6 +84,7 @@ func playCommand() {
             print("hand (\(hand)): power \(f2(launch.power)) aim \(f2(launch.aim))")
         }
         action = .throwBall(launch)
+    case "pull": action = .pull(Bet(rawValue: Int(rest.first ?? "1") ?? 1) ?? .one)
     case "arm": action = .arm(Int(rest.first ?? "") ?? -1)
     case "buy":
         let hole = rest.count > 1 ? parseHole(rest[1]) : nil

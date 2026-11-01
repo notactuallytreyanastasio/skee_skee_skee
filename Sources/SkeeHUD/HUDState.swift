@@ -21,10 +21,28 @@ public struct HUDState: Sendable {
     public var heat = 0
     public var heatMax = 10
     public var fever = false
-    /// The top slot's reels, as positions on `TopSlot.strip` (fractional
-    /// while spinning), and the combo running into the next throw.
-    public var topSlot: [Double] = [0, 1, 2]
+    /// The frame's targets (the pull's centre row) and the combo running
+    /// into the next throw.
+    public var targets: [Symbol] = [.blank, .blank, .blank]
     public var combo = 0
+    /// The pull machine, while it wants a pull or is spinning one.
+    public var machine: Machine?
+
+    public struct Machine: Sendable {
+        /// Reel positions on `Pull.strips`, top row; fractional while spinning.
+        public var positions: [Double]
+        public var bet: Bet
+        /// Bets the tickets cover.
+        public var affordable: Set<Bet>
+        /// Waiting for the lever (not spinning, not a free game).
+        public var canPull: Bool
+        public var free: Bool
+        public var freeLeft: Int
+        /// Lines that won, once the reels have stopped.
+        public var wins: [LineWin]
+        public var teasing: Bool
+        public var progressive = Progressive()
+    }
     /// This frame's three reel stops so far (nil = not thrown yet).
     public var frame: [Symbol?] = [nil, nil, nil]
     public var frameNumber = 1
@@ -74,7 +92,8 @@ public struct HUDState: Sendable {
 
     /// Build from a presentation. `holeOnScreen` places popups over holes.
     public static func make(_ p: Presentation, holeOnScreen: (Hole) -> CGPoint, center: CGPoint,
-                            selectedOffer: Int? = nil, selectedCharm: Int? = nil, screen: Screen = .game) -> HUDState {
+                            selectedOffer: Int? = nil, selectedCharm: Int? = nil, screen: Screen = .game,
+                            bet: Bet = .one) -> HUDState {
         let s = p.shown
         var h = HUDState()
         h.screen = screen
@@ -89,8 +108,20 @@ public struct HUDState: Sendable {
         h.ballsLeft = s.round.ballsLeft
         h.charms = s.charms; h.powerUps = s.powerUps; h.armed = s.round.armed
         h.busy = p.isBusy
-        h.topSlot = p.slotPositions
         h.combo = s.round.combo
+        let pulling: Pull? = if case .pull(let q) = p.current { q } else { nil }
+        let wantsPull = !p.isBusy && s.phase == .throwing && s.round.pull == nil
+        h.targets = p.lastPull?.targets ?? (wantsPull || pulling != nil ? [.blank, .blank, .blank] : s.topSlot.symbols)
+        if pulling != nil || wantsPull {
+            let shownPull = p.lastPull
+            h.machine = Machine(
+                positions: p.pullPositions, bet: pulling?.bet ?? bet,
+                affordable: Set(Bet.allCases.filter { $0.cost <= s.tickets }),
+                canPull: wantsPull, free: pulling?.free ?? false,
+                freeLeft: s.round.freeLeft,
+                wins: pulling != nil ? (shownPull?.lineWins ?? []) : [],
+                teasing: p.teasing)
+        }
         h.selectedOffer = selectedOffer; h.selectedCharm = selectedCharm
         h.firstThrow = s.ante == 1 && s.round.kind == .warmup && s.round.frames.isEmpty && s.round.currentBalls.isEmpty
         if case .prizeCounter(let c) = s.phase, !p.isBusy { h.counter = c }
@@ -113,7 +144,11 @@ public struct HUDState: Sendable {
 
         if let (t, sub, u) = p.banner { h.banner = Banner(title: t, sub: sub, progress: u) }
         h.throwsMeter = p.recentThrows
-        if !p.isBusy, case .throwing = s.phase { h.hint = hint(for: s.round.currentBalls.map(\.symbol)) }
+        if !p.isBusy, case .throwing = s.phase {
+            h.hint = s.round.pull == nil
+                ? Hint(text: "PULL · the middle row = this frame's targets")
+                : hint(for: s.round.currentBalls.map(\.symbol))
+        }
         h.popups = p.popups.map { pop in
             let at: CGPoint = switch pop.anchor {
             case .hole(let hole): holeOnScreen(hole)
@@ -169,6 +204,8 @@ public struct HUDState: Sendable {
         }
         switch st.source {
         case .base: return "frame"
+        case .pull: return "pull wins  \(what)"
+        case .freeGame: return "free game  \(what)"
         case .ball(let i): return "ball \(i + 1)  \(what)"
         case .slot(let i):
             let b = f.balls[i]

@@ -7,7 +7,10 @@ public enum Beat: Hashable, Sendable {
     case roll(ShotResult, BallRecord)
     /// Every reel, the board's and the top slot's, spins from the shown
     /// stops to these and settles.
-    case spin(to: [Hole: Int], slot: TopSlot)
+    case spin(to: [Hole: Int])
+    /// The lever: the machine's reels spin to the pull and stop left to
+    /// right, then hold so the wins can be read.
+    case pull(Pull)
     /// A frame's score is counted up step by step, Balatro style.
     case tally(FrameScore)
     /// Big centred text.
@@ -21,6 +24,7 @@ public enum Beat: Hashable, Sendable {
         switch self {
         case .roll(let r, _): r.path.last.map { $0.t * Presentation.rollSpeed } ?? 0
         case .spin: 0.75
+        case .pull(let p): Presentation.pullDuration(p)
         case .tally(let f): Double(f.steps.count) * Presentation.tallyStep + 0.6
         case .banner(_, _, let s): s
         case .commit: 0
@@ -52,8 +56,13 @@ public struct Presentation: Sendable {
     public private(set) var reelPositions: [Hole: Double]
     var spinFrom: [Hole: Double] = [:]
     /// The top slot's three reels on screen, as positions on `TopSlot.strip`.
-    public private(set) var slotPositions: [Double]
-    var slotFrom: [Double] = []
+    /// The pull machine's three reels on screen, as positions on
+    /// `Pull.strips`; the top visible row. Fractional while spinning.
+    public private(set) var pullPositions: [Double]
+    var pullFrom: [Double] = []
+    var pullStopped = 0
+    /// The pull on show, once its reels have stopped.
+    public private(set) var lastPull: Pull?
     public private(set) var popups: [Popup] = []
     public private(set) var trail: [PathSample] = []
     public private(set) var flash = 0.0
@@ -70,7 +79,8 @@ public struct Presentation: Sendable {
     public init(state: RunState) {
         shown = state
         reelPositions = state.stops.mapValues(Double.init)
-        slotPositions = state.topSlot.stops.map(Double.init)
+        pullPositions = state.round.pull?.stops.map(Double.init) ?? [0, 7, 14]
+        lastPull = state.round.pull
         style = ArtStyle.forAnte(state.ante)
     }
 
@@ -94,10 +104,10 @@ public struct Presentation: Sendable {
             case .frameScored(let f):
                 beats.append(.tally(f))
             case .feverLit:
-                beats.append(.spin(to: step.state.stops, slot: step.state.topSlot)); spun = true
+                beats.append(.spin(to: step.state.stops)); spun = true
                 beats.append(.banner("FEVER", sub: "next frame x2", seconds: 1.2))
             case .roundCleared(let score, let target, let payout):
-                if !spun { beats.append(.spin(to: step.state.stops, slot: step.state.topSlot)); spun = true }
+                if !spun { beats.append(.spin(to: step.state.stops)); spun = true }
                 beats.append(.banner("CLEARED", sub: "\(score) / \(target)   +\(payout.total) TICKETS", seconds: 1.8))
             case .roundFailed(let score, let target):
                 beats.append(.banner("GAME OVER", sub: "\(score) / \(target)", seconds: 2.4))
@@ -110,12 +120,19 @@ public struct Presentation: Sendable {
             case .roundStarted(let kind, let target):
                 beats.append(.commit(step.state))
                 beats.append(.banner(kind.title.uppercased(), sub: "REACH \(target)", seconds: 1.2))
+            case .pulled(let p):
+                // Show the frame's score before the next pull spins.
+                beats.append(.pull(p))
+            case .freeGamesWon(let n):
+                beats.append(.banner("FREE GAMES", sub: "\(n) FREE FRAMES · EVERY ONE x2", seconds: 1.8))
+            case .jackpot(let tier):
+                beats.append(.banner("\(tier.title) JACKPOT", sub: "PAID TO YOUR WINNINGS", seconds: 2.4))
             case .counterOpened, .bought, .sold, .rerolled, .armed:
                 break
             }
         }
-        if !spun && (step.state.stops != shown.stops || step.state.topSlot != shown.topSlot) {
-            beats.append(.spin(to: step.state.stops, slot: step.state.topSlot))
+        if !spun && step.state.stops != shown.stops {
+            beats.append(.spin(to: step.state.stops))
         }
         beats.append(.commit(step.state))
     }
@@ -190,9 +207,14 @@ public struct Presentation: Sendable {
         case .roll: trail = []; cues.append(.launch)
         case .spin:
             spinFrom = reelPositions
-            slotFrom = slotPositions
             lastTick = 0
             cues.append(.reelTick)
+        case .pull:
+            pullFrom = pullPositions
+            pullStopped = 0
+            lastPull = nil
+            lastTick = 0
+            cues.append(.lever)
         case .tally:
             shownSteps = 0
         case .banner(let t, _, _):
@@ -226,7 +248,31 @@ public struct Presentation: Sendable {
                 trail.append(sample)
                 if trail.count > 14 { trail.removeFirst(trail.count - 14) }
             }
-        case .spin(let to, let slot):
+        case .pull(let p):
+            let spinning = beatTime < Self.pullStop(2, p)
+            if spinning && beatTime - lastTick > 0.06 { lastTick = beatTime; cues.append(.reelTick) }
+            for i in 0..<3 {
+                let n = Double(Pull.strips[i].count)
+                let end = Self.pullStop(i, p)
+                let start = pullFrom.indices.contains(i) ? pullFrom[i] : 0
+                var target = Double(p.stops[i])
+                while target < start + n * Double(3 + i) { target += n }
+                let u = min(1, beatTime / end)
+                // Ease out with a small overshoot and settle: the reel
+                // clunks into place instead of gliding.
+                let eased = u < 1 ? 1 - pow(1 - u, 3) + 0.04 * sin(u * .pi) : 1
+                pullPositions[i] = start + (target - start) * min(eased, 1.01)
+                if u >= 1 { pullPositions[i] = target }
+            }
+            while pullStopped < 3 && beatTime >= Self.pullStop(pullStopped, p) { cues.append(.reelStop); pullStopped += 1 }
+            if !spinning && lastPull == nil {
+                lastPull = p
+                if p.lineChips > 0 {
+                    popups.append(Popup(text: "WIN \(p.lineChips)", anchor: .hud, kind: .chips, life: 1.4))
+                    cues.append(.pullWin(p.lineChips))
+                }
+            }
+        case .spin(let to):
             if beatTime - lastTick > 0.07 && beatTime < beat.duration * 0.8 { lastTick = beatTime; cues.append(.reelTick) }
             let u = min(1, beatTime / beat.duration)
             let eased = 1 - pow(1 - u, 3)
@@ -237,15 +283,6 @@ public struct Presentation: Sendable {
                 // Always spin forward at least two full turns plus the gap.
                 while target < start + 2 * n { target += n }
                 reelPositions[hole] = start + (target - start) * eased
-            }
-            // The top slot's reels stop left to right, like a real machine.
-            let n = Double(TopSlot.strip.count)
-            for i in slotPositions.indices {
-                let ui = min(1, beatTime / (beat.duration * (0.6 + 0.2 * Double(i))))
-                let start = slotFrom.indices.contains(i) ? slotFrom[i] : 0
-                var target = Double(slot.stops[i])
-                while target < start + n * Double(2 + i) { target += n }
-                slotPositions[i] = start + (target - start) * (1 - pow(1 - ui, 3))
             }
         case .tally(let f):
             let k = min(f.steps.count, Int(beatTime / Self.tallyStep) + 1)
@@ -278,10 +315,12 @@ public struct Presentation: Sendable {
                 cues.append(.combo(b.combo))
                 flash = max(flash, 0.25 + 0.1 * Double(min(b.combo, 5)))
             }
-        case .spin(let to, let slot):
+        case .spin(let to):
             reelPositions = to.mapValues(Double.init)
-            slotPositions = slot.stops.map(Double.init)
             cues.append(.reelStop)
+        case .pull(let p):
+            pullPositions = p.stops.map(Double.init)
+            lastPull = p
         case .tally(let f):
             let line: String
             switch f.payline {
@@ -296,7 +335,7 @@ public struct Presentation: Sendable {
             shown = s
             talliedBonus = 0
             reelPositions = s.stops.mapValues(Double.init)
-            slotPositions = s.topSlot.stops.map(Double.init)
+            if let p = s.round.pull { pullPositions = p.stops.map(Double.init); lastPull = p }
         case .restyle(_, let to):
             style = to
         case .banner:
@@ -349,9 +388,33 @@ public struct Presentation: Sendable {
         return (f, min(f.steps.count, Int(beatTime / Self.tallyStep) + 1))
     }
 
-    /// The top slot's symbols as shown (nearest stop while spinning).
-    public var shownSlot: [Symbol] {
-        slotPositions.map { TopSlot.strip[Int($0.rounded()) % TopSlot.strip.count] }
+    /// When reel `i` of a pull stops. With two BONUS already showing on
+    /// the first two reels the last one hangs on, the floor's oldest tease.
+    public static func pullStop(_ i: Int, _ p: Pull) -> Double {
+        let base = 0.7 + 0.3 * Double(i)
+        return i == 2 && teases(p) ? base + 0.9 : base
+    }
+
+    static func teases(_ p: Pull) -> Bool {
+        p.grid.joined().enumerated().filter { $0.element == .bonus && $0.offset % 3 < 2 }.count >= 2
+    }
+
+    /// Spin, then a beat to read the wins.
+    public static func pullDuration(_ p: Pull) -> Double {
+        pullStop(2, p) + (p.lineChips > 0 || p.triggersFreeGames ? 1.0 : 0.45)
+    }
+
+    /// The pull machine's reel `i` is teasing right now.
+    public var teasing: Bool {
+        guard case .pull(let p) = beats.first else { return false }
+        return Self.teases(p) && beatTime > Self.pullStop(1, p) && beatTime < Self.pullStop(2, p)
+    }
+
+    /// Symbol at a fractional reel position and row offset, for drawing.
+    public static func pullSymbol(reel: Int, at position: Double, row: Int) -> ReelSymbol {
+        let strip = Pull.strips[reel]
+        let i = (Int(position.rounded(.down)) + row) % strip.count
+        return strip[(i + strip.count) % strip.count]
     }
 
     public var banner: (String, String, Double)? {
@@ -363,6 +426,8 @@ public struct Presentation: Sendable {
 /// A moment worth a sound or an effect.
 public enum Cue: Hashable, Sendable {
     case launch, rail, hump, lip, backwall, landed, drop(Hole), gutter
+    /// The lever going down; a pull's line wins, in chips.
+    case lever, pullWin(Int)
     case reelTick, reelStop
     /// A ball matched the top slot; the combo level after it.
     case combo(Int)

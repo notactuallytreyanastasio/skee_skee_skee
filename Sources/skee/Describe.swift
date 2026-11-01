@@ -69,6 +69,9 @@ func describe(_ e: GameEvent) -> String? {
     switch e {
     case .shot(let r, let b): "ball: \(describe(r))\n  -> \(b.chips) chips, \(b.symbol.rawValue)"
     case .fouled: "FOUL: thumb past the crease. Ball spent."
+    case .pulled(let p): describe(p)
+    case .freeGamesWon(let n): "BONUS x3: \(n) FREE GAMES, every one scores x2."
+    case .jackpot(let t): "*** \(t.title) JACKPOT *** paid to winnings."
     case .frameScored(let f): describe(f)
     case .feverLit: "The jackpot meter is full: next frame plays at FEVER (x2)."
     case .roundCleared(let s, let t, let p):
@@ -83,6 +86,14 @@ func describe(_ e: GameEvent) -> String? {
     case .anteStarted(let a, let b): "=== ANTE \(a) === boss: \(b.name) — \(b.blurb)"
     case .runWon: "YOU BEAT THE ARCADE."
     }
+}
+
+func describe(_ p: Pull) -> String {
+    var out = [p.free ? "FREE GAME pull:" : "pull, \(p.bet.lines) line\(p.bet.lines > 1 ? "s" : "") (\(p.bet.cost)t):"]
+    for row in p.grid { out.append("  | " + row.map { $0.rawValue.padding(toLength: 7, withPad: " ", startingAt: 0) }.joined(separator: " | ") + " |") }
+    for w in p.lineWins { out.append("  line \(w.line + 1): three \(w.symbol.rawValue)\(w.multiplier > 1 ? " x\(w.multiplier)" : "") -> +\(w.chips) chips this frame") }
+    out.append("  targets: " + p.targets.map(\.rawValue).joined(separator: " "))
+    return out.joined(separator: "\n")
 }
 
 func describe(_ o: Offer) -> String {
@@ -110,7 +121,8 @@ func describe(_ s: RunState) -> String {
     }
     out.append("Board: " + board.joined(separator: " "))
     switch s.phase {
-    case .throwing: out.append("Phase: throwing")
+    case .throwing where s.round.pull == nil: out.append("Phase: PULL THE LEVER (skee play <save> pull 1|3|5)")
+    case .throwing: out.append("Phase: throwing   targets: " + s.topSlot.symbols.map(\.rawValue).joined(separator: " ") + (s.round.freeLeft > 0 ? "   free games left \(s.round.freeLeft)" : ""))
     case .lost: out.append("Phase: LOST")
     case .won: out.append("Phase: WON")
     case .prizeCounter(let c):

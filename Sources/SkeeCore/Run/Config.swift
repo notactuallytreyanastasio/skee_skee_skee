@@ -33,7 +33,7 @@ public struct RunConfig: Hashable, Sendable, Codable {
     /// next frame plays at double mult.
     public var feverHeat = 10
     /// Target for the warm-up of each ante; feature and boss scale it.
-    public var anteBase = [300, 650, 1100, 1600, 2300, 3100, 4000, 5200]
+    public var anteBase = [360, 780, 1320, 1920, 2760, 3720, 4800, 6240]
     public var kindScale: [RoundKind: Double] = [.warmup: 1, .feature: 1.5, .boss: 2]
     public var roundTickets: [RoundKind: Int] = [.warmup: 3, .feature: 4, .boss: 5]
     /// One bonus ticket per this fraction of overkill above the target.

@@ -2,6 +2,30 @@ import Testing
 import Foundation
 @testable import SkeeCore
 
+@Suite("Wallet and the jackpot meters")
+struct WalletJackpotTests {
+    @Test func oldWalletsStillLoad() throws {
+        let json = #"{"balance":40,"lifetime":90,"owned":["sticker"]}"#
+        let w = try JSONDecoder().decode(Wallet.self, from: Data(json.utf8))
+        #expect(w.balance == 40 && w.progressive == Progressive())
+    }
+
+    @Test func aJackpotPullPaysTheMeterIntoTheWallet() {
+        var w = Wallet()
+        w.progressive.meters[.minor] = 900
+        let won = w.pulled(pull(centre: [.seven, .seven, .seven]))
+        #expect(won == 900 + 2 * Progressive.growth[.minor]!)
+        #expect(w.balance == won)
+        #expect(w.progressive.amount(.minor) == Progressive.seeds[.minor]!)
+    }
+
+    @Test func freeGamesDoNotFeedTheMeters() {
+        var w = Wallet()
+        w.pulled(pull(centre: [.lemon, .cherry, .bell], free: true))
+        #expect(w.progressive == Progressive())
+    }
+}
+
 @Suite("Prize shelf")
 struct PrizeShelfTests {
     @Test func buyingTakesWinningsAndShelvesThePrize() throws {

@@ -57,12 +57,14 @@ The board teaches the slot vocabulary without a tutorial. 10 shows cherries,
   frame; Short Hand removes one.
 - Each ball scores its hole's chips (face value plus gild) and takes the symbol
   its hole is showing.
+- Before the first ball, pull the lever (see The pull).
 - After the third ball the frame is scored:
-  1. base chips 0, mult 1
-  2. each ball's chips; each cherry also pays a flat +10
+  1. base chips 0, mult 1, plus the pull's line wins as chips
+  2. each ball's chips; each cherry also pays a flat +10; target combo mult
   3. the payline: pair or three of a kind, with clover wild
   4. charms, left to right
   5. FEVER x2 if the heat meter was full going in
+  6. x2 on a free game
 - The round ends after the last frame. Reach the target, or the run is over.
 
 ### Payline values
@@ -237,25 +239,38 @@ nothing until a cherry lands in the reel. `Walkthrough` is a pure state
 machine over `GameEvent`s (SkeeCore/Meta/Walkthrough.swift, 8 tests);
 `skee frame --coach N` renders step N's card.
 
-## The top slot
+## The pull
 
-A three-reel slot sits on top of the cabinet and spins after every throw,
-fouls included. It lands on the next throw's targets. Rings showing one of
-its symbols get a cyan halo. A ball whose symbol matches k of the top reels
-adds 0.5 x k mult to its frame, times the combo: the count of consecutive
-throws this round that matched, capped at 5. A miss, gutter or foul breaks
-it. A ball that matches all three reels also pays 3 tickets. Clover is wild
-both ways.
+Every frame starts with a pull of a three-reel, three-row slot machine
+(`Pull`, `SkeeCore/Scoring/Pull.swift`). It sits over the lane until you
+drag its lever down or tap SPIN; no ball can be thrown before it. It is the
+base game a regular slot player expects, and each feature lands on the
+skee-ball frame that follows:
 
-The spin happens after a throw and before the next aim, never while the
-ball is in the air. If it landed during the flight, matching it would be
-luck; shown first, it is a target, and the combo is a streak you earn.
-It draws from its own strip (`TopSlot.strip`): common symbols often, sevens,
-diamonds and clovers once each.
+| Feature | On the machine | In the frame |
+|---|---|---|
+| Bet | 1 line free, 3 lines 1 ticket, 5 lines (rows and diagonals) 2 tickets | tickets are also what the prize counter takes, so a big bet is a real trade |
+| Line wins | three alike on an active line: cherry 20 up to diamond 150, three wilds 250 | banked as chips into the frame, so the three balls' mult multiplies them |
+| Wilds | WILD, and 2X / 3X wilds that multiply the line they complete (Double Diamond's trick) | on the centre row, a wild target that any ball matches |
+| Targets | the centre row | sits on top of the cabinet; a ball into a hole showing one adds 0.5 x matches mult, times the combo (consecutive matching throws, capped at 5) |
+| BONUS scatters | 3 anywhere in the window, any bet: 3 free games | 3 extra frames the machine pulls itself, at the bet that won them, each scoring x2 |
+| Progressive jackpots | max bet only: three bars MINI, sevens MINOR, diamonds MAJOR, three wilds on the centre line GRAND | paid to winnings, not the run; the meters (`Progressive`, in the wallet) grow with every pull and carry between runs |
 
-Bots ignore it and still score 10-30% more in the middle antes from chance
-matches; players who aim for it will score more than that. Targets have not
-been retuned for it.
+On screen the reels stop left to right with a clunk. If the first two reels
+already show two BONUS, the last one hangs on for most of a second, the
+oldest tease on a casino floor. Winning lines are drawn through the window,
+and the win is called out before the frame starts.
+
+Rates, measured over all 8,000 windows: three scatters about 1 pull in 75
+(about once a run), a centre-line win 4-15% of pulls, one window in 8,000 a
+GRAND. The bot bets 5 lines when it holds 8 tickets, 3 lines at 4.
+
+The pull replaced a top slot that spun by itself after every throw. That
+one had nothing to do: you never touched it, so it never felt like a slot.
+
+**Balance.** Banked line wins times mult pushed bot win rates from 26% to
+44% (expert) and 8% to 20% (novice). Targets went up 20%
+(`RunConfig.anteBase`): expert 28%, regular 14%, novice 12%.
 
 ## The prize shop
 

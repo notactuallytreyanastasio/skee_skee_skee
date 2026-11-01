@@ -2,6 +2,11 @@ import Testing
 import SkeeCore
 @testable import SkeeRender
 
+/// A fresh run with the first frame's lever already pulled.
+func pulledRun(_ seed: UInt64) -> RunState {
+    try! apply(.pull(.one), to: newRun(seed: seed)).get().state
+}
+
 @Suite("Presentation")
 struct PresentationTests {
     func throwOnce(_ s: RunState, power: Double = 0.6) -> Step {
@@ -9,7 +14,7 @@ struct PresentationTests {
     }
 
     @Test func showsOldStateUntilTheBallLands() {
-        let s = newRun(seed: 3)
+        let s = pulledRun(3)
         var p = Presentation(state: s)
         let step = throwOnce(s)
         p.enqueue(step)
@@ -20,7 +25,7 @@ struct PresentationTests {
     }
 
     @Test func endsOnTheRealState() {
-        let s = newRun(seed: 3)
+        let s = pulledRun(3)
         var p = Presentation(state: s)
         let step = throwOnce(s)
         p.enqueue(step)
@@ -31,7 +36,7 @@ struct PresentationTests {
     }
 
     @Test func ballMovesForwardWhileRolling() {
-        let s = newRun(seed: 3)
+        let s = pulledRun(3)
         var p = Presentation(state: s)
         p.enqueue(throwOnce(s))
         p.advance(0.1)
@@ -41,7 +46,7 @@ struct PresentationTests {
     }
 
     @Test func aFrameIsTalliedAfterItsThirdBall() {
-        var s = newRun(seed: 3)
+        var s = pulledRun(3)
         var p = Presentation(state: s)
         for _ in 0..<3 {
             let step = throwOnce(s)
@@ -56,7 +61,7 @@ struct PresentationTests {
     }
 
     @Test func tallyScoreStaysOnScreenUntilCommit() {
-        var s = newRun(seed: 3)
+        var s = pulledRun(3)
         var p = Presentation(state: s)
         var last: Step!
         for _ in 0..<3 { last = throwOnce(s); p.enqueue(last); s = last.state }
@@ -66,7 +71,7 @@ struct PresentationTests {
     }
 
     @Test func rollStartsWhereTheThumbLetGo() {
-        let s = newRun(seed: 3)
+        let s = pulledRun(3)
         var p = Presentation(state: s)
         p.enqueue(throwOnce(s), releaseAlong: 0.8)
         p.advance(1 / 120)
@@ -75,7 +80,7 @@ struct PresentationTests {
     }
 
     @Test func shotEventsBecomeTimedCues() {
-        let s = newRun(seed: 3)
+        let s = pulledRun(3)
         var p = Presentation(state: s)
         p.enqueue(throwOnce(s))
         var cues: [Cue] = []
@@ -89,7 +94,7 @@ struct PresentationTests {
     }
 
     @Test func aPairWithTheThirdBallInTheAirSlowsTime() {
-        var s = newRun(seed: 3)
+        var s = pulledRun(3)
         s.round.currentBalls = [BallRecord(hole: .ring30, symbol: .bell, chips: 30),
                                 BallRecord(hole: .ring30, symbol: .bell, chips: 30)]
         var p = Presentation(state: s)
@@ -104,7 +109,7 @@ struct PresentationTests {
     }
 
     @Test func noPairNoSlowMotion() {
-        let s = newRun(seed: 3)
+        let s = pulledRun(3)
         var p = Presentation(state: s)
         p.enqueue(throwOnce(s))
         while p.isBusy { p.advance(1 / 60); #expect(p.timeScale == 1) }
@@ -120,24 +125,36 @@ struct PresentationTests {
 
 @Suite("Presentation: top slot")
 struct TopSlotPresentationTests {
-    @Test func theTopSlotSpinsToItsNewStopsAfterAThrow() throws {
+    @Test func thePullSpinsTheMachineToItsStopsAndHoldsTheWin() throws {
         let s = newRun(seed: 2)
         var p = Presentation(state: s)
-        let step = try apply(.foul, to: s).get()
+        let step = try apply(.pull(.one), to: s).get()
         p.enqueue(step)
-        #expect(p.slotPositions == s.topSlot.stops.map(Double.init))
-        var moved = false
+        let pull = step.state.round.pull!
+        var moved = false, cues: [Cue] = []
         while p.isBusy {
             p.advance(1.0 / 60)
-            if p.slotPositions != s.topSlot.stops.map(Double.init) { moved = true }
+            cues += p.cues
+            if p.pullPositions != pull.stops.map(Double.init) { moved = true }
         }
         #expect(moved)
-        #expect(p.slotPositions == step.state.topSlot.stops.map(Double.init))
-        #expect(p.shownSlot == step.state.topSlot.symbols)
+        #expect(p.pullPositions == pull.stops.map(Double.init))
+        #expect(p.lastPull == pull)
+        #expect(cues.first == .lever)
+        #expect(cues.filter { $0 == .reelStop }.count == 3)
+    }
+
+    @Test func twoBonusOnTheFirstReelsMakeTheLastOneHangOn() {
+        let plain = Pull(stops: [0, 0, 0], bet: .one)
+        var tease = plain
+        // Find stops that show a BONUS on reels 1 and 2.
+        tease.stops[0] = Pull.strips[0].firstIndex(of: .bonus)!
+        tease.stops[1] = Pull.strips[1].firstIndex(of: .bonus)!
+        #expect(Presentation.pullStop(2, tease) > Presentation.pullStop(2, plain) + 0.5)
     }
 
     @Test func aMatchingBallCallsOutTheCombo() {
-        let s = newRun(seed: 2)
+        let s = pulledRun(2)
         var p = Presentation(state: s)
         var after = s
         let ball = BallRecord(hole: .ring30, symbol: .bell, chips: 30, slotHits: 2, combo: 3)

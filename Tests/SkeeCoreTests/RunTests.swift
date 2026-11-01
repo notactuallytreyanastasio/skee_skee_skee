@@ -17,7 +17,7 @@ func launch(for hole: Hole, on table: Table = .standard) -> Launch {
 func throwing(_ s: RunState, _ hole: Hole, times: Int = 1) throws -> (RunState, [GameEvent]) {
     var state = s, events: [GameEvent] = []
     for _ in 0..<times {
-        let step = try apply(.throwBall(launch(for: hole, on: table(for: state))), to: state).get()
+        let step = try play(.throwBall(launch(for: hole, on: table(for: state))), to: state).get()
         state = step.state
         events += step.events
     }
@@ -71,11 +71,14 @@ struct RunTests {
     @Test func throwingOutsideTheLaneIsRejected() {
         var s = newRun(seed: 1)
         s.phase = .lost
-        #expect(throws: ActionError.wrongPhase) { try apply(.throwBall(Launch(power: 0.5, aim: 0)), to: s).get() }
+        #expect(throws: ActionError.wrongPhase) { try play(.throwBall(Launch(power: 0.5, aim: 0)), to: s).get() }
     }
 
     @Test func replayIsExact() throws {
-        let actions: [Action] = (0..<9).map { i in .throwBall(Launch(power: 0.4 + Double(i) * 0.03, aim: 0)) }
+        let actions: [Action] = (0..<9).flatMap { i -> [Action] in
+            let ball = Action.throwBall(Launch(power: 0.4 + Double(i) * 0.03, aim: 0))
+            return i % 3 == 0 ? [.pull(.three), ball] : [ball]
+        }
         let a = try actions.reduce(newRun(seed: 9)) { try apply($1, to: $0).get().state }
         let b = try actions.reduce(newRun(seed: 9)) { try apply($1, to: $0).get().state }
         #expect(a == b)
@@ -187,7 +190,7 @@ struct PrizeCounterTests {
         var s = newRun(seed: seed)
         s.tickets = 10
         s.round.target = 1
-        for _ in 0..<9 { s = try! apply(.throwBall(launch(for: .ring10)), to: s).get().state }
+        for _ in 0..<9 { s = try! play(.throwBall(launch(for: .ring10)), to: s).get().state }
         return s
     }
 }

@@ -50,7 +50,7 @@ struct SpinSkidTests {
 struct FoulTests {
     @Test func aFoulSpendsABallForNothing() throws {
         let s = newRun(seed: 4)
-        let step = try apply(.foul, to: s).get()
+        let step = try play(.foul, to: s).get()
         let ball = step.state.round.currentBalls[0]
         #expect(ball.foul)
         #expect(ball.chips == 0 && ball.symbol == .blank)
@@ -68,6 +68,6 @@ struct FoulTests {
     @Test func foulOnlyWhileThrowing() {
         var s = newRun(seed: 4)
         s.phase = .lost
-        #expect(throws: ActionError.wrongPhase) { try apply(.foul, to: s).get() }
+        #expect(throws: ActionError.wrongPhase) { try play(.foul, to: s).get() }
     }
 }

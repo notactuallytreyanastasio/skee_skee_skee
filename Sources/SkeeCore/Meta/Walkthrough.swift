@@ -6,7 +6,7 @@
 /// dropped: "the ball takes the hole's symbol" is abstract on a slide and
 /// obvious the moment the cherry appears in the reel.
 public enum WalkthroughStep: Int, Hashable, Sendable, Codable, CaseIterable {
-    case flick, symbols, line, topSlot, target, counter, prizes
+    case pull, flick, symbols, line, topSlot, target, counter, prizes
 }
 
 public struct CoachCard: Hashable, Sendable {
@@ -27,12 +27,14 @@ public struct Walkthrough: Hashable, Sendable, Codable {
     var throwsHere = 0
     var lastWasFoul = false
 
-    public init(step: WalkthroughStep = .flick) { self.step = step }
+    public init(step: WalkthroughStep = .pull) { self.step = step }
 
     public mutating func observe(_ events: [GameEvent]) {
         guard !finished else { return }
         for e in events {
             switch (step, e) {
+            case (.pull, .pulled):
+                go(.flick)
             case (.flick, .fouled):
                 lastWasFoul = true
             case (.flick, .shot), (.symbols, .shot):
@@ -71,6 +73,8 @@ public struct Walkthrough: Hashable, Sendable, Codable {
 
     public var card: CoachCard {
         switch step {
+        case .pull:
+            CoachCard(title: "PULL THE LEVER", body: "Every frame of three balls starts with a pull. Drag the lever down or tap SPIN. One line is free; more lines cost tickets but pay more, and only 5 lines can hit a jackpot.", needsTap: false, high: true)
         case .flick:
             lastWasFoul
                 ? CoachCard(title: "FOUL", body: "That was a foul: your thumb went past the line. Flick and let go before it; the ball does the rest.", needsTap: false, high: false)
@@ -80,7 +84,7 @@ public struct Walkthrough: Hashable, Sendable, Codable {
         case .line:
             CoachCard(title: "3 BALLS = 1 LINE", body: "Three balls make a slot line. Two alike pay MULT, three alike pay big. Glowing rings would match.", needsTap: false, high: false)
         case .topSlot:
-            CoachCard(title: "THE TOP SLOT", body: "It spins every throw. Hit a hole showing one of its symbols for a COMBO; keep hitting to grow it. Cyan rings match.", needsTap: false, high: false)
+            CoachCard(title: "THE TARGETS", body: "The middle row of your pull sits on top of the cabinet. Hit a hole showing one of those symbols for a COMBO; keep hitting to grow it. Cyan rings match.", needsTap: false, high: false)
         case .target:
             CoachCard(title: "BEAT THE TARGET", body: "Score = chips x mult. Reach the target at the top before your balls run out.", needsTap: false, high: false)
         case .counter:

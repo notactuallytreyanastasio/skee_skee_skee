@@ -30,10 +30,12 @@ public struct ScoringContext: Hashable, Sendable {
     public var fever: Bool
     /// False under The House boss: pairs are still read, but pay nothing.
     public var pairsPay: Bool
+    /// The pull that started this frame: its line wins and free game.
+    public var pull: Pull?
 
-    public init(charms: [Charm] = [], streakBefore: Int = 0, fever: Bool = false, pairsPay: Bool = true) {
+    public init(charms: [Charm] = [], streakBefore: Int = 0, fever: Bool = false, pairsPay: Bool = true, pull: Pull? = nil) {
         self.charms = charms; self.streakBefore = streakBefore; self.fever = fever
-        self.pairsPay = pairsPay
+        self.pairsPay = pairsPay; self.pull = pull
     }
 }
 
@@ -41,7 +43,7 @@ public struct ScoringContext: Hashable, Sendable {
 /// these back one by one, Balatro-style; the total is just their fold.
 public struct ScoreStep: Hashable, Sendable, Codable {
     public enum Source: Hashable, Sendable, Codable {
-        case base, ball(Int), slot(Int), payline, charm(Charm), fever
+        case base, pull, ball(Int), slot(Int), payline, charm(Charm), fever, freeGame
     }
     public enum Effect: Hashable, Sendable, Codable {
         case base(chips: Int, mult: Double)
@@ -68,11 +70,15 @@ public struct FrameScore: Hashable, Sendable, Codable {
     public var isJackpot: Bool { payline == .triple(.seven) || payline == .triple(.diamond) }
 }
 
-/// Score one three-ball frame. Order: base, each ball's chips, flat symbol
-/// chips and top slot combo, the payline, charms left to right, fever. Order matters because
-/// `timesMult` multiplies whatever mult exists at that point.
+/// Score one three-ball frame. Order: base, the pull's line wins, each
+/// ball's chips, flat symbol chips and target combo, the payline, charms
+/// left to right, fever, free game. Order matters because `timesMult`
+/// multiplies whatever mult exists at that point.
 public func scoreFrame(_ balls: [BallRecord], context: ScoringContext) -> FrameScore {
     var steps: [ScoreStep] = [ScoreStep(source: .base, effect: .base(chips: 0, mult: 1))]
+    if let p = context.pull, p.lineChips > 0 {
+        steps.append(ScoreStep(source: .pull, effect: .chips(p.lineChips)))
+    }
     for (i, b) in balls.enumerated() {
         steps.append(ScoreStep(source: .ball(i), effect: .chips(b.chips)))
         if b.symbol.flatChips > 0 {
@@ -98,6 +104,9 @@ public func scoreFrame(_ balls: [BallRecord], context: ScoringContext) -> FrameS
     }
     if context.fever {
         steps.append(ScoreStep(source: .fever, effect: .timesMult(2)))
+    }
+    if context.pull?.free == true {
+        steps.append(ScoreStep(source: .freeGame, effect: .timesMult(2)))
     }
 
     var chips = 0, mult = 1.0, tickets = 0

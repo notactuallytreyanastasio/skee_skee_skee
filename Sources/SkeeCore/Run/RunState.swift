@@ -12,6 +12,12 @@ public struct RoundState: Hashable, Sendable, Codable {
     public var combo = 0
     /// Power-up applied to the next throw.
     public var armed: PowerUp?
+    /// This frame's pull. Nil until the lever is pulled: no ball before it.
+    public var pull: Pull?
+    /// Free games still to come; each is a frame the machine pulls itself.
+    public var freeLeft = 0
+    /// The last paid bet, which free games play at.
+    public var lastBet: Bet = .one
 
     public init(kind: RoundKind, target: Int, framesTotal: Int) {
         self.kind = kind; self.target = target; self.framesTotal = framesTotal
@@ -40,7 +46,7 @@ public struct RunState: Hashable, Sendable, Codable {
     public var setup: BoardSetup
     /// Where each hole's reel has stopped: index into `setup.reel(hole)`.
     public var stops: [Hole: Int]
-    /// The slot on top: the next throw's targets.
+    /// The frame's targets, from the centre row of its pull.
     public var topSlot: TopSlot
     public var charms: [Charm]
     public var powerUps: [PowerUp]
@@ -58,12 +64,17 @@ public struct RunStats: Hashable, Sendable, Codable {
     public var jackpots = 0
     public var rattles = 0
     public var bestFrame = 0
+    public var pulls = 0
+    public var freeGames = 0
+    public var jackpotTiers: [JackpotTier: Int] = [:]
     /// Every frame's total, all run.
     public var points = 0
     public var roundsCleared = 0
 }
 
 public enum Action: Hashable, Sendable, Codable {
+    /// Pull the lever at a bet. Every frame starts with one.
+    case pull(Bet)
     case throwBall(Launch)
     /// The thumb touched past the crease. The ball is spent, scores nothing.
     case foul
@@ -85,6 +96,9 @@ public enum ActionError: Error, Hashable, Sendable {
     case needsTarget
     case alreadyArmed
     case reelTooShort
+    /// A ball before this frame's pull.
+    case needsPull
+    case alreadyPulled
 }
 
 extension RunState {
@@ -97,6 +111,12 @@ extension RunState {
 
 /// Things the shell should show or play. Order is the order they happened.
 public enum GameEvent: Hashable, Sendable {
+    /// The lever was pulled (or a free game spun).
+    case pulled(Pull)
+    /// BONUS scatters: this many free games added.
+    case freeGamesWon(Int)
+    /// A max-bet line hit a progressive. The shell pays the meter.
+    case jackpot(JackpotTier)
     case shot(ShotResult, BallRecord)
     case fouled
     case frameScored(FrameScore)

@@ -47,9 +47,34 @@ public struct Wallet: Hashable, Sendable, Codable {
     public var lifetime: Int
     /// In the order bought.
     public var owned: [Prize]
+    /// The jackpot meters over the pull machine. They carry between runs,
+    /// so a GRAND nobody has hit in a while is worth more.
+    public var progressive = Progressive()
 
     public init(balance: Int = 0, lifetime: Int = 0, owned: [Prize] = []) {
         self.balance = balance; self.lifetime = lifetime; self.owned = owned
+    }
+
+    enum CodingKeys: String, CodingKey { case balance, lifetime, owned, progressive }
+
+    /// Wallets saved before a field existed still load, with its default.
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        balance = try c.decode(Int.self, forKey: .balance)
+        lifetime = try c.decode(Int.self, forKey: .lifetime)
+        owned = try c.decode([Prize].self, forKey: .owned)
+        progressive = try c.decodeIfPresent(Progressive.self, forKey: .progressive) ?? Progressive()
+    }
+
+    /// Feed the meters for a pull, and pay out a jackpot if it hit one.
+    /// Returns what the jackpot paid.
+    @discardableResult
+    public mutating func pulled(_ p: Pull) -> Int {
+        if !p.free { progressive.feed(p.bet) }
+        guard let tier = p.jackpot else { return 0 }
+        let won = progressive.hit(tier)
+        credit(won)
+        return won
     }
 
     public func buy(_ p: Prize) -> Result<Wallet, ShopError> {

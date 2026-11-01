@@ -8,15 +8,19 @@ struct WalkthroughTests {
         return .shot(r, BallRecord(hole: hole, symbol: .bell, chips: 30, slotHits: slotHits, combo: slotHits > 0 ? 1 : 0))
     }
 
-    @Test func startsAtTheFlick() {
-        let w = Walkthrough()
+    @Test func startsAtTheLeverThenTheFlick() {
+        var w = Walkthrough()
+        #expect(w.step == .pull)
+        w.observe([.shot(simulateShot(Launch(power: 0.5, aim: 0), on: .standard), BallRecord(hole: .ring10, symbol: .bell, chips: 10))])
+        #expect(w.step == .pull)
+        w.observe([.pulled(Pull(stops: [0, 0, 0], bet: .one))])
         #expect(w.step == .flick)
         #expect(!w.finished)
         #expect(!w.card.title.isEmpty)
     }
 
     @Test func aFoulStaysOnTheFlickAndSaysWhy() {
-        var w = Walkthrough()
+        var w = Walkthrough(step: .flick)
         w.observe([.fouled])
         #expect(w.step == .flick)
         #expect(w.card.body.lowercased().contains("foul"))
@@ -25,7 +29,7 @@ struct WalkthroughTests {
     }
 
     @Test func walksThroughEveryStepOnTheEventsThatTeachIt() throws {
-        var w = Walkthrough()
+        var w = Walkthrough(step: .flick)
         w.observe([shot()]); #expect(w.step == .symbols)
         w.observe([shot()]); #expect(w.step == .line)
         let frame = scoreFrame([], context: ScoringContext())
@@ -57,7 +61,7 @@ struct WalkthroughTests {
     }
 
     @Test func gotItOnlyWorksOnCardsWithoutATask() {
-        var w = Walkthrough()
+        var w = Walkthrough(step: .flick)
         w.gotIt()
         #expect(w.step == .flick)
         #expect(Walkthrough(step: .prizes).card.needsTap)

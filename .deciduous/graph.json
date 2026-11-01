@@ -20,6 +20,16 @@
       "to_change_id": "5758ae68-d3a6-4e69-a507-638084cdfb5d",
       "weight": 1.0
     },
+    "035b493850482a1e5966": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-01T07:48:43.672398-05:00",
+      "edge_id": "035b493850482a1e5966",
+      "edge_type": "leads_to",
+      "from_change_id": "e94066c6-423d-4e3b-aff3-5980946a9d74",
+      "rationale": "result",
+      "to_change_id": "87a64772-12fa-42b9-8d8e-a8deda65a0c5",
+      "weight": 1.0
+    },
     "058afce439bc2eb2ab1d": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:25:39.705239-04:00",
@@ -28,6 +38,16 @@
       "from_change_id": "710749f0-3d87-44cd-ab2d-a6b60dd88852",
       "rationale": "found by skee balance",
       "to_change_id": "55d9e3ac-0ed9-4e68-ab03-8025a0feed2c",
+      "weight": 1.0
+    },
+    "0600781c6e54101eda2d": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-01T07:30:31.792001-05:00",
+      "edge_id": "0600781c6e54101eda2d",
+      "edge_type": "leads_to",
+      "from_change_id": "f7f45f63-6b68-4b8e-8342-5e50240303fa",
+      "rationale": "rejected by user",
+      "to_change_id": "1d989370-48e8-492d-88c6-db528f7f2783",
       "weight": 1.0
     },
     "06b85e922ebdda70ddb7": {
@@ -170,6 +190,16 @@
       "to_change_id": "175653b3-d355-45bf-872c-aaa7b353f4eb",
       "weight": 1.0
     },
+    "2cadb0330b1a13f53b90": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-01T07:30:31.460910-05:00",
+      "edge_id": "2cadb0330b1a13f53b90",
+      "edge_type": "leads_to",
+      "from_change_id": "4f655a3c-2895-418a-bbff-caac41ec268c",
+      "rationale": "option",
+      "to_change_id": "2b1819e9-c2ef-4a9f-86fb-62927ebd865c",
+      "weight": 1.0
+    },
     "2e03faf37251bfc846fc": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T10:43:44.211533-04:00",
@@ -260,6 +290,16 @@
       "to_change_id": "1a1e1f41-c265-438d-bd52-66b72504c694",
       "weight": 1.0
     },
+    "3e82e16643cdb9506a60": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-01T07:48:43.434377-05:00",
+      "edge_id": "3e82e16643cdb9506a60",
+      "edge_type": "leads_to",
+      "from_change_id": "1d989370-48e8-492d-88c6-db528f7f2783",
+      "rationale": "implementation",
+      "to_change_id": "e94066c6-423d-4e3b-aff3-5980946a9d74",
+      "weight": 1.0
+    },
     "3f9c452b4e9c594838b3": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T09:34:48.517146-04:00",
@@ -318,6 +358,16 @@
       "from_change_id": "a6e5c0ac-620d-4e88-a1ab-3b68dbd4eb81",
       "rationale": "user-specified cel look",
       "to_change_id": "a288fb15-4cf7-49f5-a576-26b2dae7df2b",
+      "weight": 1.0
+    },
+    "564d6c15b6e7706f21ae": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-01T07:30:31.689102-05:00",
+      "edge_id": "564d6c15b6e7706f21ae",
+      "edge_type": "leads_to",
+      "from_change_id": "2b1819e9-c2ef-4a9f-86fb-62927ebd865c",
+      "rationale": "user chose: keep flick, fix the roll; aiming and too-fast also wrong",
+      "to_change_id": "1d989370-48e8-492d-88c6-db528f7f2783",
       "weight": 1.0
     },
     "5afac24e806fe854d22e": {
@@ -1002,6 +1052,16 @@
       "to_change_id": "a05cb22d-22da-4580-9138-65905453af03",
       "weight": 1.0
     },
+    "ea57d6c9d2c14d45fdeb": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-01T07:30:31.328412-05:00",
+      "edge_id": "ea57d6c9d2c14d45fdeb",
+      "edge_type": "leads_to",
+      "from_change_id": "4f655a3c-2895-418a-bbff-caac41ec268c",
+      "rationale": "option",
+      "to_change_id": "f7f45f63-6b68-4b8e-8342-5e50240303fa",
+      "weight": 1.0
+    },
     "ea58299c7ecb9f4fb0b4": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:42:57.022405-04:00",
@@ -1227,6 +1287,19 @@
       "title": "Flick input from full curve + rings-as-reels with glow hints",
       "updated_at": "2026-10-30T10:32:15.115717-04:00"
     },
+    "1d989370-48e8-492d-88c6-db528f7f2783": {
+      "author": "Bobby Grayson",
+      "change_id": "1d989370-48e8-492d-88c6-db528f7f2783",
+      "created_at": "2026-11-01T07:30:31.580764-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 80
+      },
+      "node_type": "decision",
+      "status": "pending",
+      "title": "Keep flick; rebuild aim and roll feel",
+      "updated_at": "2026-11-01T07:30:31.580764-05:00"
+    },
     "1e8b4e4b-2120-44c8-8da3-794fdb8ed1b3": {
       "author": "Bobby Grayson",
       "change_id": "1e8b4e4b-2120-44c8-8da3-794fdb8ed1b3",
@@ -1293,6 +1366,19 @@
       "status": "pending",
       "title": "Marquee shows the next throw's targets; combo chains across throws in a round",
       "updated_at": "2026-10-30T17:01:20.203770-04:00"
+    },
+    "2b1819e9-c2ef-4a9f-86fb-62927ebd865c": {
+      "author": "Bobby Grayson",
+      "change_id": "2b1819e9-c2ef-4a9f-86fb-62927ebd865c",
+      "created_at": "2026-11-01T07:30:31.206561-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 80
+      },
+      "node_type": "option",
+      "status": "pending",
+      "title": "Keep the flick; the touch-down x sets the line, the whole flick's direction trims the aim, no thumb hook; slower roll playback, continuous rolling haptics, a hump thunk",
+      "updated_at": "2026-11-01T07:30:31.206561-05:00"
     },
     "2e90e1ad-4339-42bb-8140-8ffc0cdafdc0": {
       "author": "Bobby Grayson",
@@ -1470,6 +1556,20 @@
       "status": "pending",
       "title": "Bigger plates beside holes",
       "updated_at": "2026-10-30T10:32:14.725596-04:00"
+    },
+    "4f655a3c-2895-418a-bbff-caac41ec268c": {
+      "author": "Bobby Grayson",
+      "change_id": "4f655a3c-2895-418a-bbff-caac41ec268c",
+      "created_at": "2026-11-01T07:28:19.406028-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 80,
+        "prompt": "so we need to redo the throwing mechanics it just still doesnt feel like playing skeeball correctly\n[asked: which direction] Keep flick, fix the roll. [what feels wrong] No sense of rolling, Aiming, Too fast / too abstract"
+      },
+      "node_type": "goal",
+      "status": "pending",
+      "title": "Throw that feels like skee-ball: a heavy roll, readable aim, not over too fast",
+      "updated_at": "2026-11-01T07:28:19.406028-05:00"
     },
     "507c3835-0072-449a-9abd-a769aa100f50": {
       "author": "Bobby Grayson",
@@ -1772,6 +1872,19 @@
       "status": "pending",
       "title": "Ported toon.js to SceneKit shader modifiers; built 3D cabinet with holes in every ring; solved camera so hump sits on crease; rolling ball presenter; removed 2D renderer",
       "updated_at": "2026-10-30T09:20:50.017371-04:00"
+    },
+    "87a64772-12fa-42b9-8d8e-a8deda65a0c5": {
+      "author": "Bobby Grayson",
+      "change_id": "87a64772-12fa-42b9-8d8e-a8deda65a0c5",
+      "created_at": "2026-11-01T07:48:43.561815-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 70
+      },
+      "node_type": "outcome",
+      "status": "pending",
+      "title": "128 core + 12 presentation tests pass; straight shots stay on their line; guide renders; unfelt on device (Duo offline)",
+      "updated_at": "2026-11-01T07:48:43.561815-05:00"
     },
     "89ce6e47-d9c9-4c86-afa2-648418fef3c8": {
       "author": "Bobby Grayson",
@@ -2230,6 +2343,20 @@
       "title": "Keep fixed symbols and just raise targets",
       "updated_at": "2026-10-30T08:25:40.007700-04:00"
     },
+    "e94066c6-423d-4e3b-aff3-5980946a9d74": {
+      "author": "Bobby Grayson",
+      "change_id": "e94066c6-423d-4e3b-aff3-5980946a9d74",
+      "created_at": "2026-11-01T07:48:43.266724-05:00",
+      "metadata": {
+        "branch": "main",
+        "commit": "c1782b0b92a9922363a5431f0d0c9578e47e24ea",
+        "confidence": 80
+      },
+      "node_type": "action",
+      "status": "pending",
+      "title": "Line from touch-down with a visible guide; aim from the flick's chord to peak speed; no thumb spin; roll at 1.4x; continuous rolling haptics, hump knock",
+      "updated_at": "2026-11-01T07:48:43.266724-05:00"
+    },
     "e973e3a0-0155-45e1-b132-b9ea909c7cfb": {
       "author": "Bobby Grayson",
       "change_id": "e973e3a0-0155-45e1-b132-b9ea909c7cfb",
@@ -2338,6 +2465,19 @@
       "status": "pending",
       "title": "Static slideshow of rules before the first run",
       "updated_at": "2026-10-30T17:16:50.628369-04:00"
+    },
+    "f7f45f63-6b68-4b8e-8342-5e50240303fa": {
+      "author": "Bobby Grayson",
+      "change_id": "f7f45f63-6b68-4b8e-8342-5e50240303fa",
+      "created_at": "2026-11-01T07:30:31.075516-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 30
+      },
+      "node_type": "option",
+      "status": "pending",
+      "title": "Rebuild the input: grab-and-roll, phone swing, or tap meter",
+      "updated_at": "2026-11-01T07:30:31.075516-05:00"
     },
     "fb8961bc-ce84-4d5d-93aa-53441619dd83": {
       "author": "Bobby Grayson",

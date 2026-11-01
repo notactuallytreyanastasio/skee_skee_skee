@@ -37,6 +37,8 @@ public enum Phase: Hashable, Sendable, Codable {
 /// The whole run as a value. `(seed, [Action])` reproduces it exactly.
 public struct RunState: Hashable, Sendable, Codable {
     public var config: RunConfig
+    /// Where the run is played: its board, reels, machine.
+    public var room: Room
     public var rng: SplitMix64
     public var seed: UInt64
     public var ante: Int

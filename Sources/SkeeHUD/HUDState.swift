@@ -41,6 +41,7 @@ public struct HUDState: Sendable {
         /// Lines that won, once the reels have stopped.
         public var wins: [LineWin]
         public var teasing: Bool
+        public var room: Room = .boardwalk
         public var progressive = Progressive()
     }
     /// This frame's three reel stops so far (nil = not thrown yet).
@@ -69,6 +70,8 @@ public struct HUDState: Sendable {
     /// The walkthrough's card for this moment, if one is running.
     public var coach: CoachCard?
     public var shopOpen = false
+    /// The host's table, while a comp is being negotiated.
+    public var host: HostState?
     /// The thumb's recent path, for a fading trail. Age 0...1.
     public var trail: [(CGPoint, Double)] = []
     /// The waiting ball's line: a straight flick rolls along it and lands
@@ -120,7 +123,7 @@ public struct HUDState: Sendable {
                 canPull: wantsPull, free: pulling?.free ?? false,
                 freeLeft: s.round.freeLeft,
                 wins: pulling != nil ? (shownPull?.lineWins ?? []) : [],
-                teasing: p.teasing)
+                teasing: p.teasing, room: s.room)
         }
         h.selectedOffer = selectedOffer; h.selectedCharm = selectedCharm
         h.firstThrow = s.ante == 1 && s.round.kind == .warmup && s.round.frames.isEmpty && s.round.currentBalls.isEmpty

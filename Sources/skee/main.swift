@@ -16,8 +16,10 @@ skee — play and measure Skee Skee Skee from the terminal
   skee play <save.json> <command...>
       Persistent run. Commands: new [seed] | show | throw <power> <aim> [start] [fold] [--hand skill]
       | arm <i> | buy <i> [hole] | reroll | sell <i> | leave
-  skee balance [--runs n] [--skill expert|regular|novice|perfect|all] [--seed s]
+  skee balance [--runs n] [--skill expert|regular|novice|perfect|all] [--seed s] [--room boardwalk|neonLounge|highRoller|penthouse]
       Monte Carlo bot runs with fun metrics.
+  skee haggle [--room neonLounge|highRoller|penthouse] [--seed n] [--say "line|line|deal"]
+      Negotiate a room comp with the host, live against DeepSeek (key from .env; scripts/secrets.sh).
   skee bot <seed> [--skill name]
       Narrate one bot run round by round.
   skee scene [--seed n] [--out f.png] [--size outer]
@@ -51,7 +53,8 @@ func fail(_ msg: String) -> Never {
 }
 
 func tableFromFlags() -> Table {
-    var t = difficultyTable(ante: Int(flag("ante") ?? "1") ?? 1)
+    let room = flag("room").flatMap(Room.init) ?? .boardwalk
+    var t = difficultyTable(ante: Int(flag("ante") ?? "1") ?? 1, base: room.table)
     if let b = flag("boss") {
         guard let boss = Boss.allCases.first(where: { $0.rawValue.lowercased() == b.lowercased() })
         else { fail("unknown boss \(b); one of \(Boss.allCases.map(\.rawValue))") }
@@ -72,5 +75,6 @@ case "scene": MainActor.assumeIsolated { sceneCommand() }
 case "scenefilm": MainActor.assumeIsolated { sceneFilmCommand() }
 case "frame": MainActor.assumeIsolated { frameCommand() }
 case "flickprobe": flickProbe()
+case "haggle": haggleCommand()
 default: print(usage); exit(1)
 }

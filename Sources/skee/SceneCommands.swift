@@ -69,7 +69,7 @@ func sceneFilmCommand() {
 @MainActor
 func composeFrame(_ p: Presentation, cab: Cabinet, presenter: ScenePresenter, size: CGSize, scale: CGFloat = 2,
                   screen: HUDState.Screen = .game, selectedOffer: Int? = nil, wallet: Wallet? = nil, coach: CoachCard? = nil,
-                  line: Double? = nil) -> CGImage? {
+                  line: Double? = nil, host: HostState? = nil) -> CGImage? {
     guard let scene3D = snapshot(cab, size: CGSize(width: size.width * scale, height: size.height * scale)) else { return nil }
     let a = Float(size.width / size.height)
     var hud = HUDState.make(p, holeOnScreen: { hole in
@@ -79,6 +79,7 @@ func composeFrame(_ p: Presentation, cab: Cabinet, presenter: ScenePresenter, si
     }, center: CGPoint(x: size.width / 2, y: size.height * 0.2), selectedOffer: selectedOffer, screen: screen)
     if let wallet { hud.wallet = wallet; hud.shopOpen = screen == .game }
     hud.coach = coach
+    hud.host = host
     if let line { hud.guide = presenter.guide(line: line, size: size); hud.aiming = true }
     let renderer = ImageRenderer(content: HUDView(state: hud).frame(width: size.width, height: size.height))
     renderer.scale = scale
@@ -100,8 +101,8 @@ func composeFrame(_ p: Presentation, cab: Cabinet, presenter: ScenePresenter, si
 func frameCommand() {
     let out = flag("out") ?? "out/frame.png"
     let size = flag("size") == "outer" ? CGSize(width: 466, height: 678) : CGSize(width: 626, height: 890)
-    var (p, _) = presentationForSave(flag("save"))
-    let cab = Cabinet()
+    var (p, s0) = presentationForSave(flag("save"))
+    let cab = Cabinet(table: s0.room.table, palette: .of(s0.room))
     let presenter = ScenePresenter(cabinet: cab, aspect: Float(size.width / size.height))
     let t = has("settle") ? 30 : (Double(flag("t") ?? "0") ?? 0)
     var clock = 0.0
@@ -112,10 +113,12 @@ func frameCommand() {
     guard let img = composeFrame(p, cab: cab, presenter: presenter, size: size, screen: has("title") ? .title : .game,
                                  selectedOffer: flag("select").flatMap(Int.init),
                                  // --shop: the prize shop with a sample shelf (on the title with --title).
-                                 wallet: has("shop") ? Wallet(balance: 1340, lifetime: 2000, owned: [.sticker, .rubberDuck, .yoyo]) : nil,
+                                 wallet: has("shop") || has("title") ? Wallet(balance: 1340, lifetime: 2000, owned: [.sticker, .rubberDuck, .yoyo]) : nil,
                                  // --coach 0...6: the walkthrough card for that step.
                                  coach: flag("coach").flatMap(Int.init).flatMap(WalkthroughStep.init).map { Walkthrough(step: $0).card },
-                                 line: line)
+                                 line: line,
+                                 // --host: the host's table mid-haggle, scripted (no network).
+                                 host: has("host") ? sampleHaggle() : nil)
             else { fail("render failed") }
     try? FileManager.default.createDirectory(atPath: (out as NSString).deletingLastPathComponent, withIntermediateDirectories: true)
     writePNG(img, out)
@@ -142,4 +145,16 @@ func flickProbe() {
         print(String(format: "%4.0f  %.2f  %.2f %3.0f | %5.0f %6.0f  %5.1f %5.2f | %.2f  %.2f -> %@",
                      D, T, lift, w, m.peak, m.release, m.jerk, m.snap, l.power, l.skid, "\(h.faceValue)"))
     }
+}
+
+/// A haggle two turns in, with canned replies, for screenshots.
+func sampleHaggle() -> HostState {
+    var h = Haggle(room: .neonLounge, seed: 1)
+    h.say("Two nights and some tickets would make this a real celebration.")
+    h.hear(HostReply(say: "Two nights I could warm to, but 'some tickets' is a fog machine, not a number. Give me a reason worth the ink.",
+                     offer: .init(nights: 2, tickets: 0, credit: 0)))
+    h.say("I've been telling everyone on the boardwalk the Lounge is where the real players go. Make me look right?")
+    h.hear(HostReply(say: "Now that's a compliment with legs. One ticket a night, and you keep talking us up on that boardwalk.",
+                     offer: .init(nights: 2, tickets: 1, credit: 0), mood: 1))
+    return HostState(haggle: h, thinking: false, error: nil)
 }

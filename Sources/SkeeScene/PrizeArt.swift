@@ -156,6 +156,157 @@ extension Textures {
             fill(rect(0.44, 0.58, 0.12, 0.16), RGB(0xFFC83D), highlight: false)
             fill(rect(0.28, 0.74, 0.44, 0.16, round: 0.03), RGB(0x6F55D6))
             fill(star(0.5, 0.3, 0.12, 0.05), RGB(0xFFF8EC), highlight: false)
+
+        // The Neon Lounge
+        case .glowSticks:
+            for (i, col) in [RGB(0x7EDC7A), RGB(0xFF7FAE), RGB(0x5FC8FF)].enumerated() {
+                let x = 0.3 + CGFloat(i) * 0.2
+                let stick = CGMutablePath()
+                stick.move(to: pt(x - 0.06, 0.88)); stick.addLine(to: pt(x + 0.06, 0.12))
+                stroke(stick, col, width: r.width * 0.09)
+            }
+        case .rollerSkates:
+            fill(rect(0.18, 0.14, 0.34, 0.5, round: 0.08), RGB(0xFF7FAE))
+            fill(rect(0.18, 0.5, 0.64, 0.18, round: 0.06), RGB(0xFF7FAE))
+            fill(rect(0.12, 0.66, 0.76, 0.08, round: 0.03), RGB(0xFFF8EC), highlight: false)
+            for x in [0.26, 0.5, 0.74] { fill(oval(x, 0.84, 0.09, 0.09), RGB(0xFFD84D), highlight: false) }
+            for y in [0.24, 0.34, 0.44] { dot(0.35, y, 0.02) }
+        case .discoBall:
+            let chain = CGMutablePath()
+            chain.move(to: pt(0.5, 0.02)); chain.addLine(to: pt(0.5, 0.16))
+            stroke(chain, RGB(0xC9CED8), width: line * 0.6)
+            fill(oval(0.5, 0.55, 0.38, 0.38), RGB(0xC9CED8))
+            for i in 1..<5 {
+                let y = 0.17 + CGFloat(i) * 0.152
+                let row = CGMutablePath(); row.move(to: pt(0.14, y)); row.addLine(to: pt(0.86, y))
+                c.saveGState(); c.addPath(oval(0.5, 0.55, 0.38, 0.38)); c.clip()
+                c.addPath(row); c.setStrokeColor(ink.cg(0.5)); c.setLineWidth(line * 0.5); c.strokePath()
+                c.restoreGState()
+            }
+            if !silhouette { fill(star(0.32, 0.42, 0.08, 0.03), RGB(0xFFF8EC), highlight: false) }
+        case .neonSign:
+            fill(rect(0.06, 0.2, 0.88, 0.6, round: 0.08), RGB(0x2A1D33), highlight: false)
+            let heart = CGMutablePath()
+            heart.move(to: pt(0.5, 0.7))
+            heart.addCurve(to: pt(0.5, 0.36), control1: pt(0.14, 0.5), control2: pt(0.3, 0.2))
+            heart.addCurve(to: pt(0.5, 0.7), control1: pt(0.7, 0.2), control2: pt(0.86, 0.5))
+            stroke(heart, RGB(0xFF4D6D), width: line * 1.1)
+        case .jukebox:
+            let body = CGMutablePath()
+            body.move(to: pt(0.16, 0.94)); body.addLine(to: pt(0.16, 0.42))
+            body.addArc(center: pt(0.5, 0.42), radius: 0.34 * r.width, startAngle: .pi, endAngle: 0, clockwise: false)
+            body.addLine(to: pt(0.84, 0.94)); body.closeSubpath()
+            fill(body, RGB(0xFF8A3D))
+            fill(rect(0.28, 0.3, 0.44, 0.24, round: 0.1), RGB(0xFFD84D), highlight: false)
+            for x in [0.3, 0.42, 0.54, 0.66] { fill(rect(x, 0.62, 0.06, 0.24, round: 0.02), RGB(0x5FC8FF), highlight: false) }
+        case .arcadeCabinet:
+            fill(rect(0.24, 0.06, 0.52, 0.9, round: 0.04), RGB(0x6F55D6))
+            fill(rect(0.3, 0.16, 0.4, 0.3, round: 0.03), RGB(0x2A1D33), highlight: false)
+            fill(star(0.5, 0.31, 0.08, 0.035), RGB(0xFFD84D), highlight: false)
+            fill(rect(0.24, 0.52, 0.52, 0.12), RGB(0xFF6FA5), highlight: false)
+            fill(oval(0.4, 0.58, 0.04, 0.04), RGB(0xFF4D6D), highlight: false)
+            fill(oval(0.58, 0.58, 0.035, 0.035), RGB(0x7EDC7A), highlight: false)
+
+        // The High Roller Suite
+        case .cufflinks:
+            for x in [0.3, 0.7] {
+                fill(oval(x, 0.5, 0.18, 0.18), RGB(0xFFC83D))
+                fill(oval(x, 0.5, 0.08, 0.08), RGB(0x5FC8FF), highlight: false)
+            }
+        case .champagne:
+            let bottle = CGMutablePath()
+            bottle.move(to: pt(0.42, 0.06)); bottle.addLine(to: pt(0.58, 0.06)); bottle.addLine(to: pt(0.58, 0.34))
+            bottle.addQuadCurve(to: pt(0.72, 0.5), control: pt(0.72, 0.38)); bottle.addLine(to: pt(0.72, 0.94))
+            bottle.addLine(to: pt(0.28, 0.94)); bottle.addLine(to: pt(0.28, 0.5))
+            bottle.addQuadCurve(to: pt(0.42, 0.34), control: pt(0.28, 0.38)); bottle.closeSubpath()
+            fill(bottle, RGB(0x3E8E5A))
+            fill(rect(0.4, 0.04, 0.2, 0.16, round: 0.03), RGB(0xFFC83D), highlight: false)
+            fill(rect(0.3, 0.58, 0.4, 0.2, round: 0.02), RGB(0xFFF8EC), highlight: false)
+        case .pearlNecklace:
+            for i in 0..<11 {
+                let a = CGFloat.pi * (0.1 + 0.8 * CGFloat(i) / 10)
+                fill(oval(0.5 - 0.36 * cos(a), 0.3 + 0.48 * sin(a), 0.065, 0.065), RGB(0xFFF8EC))
+            }
+        case .goldWatch:
+            fill(rect(0.38, 0.02, 0.24, 0.96, round: 0.06), RGB(0x8A5A3C), highlight: false)
+            fill(oval(0.5, 0.5, 0.3, 0.3), RGB(0xFFC83D))
+            fill(oval(0.5, 0.5, 0.22, 0.22), RGB(0xFFF8EC), highlight: false)
+            let hands = CGMutablePath()
+            hands.move(to: pt(0.5, 0.36)); hands.addLine(to: pt(0.5, 0.5)); hands.addLine(to: pt(0.6, 0.56))
+            stroke(hands, RGB(0x2A1D33), width: line * 0.5)
+        case .chandelier:
+            let chain = CGMutablePath(); chain.move(to: pt(0.5, 0.0)); chain.addLine(to: pt(0.5, 0.2))
+            stroke(chain, RGB(0xFFC83D), width: line * 0.6)
+            let arms = CGMutablePath()
+            arms.move(to: pt(0.12, 0.42)); arms.addQuadCurve(to: pt(0.88, 0.42), control: pt(0.5, 0.78))
+            stroke(arms, RGB(0xFFC83D), width: line)
+            for x in [0.12, 0.31, 0.5, 0.69, 0.88] {
+                fill(rect(x - 0.035, 0.28, 0.07, 0.14), RGB(0xFFF8EC), highlight: false)
+                fill(oval(x, 0.24, 0.025, 0.04), RGB(0xFFD84D), highlight: false)
+                fill(oval(x, 0.72, 0.04, 0.07), RGB(0xBFEFFF), highlight: false)
+            }
+        case .sportsCar:
+            let body = CGMutablePath()
+            body.move(to: pt(0.04, 0.7)); body.addLine(to: pt(0.06, 0.52)); body.addLine(to: pt(0.32, 0.46))
+            body.addQuadCurve(to: pt(0.66, 0.44), control: pt(0.48, 0.24)); body.addLine(to: pt(0.94, 0.54))
+            body.addLine(to: pt(0.96, 0.7)); body.closeSubpath()
+            fill(body, RGB(0xFF4D6D))
+            fill(rect(0.4, 0.34, 0.18, 0.1, round: 0.03), RGB(0xBFEFFF), highlight: false)
+            for x in [0.24, 0.76] { fill(oval(x, 0.72, 0.1, 0.1), RGB(0x2A1D33), highlight: false); fill(oval(x, 0.72, 0.04, 0.04), RGB(0xC9CED8), highlight: false) }
+
+        // The Penthouse
+        case .goldenFlamingo:
+            let neck = CGMutablePath()
+            neck.move(to: pt(0.5, 0.52)); neck.addQuadCurve(to: pt(0.6, 0.16), control: pt(0.3, 0.3))
+            stroke(neck, RGB(0xFFC83D), width: line * 1.6)
+            fill(oval(0.62, 0.16, 0.08, 0.07), RGB(0xFFC83D), highlight: false)
+            fill(oval(0.56, 0.58, 0.26, 0.15), RGB(0xFFC83D))
+            for x in [0.5, 0.58] {
+                let leg = CGMutablePath(); leg.move(to: pt(x, 0.7)); leg.addLine(to: pt(x, 0.96))
+                stroke(leg, RGB(0xFFC83D), width: line * 0.7)
+            }
+            dot(0.64, 0.14, 0.015)
+        case .hotTub:
+            fill(rect(0.06, 0.46, 0.88, 0.44, round: 0.1), RGB(0x8A5A3C))
+            fill(oval(0.5, 0.48, 0.42, 0.1), RGB(0x5FC8FF), highlight: false)
+            for (x, y, rr) in [(0.32, 0.3, 0.05), (0.5, 0.2, 0.07), (0.68, 0.32, 0.045)] { fill(oval(x, y, rr, rr), RGB(0xFFF8EC), highlight: false) }
+        case .grandPiano:
+            let lid = CGMutablePath()
+            lid.move(to: pt(0.1, 0.5)); lid.addLine(to: pt(0.84, 0.5))
+            lid.addQuadCurve(to: pt(0.6, 0.2), control: pt(0.9, 0.2)); lid.addLine(to: pt(0.1, 0.2)); lid.closeSubpath()
+            fill(lid, RGB(0x2A1D33))
+            fill(rect(0.1, 0.5, 0.74, 0.12), RGB(0x2A1D33), highlight: false)
+            for i in 0..<7 { fill(rect(0.12 + CGFloat(i) * 0.1, 0.5, 0.09, 0.08), RGB(0xFFF8EC), highlight: false) }
+            for x in [0.16, 0.78] { fill(rect(x, 0.62, 0.05, 0.3), RGB(0x2A1D33), highlight: false) }
+        case .yacht:
+            let hull = CGMutablePath()
+            hull.move(to: pt(0.04, 0.6)); hull.addLine(to: pt(0.96, 0.6)); hull.addLine(to: pt(0.82, 0.82))
+            hull.addLine(to: pt(0.16, 0.82)); hull.closeSubpath()
+            fill(hull, RGB(0xFFF8EC))
+            fill(rect(0.26, 0.42, 0.46, 0.18, round: 0.04), RGB(0xFFF8EC))
+            fill(rect(0.36, 0.28, 0.24, 0.14, round: 0.04), RGB(0xFFF8EC))
+            for x in [0.32, 0.46, 0.6] { fill(rect(x, 0.47, 0.08, 0.06, round: 0.02), RGB(0x5FC8FF), highlight: false) }
+            let wave = CGMutablePath(); wave.move(to: pt(0.02, 0.9)); wave.addQuadCurve(to: pt(0.98, 0.9), control: pt(0.5, 0.98))
+            stroke(wave, RGB(0x5FC8FF), width: line)
+        case .privateJet:
+            let body = CGMutablePath()
+            body.move(to: pt(0.04, 0.52)); body.addQuadCurve(to: pt(0.2, 0.42), control: pt(0.06, 0.42))
+            body.addLine(to: pt(0.86, 0.42)); body.addLine(to: pt(0.96, 0.24)); body.addLine(to: pt(0.96, 0.56))
+            body.addLine(to: pt(0.2, 0.6)); body.closeSubpath()
+            fill(body, RGB(0xFFF8EC))
+            let wing = CGMutablePath()
+            wing.move(to: pt(0.4, 0.56)); wing.addLine(to: pt(0.62, 0.56)); wing.addLine(to: pt(0.46, 0.84)); wing.addLine(to: pt(0.36, 0.84)); wing.closeSubpath()
+            fill(wing, RGB(0xC9CED8))
+            for i in 0..<5 { fill(oval(0.28 + CGFloat(i) * 0.1, 0.49, 0.025, 0.03), RGB(0x5FC8FF), highlight: false) }
+        case .diamondCrown:
+            let crown = CGMutablePath()
+            crown.move(to: pt(0.1, 0.8)); crown.addLine(to: pt(0.1, 0.3)); crown.addLine(to: pt(0.3, 0.52))
+            crown.addLine(to: pt(0.5, 0.18)); crown.addLine(to: pt(0.7, 0.52)); crown.addLine(to: pt(0.9, 0.3))
+            crown.addLine(to: pt(0.9, 0.8)); crown.closeSubpath()
+            fill(crown, RGB(0xFFC83D))
+            fill(rect(0.1, 0.72, 0.8, 0.12, round: 0.02), RGB(0xFFD84D), highlight: false)
+            for (x, col) in [(0.3, RGB(0xFF4D6D)), (0.5, RGB(0x5FC8FF)), (0.7, RGB(0x7EDC7A))] { fill(oval(x, 0.78, 0.05, 0.04), col, highlight: false) }
+            fill(star(0.5, 0.44, 0.09, 0.04), RGB(0xBFEFFF), highlight: false)
         }
     }
 }

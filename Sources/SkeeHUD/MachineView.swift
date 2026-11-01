@@ -79,7 +79,7 @@ struct MachineView: View {
                 HStack(spacing: 0) {
                     ForEach(0..<3, id: \.self) { reel in
                         PullReel(reel: reel, position: m.positions.indices.contains(reel) ? m.positions[reel] : 0,
-                                 teasing: m.teasing && reel == 2)
+                                 teasing: m.teasing && reel == 2, room: m.room)
                             .frame(width: cw, height: g.size.height)
                     }
                 }
@@ -142,6 +142,7 @@ struct PullReel: View {
     let reel: Int
     let position: Double
     var teasing = false
+    var room: Room = .boardwalk
     var body: some View {
         GeometryReader { g in
             let h = g.size.height / 3
@@ -150,7 +151,7 @@ struct PullReel: View {
             ZStack(alignment: .top) {
                 if teasing { Ink.butter.opacity(0.35) }
                 ForEach(-1..<4, id: \.self) { k in
-                    ReelSymbolView(symbol: Presentation.pullSymbol(reel: reel, at: base, row: k + Pull.strips[reel].count))
+                    ReelSymbolView(symbol: Presentation.pullSymbol(reel: reel, at: base, row: k + Pull.strips[reel].count, room: room))
                         .padding(6)
                         .frame(width: g.size.width, height: h)
                         .offset(y: (Double(k) - frac) * h)

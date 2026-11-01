@@ -411,8 +411,8 @@ public struct Presentation: Sendable {
     }
 
     /// Symbol at a fractional reel position and row offset, for drawing.
-    public static func pullSymbol(reel: Int, at position: Double, row: Int) -> ReelSymbol {
-        let strip = Pull.strips[reel]
+    public static func pullSymbol(reel: Int, at position: Double, row: Int, room: Room = .boardwalk) -> ReelSymbol {
+        let strip = room.strips[reel]
         let i = (Int(position.rounded(.down)) + row) % strip.count
         return strip[(i + strip.count) % strip.count]
     }

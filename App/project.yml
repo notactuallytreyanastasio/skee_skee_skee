@@ -6,6 +6,9 @@ options:
 packages:
   SkeeSkeeSkee:
     path: ..
+configFiles:
+  Debug: Base.xcconfig
+  Release: Base.xcconfig
 targets:
   SkeeSkeeSkee:
     type: application
@@ -20,12 +23,16 @@ targets:
         product: SkeeScene
       - package: SkeeSkeeSkee
         product: SkeeHUD
+      - package: SkeeSkeeSkee
+        product: SkeeNet
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.bobbygrayson.skeeskeeskee
         SWIFT_VERSION: "6.0"
         TARGETED_DEVICE_FAMILY: "1"
         GENERATE_INFOPLIST_FILE: YES
+        # Merged into the generated plist: carries DEEPSEEK_API_KEY in.
+        INFOPLIST_FILE: Info.plist
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
         INFOPLIST_KEY_UIStatusBarHidden: YES

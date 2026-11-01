@@ -98,9 +98,11 @@ public struct Pull: Hashable, Sendable, Codable {
     public var bet: Bet
     /// A free game: spun by the machine, cost nothing, scores double.
     public var free: Bool
+    /// Whose machine: each room's strips differ.
+    public var room: Room
 
-    public init(stops: [Int], bet: Bet, free: Bool = false) {
-        self.stops = stops; self.bet = bet; self.free = free
+    public init(stops: [Int], bet: Bet, free: Bool = false, room: Room = .boardwalk) {
+        self.stops = stops; self.bet = bet; self.free = free; self.room = room
     }
 
     /// Common symbols often, rich ones rarely. Reels 1 and 3 carry two
@@ -125,15 +127,16 @@ public struct Pull: Hashable, Sendable, Codable {
         [2, 1, 0],
     ]
 
-    public static func spin(bet: Bet, free: Bool = false, _ rng: inout SplitMix64) -> Pull {
-        Pull(stops: strips.map { rng.nextInt(below: $0.count) }, bet: bet, free: free)
+    public static func spin(bet: Bet, free: Bool = false, room: Room = .boardwalk, _ rng: inout SplitMix64) -> Pull {
+        Pull(stops: room.strips.map { rng.nextInt(below: $0.count) }, bet: bet, free: free, room: room)
     }
 
     /// `grid[row][reel]`, rows top to bottom.
     public var grid: [[ReelSymbol]] {
-        (0..<3).map { row in
+        let strips = room.strips
+        return (0..<3).map { row in
             (0..<3).map { reel in
-                let strip = Self.strips[reel]
+                let strip = strips[reel]
                 return strip[(stops[reel] + row) % strip.count]
             }
         }

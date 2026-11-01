@@ -5,6 +5,7 @@ import QuartzCore
 import SceneKit
 import SkeeCore
 import SkeeHUD
+import SkeeNet
 import SkeeRender
 import SkeeScene
 import UIKit
@@ -73,14 +74,29 @@ final class GameModel {
     var selectedCharm: Int?
     var fold: Double = 0
     /// Winnings and the prize shelf, across runs.
-    var wallet = WalletStore.load()
+    var wallet: Wallet
     var shopOpen = false
     /// The coached practice warm-up, while it runs. The real run waits in
     /// `parked` and comes back when the walkthrough ends or is skipped.
     var walkthrough: Walkthrough?
     @ObservationIgnored private var parked: (seed: UInt64, actions: [Action], state: RunState)?
 
-    @ObservationIgnored let cabinet = Cabinet()
+    @ObservationIgnored let cabinet: Cabinet
+    /// The comp negotiation, while the host is at the table.
+    var haggle: Haggle?
+    var hostThinking = false
+    var hostError: String?
+    @ObservationIgnored private let deepseek = DeepSeek(key: GameModel.deepseekKey)
+    /// The app swaps in a fresh model (new cabinet, new room) through this.
+    @ObservationIgnored var rebuild: (_ toGame: Bool) -> Void = { _ in }
+    @ObservationIgnored private var extraTickets = 0
+
+    /// Baked into Info.plist from App/Secrets.xcconfig at build time. An
+    /// unexpanded "$(...)" means the build had no key.
+    static var deepseekKey: String {
+        let k = Bundle.main.object(forInfoDictionaryKey: "DeepSeekAPIKey") as? String ?? ""
+        return k.hasPrefix("$(") ? "" : k
+    }
     @ObservationIgnored let presenter: ScenePresenter
     @ObservationIgnored let stage: Stage
     @ObservationIgnored let driver: RenderDriver
@@ -93,22 +109,32 @@ final class GameModel {
     @ObservationIgnored private var lastBall: (along: Double, x: Double, t: CFTimeInterval)?
     @ObservationIgnored private var autoplay: [Launch] = []
 
-    init() {
+    /// - Parameter fresh: start a new run in the wallet's room, ignoring
+    ///   the save (after changing rooms).
+    init(fresh: Bool = false, toGame: Bool = false) {
         let args = LaunchArguments()
         var seed = args.seed ?? UInt64(Date().timeIntervalSince1970)
         var s: RunState
         var actions: [Action] = []
-        if let saved = RunStore.load(), !args.fresh {
+        var wallet = WalletStore.load()
+        let room = wallet.room
+        cabinet = Cabinet(table: room.table, palette: .of(room))
+        if let saved = RunStore.load(), !args.fresh, !fresh, saved.room ?? .boardwalk == room {
             seed = saved.seed
-            s = newRun(seed: saved.seed)
+            extraTickets = saved.extraTickets ?? 0
+            s = newRun(seed: saved.seed, room: room, extraTickets: extraTickets)
             for a in saved.actions {
                 guard case .success(let step) = apply(a, to: s) else { break }
                 s = step.state
                 actions.append(a)
             }
         } else {
-            s = newRun(seed: seed)
+            extraTickets = wallet.checkIn()
+            WalletStore.save(wallet)
+            s = newRun(seed: seed, room: room, extraTickets: extraTickets)
+            RunStore.save(seed: seed, room: room, extraTickets: extraTickets, actions: [])
         }
+        self.wallet = wallet
         if let ante = args.ante { s.ante = ante; s.round.target = s.config.target(ante: ante, kind: .warmup) }
         self.seed = seed
         self.state = s
@@ -122,6 +148,7 @@ final class GameModel {
         // First time in this version: show the title, whose TAP TO PLAY
         // starts the walkthrough.
         if !WalkthroughStore.done && args.autoplay.isEmpty && !args.skipTitle { self.screen = .title }
+        if toGame { self.screen = .game }
         if let f = args.fold { fold = f }
         self.autoplay = args.autoplay
     }
@@ -177,6 +204,7 @@ final class GameModel {
            selectedOffer: selectedOffer, selectedCharm: selectedCharm, screen: screen, bet: affordableBet)
         hud.machine?.progressive = wallet.progressive
         hud.trail = trail
+        hud.host = haggle.map { HostState(haggle: $0, thinking: hostThinking, error: hostError) }
         hud.guide = canThrow ? presenter.guide(line: line, size: viewSize) : []
         hud.aiming = aiming
         hud.wallet = wallet
@@ -293,6 +321,12 @@ final class GameModel {
             send(.pull(affordableBet))
         }
         a.setBet = { [weak self] b in self?.bet = b; self?.haptics.tap() }
+        a.pickRoom = { [weak self] r in self?.pickRoom(r) }
+        a.openHost = { [weak self] in self?.openHost(); self?.haptics.tap() }
+        a.hostSay = { [weak self] t in self?.hostSay(t) }
+        a.hostRetry = { [weak self] in self?.askHost() }
+        a.hostDeal = { [weak self] in self?.hostDeal() }
+        a.closeHost = { [weak self] in self?.closeHost() }
         a.skipWalkthrough = { [weak self] in self?.endWalkthrough(); self?.haptics.tap() }
         a.gotIt = { [weak self] in
             guard let self else { return }
@@ -334,7 +368,7 @@ final class GameModel {
                 if case .throwBall = action { haptics.launch() } else { haptics.tap() }
                 return
             }
-            RunStore.save(seed: seed, actions: actions)
+            RunStore.save(seed: seed, room: state.room, extraTickets: extraTickets, actions: actions)
             // A finished run pays its winnings to the shelf, once.
             for e in step.events {
                 switch e {
@@ -352,7 +386,7 @@ final class GameModel {
     func startWalkthrough() {
         if walkthrough == nil { parked = (seed, actions, state) }
         walkthrough = Walkthrough()
-        state = practiceRun()
+        state = practiceRun(room: wallet.room)
         actions = []
         let fresh = Presentation(state: state)
         stage.with { $0 = fresh }
@@ -381,13 +415,81 @@ final class GameModel {
     func newGame() {
         seed = UInt64(Date().timeIntervalSince1970)
         actions = []
-        state = newRun(seed: seed)
+        extraTickets = wallet.checkIn()
+        WalletStore.save(wallet)
+        state = newRun(seed: seed, room: wallet.room, extraTickets: extraTickets)
         let fresh = Presentation(state: state)
         stage.with { $0 = fresh }
         selectedOffer = nil; selectedCharm = nil
         screen = .game
-        RunStore.save(seed: seed, actions: actions)
+        RunStore.save(seed: seed, room: wallet.room, extraTickets: extraTickets, actions: actions)
     }
+
+    // MARK: rooms and the host
+
+    /// Play in another room you own. The cabinet is rebuilt for it.
+    func pickRoom(_ r: Room) {
+        guard wallet.rooms.contains(r), r != wallet.room else { return }
+        wallet.room = r
+        WalletStore.save(wallet)
+        stop()
+        rebuild(false)
+    }
+
+    func openHost() {
+        guard let room = wallet.compDue else { return }
+        haggle = Haggle(room: room, seed: UInt64(Date().timeIntervalSince1970))
+        hostError = deepseek.key.isEmpty ? "The host can't be reached: this build has no DeepSeek key (run scripts/secrets.sh, then rebuild)." : nil
+    }
+
+    func hostSay(_ text: String) {
+        let t = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !t.isEmpty, !hostThinking, haggle?.status == .open else { return }
+        haggle?.say(t)
+        askHost()
+    }
+
+    /// Ask for the host's reply to the last thing said. Also the retry
+    /// after a failed call: the player's line is already on the table.
+    func askHost() {
+        guard let h = haggle, h.status == .open, h.lines.last?.speaker == .player else { return }
+        hostThinking = true
+        hostError = nil
+        let client = deepseek
+        Task {
+            do {
+                let reply = try await client.reply(in: h)
+                haggle?.hear(reply)
+                haptics.tap()
+                if let h = haggle, h.status != .open { settle(h) }
+            } catch {
+                hostError = "\(error)"
+                haptics.reject()
+            }
+            hostThinking = false
+        }
+    }
+
+    func hostDeal() {
+        guard haggle?.status == .open, !hostThinking else { return }
+        haggle?.accept()
+        haptics.prize()
+        if let h = haggle { settle(h) }
+    }
+
+    private func settle(_ h: Haggle) {
+        wallet.close(h)
+        WalletStore.save(wallet)
+    }
+
+    /// Leave the table. A finished deal checks you into the new room.
+    func closeHost() {
+        guard let h = haggle else { return }
+        haggle = nil
+        if h.status != .open { stop(); rebuild(true) }
+    }
+
+    func stop() { link?.invalidate(); link = nil }
 }
 
 /// CADisplayLink retains its target; this breaks the cycle.
@@ -450,12 +552,14 @@ enum WalletStore {
 
 /// The run on disk is the seed and the actions; replaying rebuilds it.
 enum RunStore {
-    struct File: Codable { var seed: UInt64; var actions: [Action] }
+    /// Room and comped tickets are optional so saves from before rooms
+    /// still load (as Boardwalk runs).
+    struct File: Codable { var seed: UInt64; var room: Room?; var extraTickets: Int?; var actions: [Action] }
     static var url: URL {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("run.json")
     }
-    static func save(seed: UInt64, actions: [Action]) {
-        if let data = try? JSONEncoder().encode(File(seed: seed, actions: actions)) { try? data.write(to: url) }
+    static func save(seed: UInt64, room: Room, extraTickets: Int, actions: [Action]) {
+        if let data = try? JSONEncoder().encode(File(seed: seed, room: room, extraTickets: extraTickets, actions: actions)) { try? data.write(to: url) }
     }
     static func load() -> File? {
         guard let data = try? Data(contentsOf: url) else { return nil }

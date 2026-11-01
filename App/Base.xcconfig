@@ -1,0 +1,4 @@
+// The DeepSeek key for the casino host lives in Secrets.xcconfig, which is
+// gitignored and written by scripts/secrets.sh. Without it the app still
+// builds; the host just can't be reached, and says so.
+#include? "Secrets.xcconfig"

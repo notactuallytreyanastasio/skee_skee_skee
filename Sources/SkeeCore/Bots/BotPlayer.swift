@@ -8,9 +8,9 @@ public struct BotRun: Sendable {
     public var events: [GameEvent]
 }
 
-public func playBotRun(seed: UInt64, skill: Skill, config: RunConfig = .standard,
+public func playBotRun(seed: UInt64, skill: Skill, config: RunConfig = .standard, room: Room = .boardwalk,
                        books: inout [Table: AimBook]) -> BotRun {
-    var s = newRun(seed: seed, config: config)
+    var s = newRun(seed: seed, config: config, room: room)
     var hand = SplitMix64(seed: seed ^ 0xB07)
     var actions: [Action] = []
     var events: [GameEvent] = []
@@ -62,9 +62,9 @@ public func playBotRun(seed: UInt64, skill: Skill, config: RunConfig = .standard
     return BotRun(final: s, actions: actions, events: events)
 }
 
-public func playBotRun(seed: UInt64, skill: Skill, config: RunConfig = .standard) -> BotRun {
+public func playBotRun(seed: UInt64, skill: Skill, config: RunConfig = .standard, room: Room = .boardwalk) -> BotRun {
     var books: [Table: AimBook] = [:]
-    return playBotRun(seed: seed, skill: skill, config: config, books: &books)
+    return playBotRun(seed: seed, skill: skill, config: config, room: room, books: &books)
 }
 
 private let Self_charmPreference: [Charm] = [

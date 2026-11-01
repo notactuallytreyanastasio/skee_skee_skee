@@ -9,6 +9,8 @@ import PackageDescription
 // SkeeScene is the 3D cabinet: SceneKit, cel-shaded with a port of the toon
 // kit from whats_going_through_your_mind. Builds on iOS and macOS so the CLI
 // can render the same frames headless.
+// SkeeNet is the network shell: the DeepSeek client that plays the casino
+// host. The rules of the haggle stay in SkeeCore.
 // `skee` is a macOS command-line shell around it for playing, mapping and
 // balancing the game headlessly. The iOS app (App/) is the other shell.
 let package = Package(
@@ -19,6 +21,7 @@ let package = Package(
         .library(name: "SkeeRender", targets: ["SkeeRender"]),
         .library(name: "SkeeScene", targets: ["SkeeScene"]),
         .library(name: "SkeeHUD", targets: ["SkeeHUD"]),
+        .library(name: "SkeeNet", targets: ["SkeeNet"]),
         .executable(name: "skee", targets: ["skee"]),
     ],
     targets: [
@@ -26,8 +29,9 @@ let package = Package(
         .target(name: "SkeeRender", dependencies: ["SkeeCore"]),
         .target(name: "SkeeScene", dependencies: ["SkeeCore", "SkeeRender"]),
         .target(name: "SkeeHUD", dependencies: ["SkeeCore", "SkeeRender", "SkeeScene"]),
-        .executableTarget(name: "skee", dependencies: ["SkeeCore", "SkeeRender", "SkeeScene", "SkeeHUD"]),
+        .target(name: "SkeeNet", dependencies: ["SkeeCore"]),
+        .executableTarget(name: "skee", dependencies: ["SkeeCore", "SkeeRender", "SkeeScene", "SkeeHUD", "SkeeNet"]),
         .testTarget(name: "SkeeCoreTests", dependencies: ["SkeeCore"]),
-        .testTarget(name: "SkeeRenderTests", dependencies: ["SkeeRender", "SkeeHUD"]),
+        .testTarget(name: "SkeeRenderTests", dependencies: ["SkeeRender", "SkeeHUD", "SkeeNet"]),
     ]
 )

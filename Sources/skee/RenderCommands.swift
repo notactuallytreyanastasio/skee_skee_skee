@@ -34,7 +34,9 @@ func writePNG(_ img: CGImage, _ path: String) {
 func presentationForSave(_ path: String?) -> (Presentation, RunState) {
     guard let path, let data = try? Data(contentsOf: URL(fileURLWithPath: path)),
           let file = try? JSONDecoder().decode(SaveFile.self, from: data) else {
-        let s = newRun(seed: 1)
+        // No save: a fresh run in --room, pulled once with --pulled.
+        var s = newRun(seed: 1, room: flag("room").flatMap(Room.init) ?? .boardwalk)
+        if has("pulled"), case .success(let step) = apply(.pull(.five), to: s) { s = step.state }
         return (Presentation(state: s), s)
     }
     var state = newRun(seed: file.seed)

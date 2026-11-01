@@ -154,6 +154,7 @@ func botCommand() {
 func balanceCommand() {
     let runs = Int(flag("runs") ?? "50") ?? 50
     let seed0 = UInt64(flag("seed") ?? "1000") ?? 1000
+    let room = flag("room").flatMap(Room.init) ?? .boardwalk
     var books: [Table: AimBook] = [:]
     for skill in skillsFromFlag() {
         var reached = [Int](repeating: 0, count: 10)
@@ -165,7 +166,7 @@ func balanceCommand() {
         var feverFrames = 0
         var ticketsEarned = 0, purchases = 0
         for k in 0..<runs {
-            let run = playBotRun(seed: seed0 + UInt64(k), skill: skill, books: &books)
+            let run = playBotRun(seed: seed0 + UInt64(k), skill: skill, room: room, books: &books)
             let s = run.final
             reached[min(s.ante, 9)] += 1
             if s.phase == .won { wins += 1 }

@@ -97,8 +97,10 @@ public struct Walkthrough: Hashable, Sendable, Codable {
 
 /// The walkthrough's warm-up: a fixed seed and a low target, so a first
 /// try clears it and sees the prize counter.
-public func practiceRun() -> RunState {
-    var s = newRun(seed: 2024)
+/// The practice round is played in whatever room the cabinet is: the
+/// physics has to match the board on screen.
+public func practiceRun(room: Room = .boardwalk) -> RunState {
+    var s = newRun(seed: 2024, room: room)
     s.round.target = Walkthrough.practiceTarget
     return s
 }

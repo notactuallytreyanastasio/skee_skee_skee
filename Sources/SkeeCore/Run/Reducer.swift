@@ -1,13 +1,15 @@
 /// Start a run. The first ante's boss is drawn immediately so it can be
 /// shown from the start.
-public func newRun(seed: UInt64, config: RunConfig = .standard) -> RunState {
+/// `extraTickets` are a comped night's: part of how the run starts, so a
+/// save (seed and actions) must carry them to replay exactly.
+public func newRun(seed: UInt64, config: RunConfig = .standard, room: Room = .boardwalk, extraTickets: Int = 0) -> RunState {
     var rng = SplitMix64(seed: seed)
     let boss = rng.pick(Boss.allCases)
     var s = RunState(
-        config: config, rng: rng, seed: seed, ante: 1, boss: boss,
+        config: config, room: room, rng: rng, seed: seed, ante: 1, boss: boss,
         round: RoundState(kind: .warmup, target: 0, framesTotal: 0),
-        phase: .throwing, setup: .standard, stops: [:], topSlot: .empty, charms: [], powerUps: [],
-        tickets: config.startTickets, heat: 0, fever: false, stats: RunStats())
+        phase: .throwing, setup: room.setup, stops: [:], topSlot: .empty, charms: [], powerUps: [],
+        tickets: config.startTickets + extraTickets, heat: 0, fever: false, stats: RunStats())
     s.round = freshRound(.warmup, in: s)
     spinReels(&s)
     return s
@@ -23,7 +25,7 @@ private func spinReels(_ s: inout RunState) {
 /// The table the next ball is thrown on: ante difficulty, then the boss (on
 /// boss rounds), then the armed power-up.
 public func table(for s: RunState) -> Table {
-    var t = difficultyTable(ante: s.ante, antes: s.config.antes)
+    var t = difficultyTable(ante: s.ante, base: s.room.table, antes: s.config.antes)
     if s.round.kind == .boss { t = s.boss.modify(t) }
     if let p = s.round.armed { t = p.modify(t) }
     return t
@@ -57,7 +59,7 @@ private func pull(_ bet: Bet, _ s0: RunState) -> Result<Step, ActionError> {
     var s = s0
     s.tickets -= bet.cost
     s.round.lastBet = bet
-    return .success(spin(Pull.spin(bet: bet, &s.rng), s))
+    return .success(spin(Pull.spin(bet: bet, room: s.room, &s.rng), s))
 }
 
 private func spin(_ p: Pull, _ s0: RunState) -> Step {
@@ -154,7 +156,7 @@ private func finishBall(_ s0: RunState, _ events0: [GameEvent]) -> Step {
         // A free game: the machine pulls for you, at the bet that won it.
         guard s.round.freeLeft > 0 else { return Step(state: s, events: events) }
         s.round.freeLeft -= 1
-        let step = spin(Pull.spin(bet: s.round.lastBet, free: true, &s.rng), s)
+        let step = spin(Pull.spin(bet: s.round.lastBet, free: true, room: s.room, &s.rng), s)
         return Step(state: step.state, events: events + step.events)
     }
     return endRound(s, events)

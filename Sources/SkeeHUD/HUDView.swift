@@ -21,6 +21,12 @@ public struct HUDActions {
     public var howToPlay: () -> Void = {}
     public var pull: () -> Void = {}
     public var setBet: (Bet) -> Void = { _ in }
+    public var pickRoom: (Room) -> Void = { _ in }
+    public var openHost: () -> Void = {}
+    public var hostSay: (String) -> Void = { _ in }
+    public var hostRetry: () -> Void = {}
+    public var hostDeal: () -> Void = {}
+    public var closeHost: () -> Void = {}
     public init() {}
 }
 
@@ -106,7 +112,8 @@ public struct HUDView: View {
         GeometryReader { geo in
             ZStack {
                 if state.screen == .title {
-                    TitleCard(start: actions.start, shop: actions.openShop, howToPlay: actions.howToPlay, wallet: state.wallet)
+                    TitleCard(start: actions.start, shop: actions.openShop, howToPlay: actions.howToPlay, wallet: state.wallet,
+                              pickRoom: actions.pickRoom, host: actions.openHost)
                 } else {
                     VStack(spacing: 6) {
                         topBar
@@ -149,7 +156,7 @@ public struct HUDView: View {
                     }
                     if let over = state.over {
                         GameOverView(won: over.won, stats: over.stats, ante: state.ante, wallet: state.wallet,
-                                     newRun: actions.newRun, shop: actions.openShop)
+                                     newRun: actions.newRun, shop: actions.openShop, host: actions.openHost)
                             .position(x: geo.size.width / 2, y: geo.size.height * 0.5)
                     }
                 }
@@ -167,6 +174,9 @@ public struct HUDView: View {
                 }
                 if state.shopOpen {
                     PrizeShopView(wallet: state.wallet, buy: actions.buyPrize, close: actions.closeShop)
+                }
+                if let host = state.host {
+                    HostView(host: host, say: actions.hostSay, retry: actions.hostRetry, deal: actions.hostDeal, close: actions.closeHost)
                 }
             }
         }
@@ -455,6 +465,8 @@ struct TitleCard: View {
     let shop: () -> Void
     let howToPlay: () -> Void
     let wallet: Wallet
+    let pickRoom: (Room) -> Void
+    let host: () -> Void
     var body: some View {
         ZStack {
             // Tap anywhere to play; the shop button sits on top of that.
@@ -472,9 +484,9 @@ struct TitleCard: View {
                 Pill(fill: Ink.mint, radius: 22) { CelText(text: "TAP TO PLAY", size: 28) }
                     .allowsHitTesting(false)
                 VStack(spacing: 2) {
-                    CelText(text: "flick the ball up the lane", size: 15)
-                    CelText(text: "don't drag past the crease", size: 15, fill: Ink.butter)
-                    CelText(text: "fold the phone for a steeper ramp", size: 13)
+                    CelText(text: wallet.room.name.uppercased(), size: 17, fill: Ink.butter)
+                    CelText(text: wallet.room.blurb, size: 12)
+                        .multilineTextAlignment(.center).frame(maxWidth: 320)
                 }
                 .allowsHitTesting(false)
                 HStack(spacing: 10) {
@@ -487,6 +499,7 @@ struct TitleCard: View {
                     }
                     .buttonStyle(.plain)
                 }
+                RoomPicker(wallet: wallet, pick: pickRoom, host: host)
                 PrizeShelfStrip(owned: wallet.owned).allowsHitTesting(false)
                 Spacer().frame(height: 60)
             }
@@ -502,6 +515,7 @@ struct GameOverView: View {
     let wallet: Wallet
     let newRun: () -> Void
     let shop: () -> Void
+    let host: () -> Void
     var body: some View {
         Pill(fill: won ? Ink.mint : Ink.pink, radius: 26) {
             VStack(spacing: 10) {
@@ -521,6 +535,12 @@ struct GameOverView: View {
                     .buttonStyle(.plain)
                 }
                 .padding(.top, 6)
+                if let due = wallet.compDue {
+                    Button(action: host) {
+                        Pill(fill: Ink.butter, radius: 16) { CelText(text: "THE HOST WANTS A WORD · \(due.name.uppercased())", size: 13) }
+                    }
+                    .buttonStyle(.plain)
+                }
             }
             .padding(16)
         }

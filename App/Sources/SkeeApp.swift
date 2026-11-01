@@ -12,9 +12,21 @@ struct SkeeApp: App {
     var body: some Scene {
         WindowGroup {
             GameView(model: model)
+                // A new room is a new cabinet: a new model, a new SCNView.
+                .id(ObjectIdentifier(model))
+                .onAppear { wire(model) }
                 .ignoresSafeArea()
                 .statusBarHidden()
                 .persistentSystemOverlays(.hidden)
+        }
+    }
+
+    /// Changing rooms swaps in a model built for the new room.
+    func wire(_ m: GameModel) {
+        m.rebuild = { toGame in
+            let next = GameModel(fresh: true, toGame: toGame)
+            wire(next)
+            model = next
         }
     }
 }

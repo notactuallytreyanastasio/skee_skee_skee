@@ -16,6 +16,7 @@ struct PrizeShopView: View {
             StripeBackdrop().ignoresSafeArea()
             VStack(spacing: 10) {
                 CelText(text: "PRIZE SHOP", size: 32, fill: Ink.butter)
+                CelText(text: wallet.room.name.uppercased(), size: 13)
                 Pill(fill: Ink.butter) {
                     HStack(spacing: 6) {
                         StarShape().fill(Ink.cream).overlay(StarShape().stroke(Ink.ink, lineWidth: 2)).frame(width: 20, height: 20)
@@ -25,7 +26,8 @@ struct PrizeShopView: View {
                 CelText(text: "just for show · prizes never change a run", size: 11)
                 // A fixed grid, three to a shelf: ten prizes fit on the
                 // folded screen without scrolling.
-                let rows = stride(from: 0, to: Prize.allCases.count, by: 3).map { Array(Prize.allCases[$0..<min($0 + 3, Prize.allCases.count)]) }
+                let shelf = wallet.room.prizes
+                let rows = stride(from: 0, to: shelf.count, by: 3).map { Array(shelf[$0..<min($0 + 3, shelf.count)]) }
                 VStack(spacing: 8) {
                     ForEach(rows.indices, id: \.self) { r in
                         HStack(spacing: 8) {

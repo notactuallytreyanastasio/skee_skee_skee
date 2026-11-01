@@ -9,3 +9,7 @@ xcuserdata/
 DerivedData/
 .prs/
 /out/
+
+# DeepSeek key for the casino host: never committed. scripts/secrets.sh writes both.
+.env
+App/Secrets.xcconfig

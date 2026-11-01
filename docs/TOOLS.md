@@ -58,6 +58,9 @@ skee frame --save run.json --settle --select 2      # prize counter, stamp selec
 skee frame --shop [--title] --size outer           # prize shop (or title) with a sample shelf
 skee frame --coach 3 --size outer                  # walkthrough card for step 3 (0...6)
 skee frame --line 0.6                              # waiting ball on a release line, with its guide
+skee frame --room penthouse --pulled               # a room's cabinet, machine already pulled at max bet
+skee frame --host                                  # the host's table mid-haggle (canned, no network)
+skee frame --title                                 # title with the room picker and a host invitation
 skee frame --title
 skee scenefilm --save run.json --from 0.5 --frames 8 --dt 0.12   # contact sheet
 ```
@@ -82,3 +85,17 @@ Launch arguments: `-seed`, `-fresh`, `-ante` (to see a later era), `-fold`,
 The simulator boots the Duo folded. `--display=LCD` captures the outer display;
 the inner one (`LCD-1`) stays black until the device is unfolded, and there is
 no `simctl` command to unfold it.
+
+## The host, live
+
+```
+scripts/secrets.sh                                 # copy the DeepSeek key from ../marginalia/.env (gitignored)
+skee haggle --room neonLounge                      # talk to the host on stdin; "deal" accepts
+skee haggle --room highRoller --say "MORE|more!!"  # scripted; prints what the model asked for and what the rules allowed
+skee balance --room neonLounge                     # bots in a room
+skee windows --room penthouse                      # hole windows on a room's board
+```
+
+Each haggle turn prints the reply time, the model's mood, the offer it asked
+for, and the offer the rules allowed. A model that overreaches shows up as
+the two differing.

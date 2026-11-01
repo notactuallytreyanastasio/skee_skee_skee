@@ -44,9 +44,12 @@ struct PrizeShelfTests {
         #expect(w.buy(.sticker) == .failure(.alreadyOwned))
     }
 
-    @Test func pricesClimb() {
-        let prices = Prize.allCases.map(\.price)
-        #expect(prices == prices.sorted())
+    @Test func pricesClimbOnEveryRoomsShelf() {
+        for room in Room.allCases {
+            let prices = room.prizes.map(\.price)
+            #expect(prices == prices.sorted())
+        }
+        #expect(Set(Room.allCases.flatMap(\.prizes)) == Set(Prize.allCases))
         #expect(Set(Prize.allCases.map(\.name)).count == Prize.allCases.count)
     }
 

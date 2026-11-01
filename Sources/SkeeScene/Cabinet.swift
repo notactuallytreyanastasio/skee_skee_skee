@@ -35,17 +35,10 @@ public final class Cabinet: @unchecked Sendable {
     public private(set) var marqueeTop: SIMD3<Float> = .zero
     let kit = ToonKit()
 
-    // Palette: pastel arcade, ink outlines.
-    static let backdrop: UInt32 = 0xFFE9F6
-    static let rail: UInt32 = 0x9B83F2
-    static let railDark: UInt32 = 0x6F55D6
-    static let cabinet: UInt32 = 0xFF6FA5
-    static let zones: [UInt32] = [0xFFD84D, 0x5FC8FF, 0xFF7FAE, 0x7EDC7A]   // 40 cup outward to 10
-    static let lip: UInt32 = 0xFFFAF0
-    static let hole: UInt32 = 0x2A1D33
-    static let felt: UInt32 = 0x6C5BD8
+    public let palette: CabinetPalette
 
-    public init(table: Table = .standard) {
+    public init(table: Table = .standard, palette: CabinetPalette = .boardwalk) {
+        self.palette = palette
         world = World(table: table)
         let r = CGFloat(world.ballRadius)
         let ballGeo = SCNSphere(radius: r)
@@ -67,7 +60,7 @@ public final class Cabinet: @unchecked Sendable {
     }
 
     func build() {
-        scene.background.contents = hex(Self.backdrop)
+        scene.background.contents = hex(palette.backdrop)
         let root = scene.rootNode
         let w = world
         let laneW = Float(w.table.lane.width)
@@ -76,7 +69,7 @@ public final class Cabinet: @unchecked Sendable {
         // A big plane, not SCNFloor: SCNFloor sets up a reflection pass that
         // logs an error every frame when reflectivity is zero.
         let floor = SCNPlane(width: 30, height: 30)
-        floor.materials = [Toon.material(hex(0xE7B8D9))]
+        floor.materials = [Toon.material(hex(palette.floor))]
         let floorNode = SCNNode(geometry: floor)
         floorNode.simdEulerAngles.x = -.pi / 2
         floorNode.position = v3(0, -0.45, 0)
@@ -99,12 +92,12 @@ public final class Cabinet: @unchecked Sendable {
 
         // Rails along both sides, and the cabinet body underneath.
         for sx: Float in [-1, 1] {
-            let rail = kit.part(Geo.box, Self.rail, scale: v3(0.07, 0.11, w.laneLength + 0.1), parent: laneNode, outline: 0.03)
+            let rail = kit.part(Geo.box, palette.rail, scale: v3(0.07, 0.11, w.laneLength + 0.1), parent: laneNode, outline: 0.03)
             rail.position = v3(sx * (laneW / 2 + 0.035), 0.04, 0)
-            let cap = kit.part(Geo.box, Self.railDark, scale: v3(0.08, 0.025, w.laneLength + 0.12), parent: laneNode, outline: 0.03)
+            let cap = kit.part(Geo.box, palette.railDark, scale: v3(0.08, 0.025, w.laneLength + 0.12), parent: laneNode, outline: 0.03)
             cap.position = v3(sx * (laneW / 2 + 0.035), 0.1, 0)
         }
-        let body = kit.part(Geo.box, Self.cabinet, scale: v3(laneW + 0.2, 0.42, w.laneLength + 0.1), parent: laneNode, outline: 0.03)
+        let body = kit.part(Geo.box, palette.cabinet, scale: v3(laneW + 0.2, 0.42, w.laneLength + 0.1), parent: laneNode, outline: 0.03)
         body.position = v3(0, -0.24, 0)
 
         // The hump: a rounded ridge across the lane at the hinge.
@@ -144,7 +137,7 @@ public final class Cabinet: @unchecked Sendable {
         let bw = Float(b.width), bh = Float(b.height)
 
         // Backing panel.
-        let panel = kit.part(Geo.box, Self.felt, scale: v3(bw + 0.02, bh + 0.02, 0.05), parent: board, outline: 0.03)
+        let panel = kit.part(Geo.box, palette.felt, scale: v3(bw + 0.02, bh + 0.02, 0.05), parent: board, outline: 0.03)
         panel.position = v3(0, bh / 2, -0.026)
 
         // Concentric ring zones, painted, outermost first; then raised lips.
@@ -152,7 +145,7 @@ public final class Cabinet: @unchecked Sendable {
         for (i, wall) in b.ringWalls.enumerated().reversed() {
             let disc = SCNCylinder(radius: CGFloat(wall), height: 0.002)
             disc.radialSegmentCount = 96
-            disc.materials = [kit.mat(Self.zones[i])]
+            disc.materials = [kit.mat(palette.zones[i])]
             let n = SCNNode(geometry: disc)
             n.simdEulerAngles.x = .pi / 2
             n.position = v3(Float(c.x), Float(c.y), 0.001 + Float(3 - i) * 0.0004)
@@ -165,7 +158,7 @@ public final class Cabinet: @unchecked Sendable {
             let gapHalf = asin(min(0.95, Float(b.ringHoleVisual + 0.006) / Float(wall)))
             let g = Shapes.lipArc(ring: Float(wall), tube: 0.0085, height: Float(b.lipHeight),
                                   gapAt: -.pi / 2, gapHalf: gapHalf)
-            g.materials = [kit.mat(Self.lip)]
+            g.materials = [kit.mat(palette.lip)]
             let n = SCNNode(geometry: g)
             n.position = v3(Float(c.x), Float(c.y), 0)
             Toon.outline(n, thick: 0.022)
@@ -182,7 +175,7 @@ public final class Cabinet: @unchecked Sendable {
             let pit = SCNCylinder(radius: CGFloat(radius), height: 0.002)
             pit.radialSegmentCount = 48
             let pm = Toon.material(Textures.pit)
-            pit.materials = [kit.mat(Self.hole), pm, kit.mat(Self.hole)]
+            pit.materials = [kit.mat(palette.hole), pm, kit.mat(palette.hole)]
             let pn = SCNNode(geometry: pit)
             pn.simdEulerAngles.x = .pi / 2
             pn.position = v3(Float(p.x), Float(p.y), 0.004)
@@ -215,10 +208,10 @@ public final class Cabinet: @unchecked Sendable {
 
         // Side walls and backwall.
         for sx: Float in [-1, 1] {
-            let wall = kit.part(Geo.box, Self.rail, scale: v3(0.04, bh + 0.04, 0.16), parent: board, outline: 0.03)
+            let wall = kit.part(Geo.box, palette.rail, scale: v3(0.04, bh + 0.04, 0.16), parent: board, outline: 0.03)
             wall.position = v3(sx * (bw / 2 + 0.02), bh / 2, 0.06)
         }
-        let back = kit.part(Geo.box, Self.railDark, scale: v3(bw + 0.08, 0.05, 0.18), parent: board, outline: 0.03)
+        let back = kit.part(Geo.box, palette.railDark, scale: v3(bw + 0.08, 0.05, 0.18), parent: board, outline: 0.03)
         back.position = v3(0, bh + 0.02, 0.07)
     }
 
@@ -229,7 +222,7 @@ public final class Cabinet: @unchecked Sendable {
         marquee.simdPosition = top + SIMD3(0, 0.15, 0)
         marquee.simdEulerAngles.x = -0.2
         scene.rootNode.addChildNode(marquee)
-        kit.part(Geo.box, Self.cabinet, scale: v3(0.86, 0.36, 0.08), parent: marquee, outline: 0.03)
+        kit.part(Geo.box, palette.cabinet, scale: v3(0.86, 0.36, 0.08), parent: marquee, outline: 0.03)
         marqueeTop = marquee.simdPosition + SIMD3(0, 0.18, 0)
         let title = SCNPlane(width: 0.74, height: 0.18)
         let tm = Toon.material(Textures.marqueeTitle()); tm.transparencyMode = .aOne
@@ -256,7 +249,7 @@ public final class Cabinet: @unchecked Sendable {
         let w = world
         let laneW = Float(w.table.lane.width)
         // Return channel across the cabinet front, below the release line.
-        let trough = kit.part(Geo.box, Self.railDark, scale: v3(laneW + 0.12, 0.035, 0.09), parent: scene.rootNode, outline: 0.03)
+        let trough = kit.part(Geo.box, palette.railDark, scale: v3(laneW + 0.12, 0.035, 0.09), parent: scene.rootNode, outline: 0.03)
         trough.simdPosition = w.lane(x: 0, s: -0.2) + SIMD3(0, -0.06, 0.02)
         for i in 0..<12 {
             let g = SCNSphere(radius: CGFloat(w.ballRadius)); g.segmentCount = 32
@@ -393,5 +386,46 @@ public final class Cabinet: @unchecked Sendable {
 
     public func setWaiting(_ n: Int) {
         for (i, b) in waiting.enumerated() { b.isHidden = i >= n }
+    }
+}
+
+/// A room's colours. Same cel look, ink outlines everywhere; each room
+/// repaints the wood, the rails and the rings.
+public struct CabinetPalette: Hashable, Sendable {
+    public var backdrop: UInt32
+    public var rail: UInt32
+    public var railDark: UInt32
+    public var cabinet: UInt32
+    /// Ring zones, the 40 cup outward to the 10.
+    public var zones: [UInt32]
+    public var lip: UInt32
+    public var hole: UInt32
+    public var felt: UInt32
+    public var floor: UInt32
+
+    /// Pastel arcade.
+    public static let boardwalk = CabinetPalette(
+        backdrop: 0xFFE9F6, rail: 0x9B83F2, railDark: 0x6F55D6, cabinet: 0xFF6FA5,
+        zones: [0xFFD84D, 0x5FC8FF, 0xFF7FAE, 0x7EDC7A], lip: 0xFFFAF0, hole: 0x2A1D33, felt: 0x6C5BD8, floor: 0xE7B8D9)
+    /// Night club: deep blue room, hot pink and cyan.
+    public static let neonLounge = CabinetPalette(
+        backdrop: 0x2B2350, rail: 0x3DE3FF, railDark: 0x1E9DBF, cabinet: 0xFF3EA5,
+        zones: [0xFFF04D, 0xFF3EA5, 0x3DE3FF, 0x8A5CFF], lip: 0xFFFFFF, hole: 0x120C24, felt: 0x2A1E5C, floor: 0x3A2E6E)
+    /// Green baize and brass.
+    public static let highRoller = CabinetPalette(
+        backdrop: 0xF3E6C8, rail: 0xC9A045, railDark: 0x8C6A22, cabinet: 0x2E6B4A,
+        zones: [0xFFD84D, 0xE8C27A, 0x9ED1A8, 0x4E9C6E], lip: 0xFFF6DD, hole: 0x1D1A14, felt: 0x1F5A3C, floor: 0x8C2F3A)
+    /// Sunset over the city: coral, gold, cream.
+    public static let penthouse = CabinetPalette(
+        backdrop: 0xFFD9C2, rail: 0xF2B84B, railDark: 0xC27A2C, cabinet: 0xFFFFFF,
+        zones: [0xFFC83D, 0xFF8A65, 0xFFB3C1, 0x9FD6E8], lip: 0xFFFDF5, hole: 0x2A1D33, felt: 0xE85D6F, floor: 0xE9C9A8)
+
+    public static func of(_ room: Room) -> CabinetPalette {
+        switch room {
+        case .boardwalk: .boardwalk
+        case .neonLounge: .neonLounge
+        case .highRoller: .highRoller
+        case .penthouse: .penthouse
+        }
     }
 }

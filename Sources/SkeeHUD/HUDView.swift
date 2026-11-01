@@ -141,6 +141,7 @@ public struct HUDView: View {
 
                     sideTrays(geo.size)
                     meter(geo.size)
+                    guide()
                     trail()
                     // The slot sits on the backboard under the rings: up top
                     // it hid the pockets and the 50, the symbols that matter most.
@@ -153,8 +154,8 @@ public struct HUDView: View {
                     if let b = state.banner { BannerView(banner: b).position(x: geo.size.width / 2, y: geo.size.height * 0.3).allowsHitTesting(false) }
                     if state.firstThrow && !state.busy && state.counter == nil && state.coach == nil {
                         VStack(spacing: 2) {
-                            CelText(text: "flick up the lane", size: 20)
-                            CelText(text: "don't drag past the crease", size: 15, fill: Ink.butter)
+                            CelText(text: "thumb down on your line", size: 20)
+                            CelText(text: "then flick straight up", size: 15, fill: Ink.butter)
                         }
                         .position(x: geo.size.width / 2, y: geo.size.height * 0.62)
                         .allowsHitTesting(false)
@@ -300,6 +301,21 @@ public struct HUDView: View {
         }
         .frame(height: h, alignment: .bottom)
         .position(x: size.width - 14, y: size.height * 0.62)
+        .allowsHitTesting(false)
+    }
+
+    /// Dashes from the ball straight up its line: where a straight flick
+    /// goes. Brighter while the thumb is down.
+    func guide() -> some View {
+        Canvas { ctx, _ in
+            guard let first = state.guide.first else { return }
+            var p = Path(); p.move(to: first)
+            for q in state.guide.dropFirst() { p.addLine(to: q) }
+            let a = state.aiming ? 0.9 : 0.4
+            let dash = StrokeStyle(lineWidth: 4, lineCap: .round, dash: [2, 12])
+            ctx.stroke(p, with: .color(Ink.ink.opacity(a * 0.6)), style: StrokeStyle(lineWidth: 8, lineCap: .round, dash: [2, 12]))
+            ctx.stroke(p, with: .color(Ink.cream.opacity(a)), style: dash)
+        }
         .allowsHitTesting(false)
     }
 

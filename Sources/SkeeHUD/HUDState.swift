@@ -53,6 +53,11 @@ public struct HUDState: Sendable {
     public var shopOpen = false
     /// The thumb's recent path, for a fading trail. Age 0...1.
     public var trail: [(CGPoint, Double)] = []
+    /// The waiting ball's line: a straight flick rolls along it and lands
+    /// somewhere on it. Screen points from the ball up the lane and the
+    /// board; empty when not throwing. `aiming` while the thumb is down.
+    public var guide: [CGPoint] = []
+    public var aiming = false
 
     public struct Hint: Sendable {
         public var text: String

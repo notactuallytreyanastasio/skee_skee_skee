@@ -1,3 +1,4 @@
+import CoreHaptics
 import Foundation
 import Observation
 import QuartzCore
@@ -149,11 +150,14 @@ final class GameModel {
         let now = CACurrentMediaTime()
         if let b = p.ball, b.phase != .air || b.height < 0.003 {
             if let l = lastBall, now > l.t {
-                let speed = abs(b.along - l.along) / (now - l.t)
-                sound.setRumble(Float(min(1, speed / 4)) * (p.isBusy ? 1 : 0))
+                // Screen speed is slowed by the roll's pace; undo that.
+                let speed = abs(b.along - l.along) / (now - l.t) * Presentation.rollSpeed
+                let level = min(1, speed / 4) * (p.isBusy ? 1 : 0)
+                sound.setRumble(Float(level))
+                haptics.rumble(b.phase == .lane ? level : b.phase == .board ? level * 0.5 : 0)
             }
             lastBall = (b.along, b.x, now)
-        } else { sound.setRumble(0); lastBall = nil }
+        } else { sound.setRumble(0); haptics.rumble(0); lastBall = nil }
         sound.setDrumRoll(p.anticipation > 0)
         refreshHUD(p)
         if !p.isBusy, case .throwing = state.phase, !autoplay.isEmpty {
@@ -172,6 +176,8 @@ final class GameModel {
         }, center: CGPoint(x: size.width / 2, y: size.height * 0.2),
            selectedOffer: selectedOffer, selectedCharm: selectedCharm, screen: screen)
         hud.trail = trail
+        hud.guide = canThrow ? presenter.guide(line: line, size: viewSize) : []
+        hud.aiming = aiming
         hud.wallet = wallet
         hud.shopOpen = shopOpen
         if let w = walkthrough, !w.finished {
@@ -184,6 +190,10 @@ final class GameModel {
 
     @ObservationIgnored private var flickSamples: [FlickSample] = []
     @ObservationIgnored private var trailPoints: [(CGPoint, CFTimeInterval)] = []
+    /// The waiting ball's release line, -1...1. Kept between throws, so a
+    /// line that worked is still there for the next ball.
+    @ObservationIgnored private var line = 0.0
+    @ObservationIgnored private var aiming = false
 
     var geometry: FlickGeometry { presenter.flickGeometry(size: viewSize) }
     var busy: Bool { stage.with { $0.isBusy } }
@@ -193,10 +203,14 @@ final class GameModel {
         return false
     }
 
-    /// The ball waits at the line; the flick is read whole after lift-off.
+    /// The ball slides under the thumb as it lands: that is the line. The
+    /// flick is read whole after lift-off.
     func touchBegan(t: Double, x: Double, y: Double) {
         if busy { stage.with { $0.skip() }; return }
         guard canThrow, y > geometry.creaseY else { return }
+        line = laneStart(touchX: x, in: geometry)
+        aiming = true
+        placeBall()
         flickSamples = [FlickSample(t: t, x: x, y: y)]
         trailPoints = [(CGPoint(x: x, y: y), CACurrentMediaTime())]
     }
@@ -210,6 +224,7 @@ final class GameModel {
         if crossedFoulLine(new, in: geometry) {
             // Dragged well past the crease: foul.
             flickSamples = []
+            aiming = false
             haptics.foul()
             send(.foul)
         }
@@ -220,6 +235,7 @@ final class GameModel {
         flickSamples += touches.map { FlickSample(t: $0.t, x: $0.x, y: $0.y) }
         let outcome = analyzeFlick(flickSamples, in: geometry, fold: fold)
         flickSamples = []
+        aiming = false
         switch outcome {
         case .none: break
         case .foul: haptics.foul(); send(.foul)
@@ -227,7 +243,9 @@ final class GameModel {
         }
     }
 
-    func touchCancelled() { flickSamples = [] }
+    func touchCancelled() { flickSamples = []; aiming = false }
+
+    func placeBall() { stage.setHeld(presenter.waitingBall(line: line)) }
 
     var trail: [(CGPoint, Double)] {
         let now = CACurrentMediaTime()
@@ -440,6 +458,45 @@ final class Haptics {
     private let rigid = UIImpactFeedbackGenerator(style: .rigid)
     private let note = UINotificationFeedbackGenerator()
 
+    /// A continuous buzz that follows the ball while it rolls: the alley
+    /// under your hand. Impact taps alone left the roll silent in the hand.
+    private var engine: CHHapticEngine?
+    private var player: CHHapticAdvancedPatternPlayer?
+    private var level = 0.0
+
+    init() {
+        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
+        engine = try? CHHapticEngine()
+        engine?.resetHandler = { [weak self] in self?.player = nil; try? self?.engine?.start() }
+        engine?.stoppedHandler = { [weak self] _ in self?.player = nil }
+        try? engine?.start()
+    }
+
+    /// 0 stops; 0...1 sets how hard the ball is rumbling.
+    func rumble(_ to: Double) {
+        guard let engine else { return }
+        if to < 0.05 {
+            if player != nil { try? player?.stop(atTime: CHHapticTimeImmediate); player = nil }
+            level = 0
+            return
+        }
+        if player == nil {
+            let buzz = CHHapticEvent(eventType: .hapticContinuous, parameters: [
+                CHHapticEventParameter(parameterID: .hapticIntensity, value: 1),
+                CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.12),
+            ], relativeTime: 0, duration: 20)
+            guard let pattern = try? CHHapticPattern(events: [buzz], parameters: []) else { return }
+            try? engine.start()
+            player = try? engine.makeAdvancedPlayer(with: pattern)
+            try? player?.start(atTime: CHHapticTimeImmediate)
+            level = -1
+        }
+        guard abs(to - level) > 0.03 else { return }
+        level = to
+        try? player?.sendParameters([CHHapticDynamicParameter(parameterID: .hapticIntensityControl, value: Float(0.2 + 0.55 * to), relativeTime: 0)],
+                                    atTime: CHHapticTimeImmediate)
+    }
+
     func tap() { light.impactOccurred() }
     func launch() { rigid.impactOccurred(intensity: 0.7) }
     func reject() { note.notificationOccurred(.warning) }
@@ -449,7 +506,9 @@ final class Haptics {
     /// Light taps timed to the ball: the hump, rattles, the drop.
     func cue(_ c: Cue) {
         switch c {
-        case .hump: rigid.impactOccurred(intensity: 0.6)
+        // The hop: the one hard knock in the throw, then silence in the air.
+        case .hump: rumble(0); heavy.impactOccurred(intensity: 1)
+        case .landed: heavy.impactOccurred(intensity: 0.6)
         case .lip: light.impactOccurred(intensity: 0.8)
         case .drop(let h): heavy.impactOccurred(intensity: min(1, 0.45 + CGFloat(h.faceValue) / 110))
         case .reelStop: light.impactOccurred(intensity: 0.4)

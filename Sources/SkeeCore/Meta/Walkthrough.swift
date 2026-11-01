@@ -74,7 +74,7 @@ public struct Walkthrough: Hashable, Sendable, Codable {
         case .flick:
             lastWasFoul
                 ? CoachCard(title: "FOUL", body: "That was a foul: your thumb went past the line. Flick and let go before it; the ball does the rest.", needsTap: false, high: false)
-                : CoachCard(title: "FLICK IT", body: "Swipe up the lane and let go. A faster flick rolls farther. Aim for the middle.", needsTap: false, high: false)
+                : CoachCard(title: "FLICK IT", body: "Put your thumb down where you want the ball: it rolls up that dotted line. Then flick straight up and let go. Faster rolls farther.", needsTap: false, high: false)
         case .symbols:
             CoachCard(title: "HOLES ARE REELS", body: "Every hole shows a symbol. Your ball takes the symbol of the hole it drops in. Throw again.", needsTap: false, high: false)
         case .line:

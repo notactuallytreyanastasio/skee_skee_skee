@@ -218,6 +218,25 @@ public final class ScenePresenter: @unchecked Sendable {
                              laneHalfWidth: Double(r.x - l.x) / 2 * Double(size.width))
     }
 
+    /// Where the waiting ball sits for a release line -1...1 (as
+    /// `Launch.start`): the physics' lane x, a little up from the bottom.
+    public func waitingBall(line: Double) -> SIMD3<Float> {
+        world.lane(x: laneX(line), s: 0.12) + world.laneNormal * world.ballRadius
+    }
+
+    func laneX(_ line: Double) -> Double { line * (world.table.lane.width / 2 - Double(world.ballRadius)) }
+
+    /// Screen points along a release line: up the lane, over the hump, up
+    /// the board. A straight flick rolls along it and lands on it.
+    public func guide(line: Double, size: CGSize) -> [CGPoint] {
+        let a = Float(size.width / size.height), x = laneX(line), L = world.table.lane.length
+        return [world.lane(x: x, s: 0.24), world.lane(x: x, s: L), world.board(Vec2(x, 0)), world.board(Vec2(x, world.table.board.height - 0.04))]
+            .map { p in
+                let f = rig.project(p, aspect: a)
+                return CGPoint(x: CGFloat(f.x) * size.width, y: CGFloat(f.y) * size.height)
+            }
+    }
+
     /// Physics lane coordinates (x across, s up the lane) of a scene point
     /// on the lane.
     public func laneCoordinates(_ p: SIMD3<Float>) -> (x: Double, s: Double) {

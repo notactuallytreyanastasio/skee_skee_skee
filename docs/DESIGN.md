@@ -184,20 +184,36 @@ built for 3D yet. Every ante is cel for now.
 
 ## The throw
 
-A flick, the way anyone flicks on a phone. The ball waits at the release
-line; after your thumb lifts, the shot fires from the whole motion
-(`analyzeFlick`, `SkeeCore/Input/Stroke.swift`):
+Thumb down where you want the ball, then flick straight up. The ball slides
+under your thumb the moment it lands, and a dotted guide runs from it up the
+lane and the board: a straight flick rolls along that line and comes down on
+it. The line stays put between throws, so a line that worked is still there
+for the next ball. After your thumb lifts, the shot fires from the whole
+motion (`analyzeFlick`, `SkeeCore/Input/Stroke.swift`):
 
+- **line**: where the thumb touched down. This is the main lateral control,
+  and you can see it before you commit.
 - **speed**: mostly the speed at lift-off, partly the peak, so letting go at
   speed beats riding out to a stop. Accelerating through the release adds a
   little; easing off costs a little.
+- **aim**: the direction from where the flick got going to where it was
+  fastest, as a trim on the line. Full aim takes a flick 57 degrees off
+  straight; a flick 10 degrees crooked moves the ball about 7 cm at the board.
+- **no spin from the thumb.** A thumb pivots on its joint, so every flick
+  curls at the end. The first version read that curl as hook and took aim
+  from the last 80 ms, which is mostly curl; straight throws landed anywhere.
+  The aim map showed the other half of the problem: with aim as the only
+  lateral control, a hard-aimed ball came off the rail back to the 50 while a
+  slightly-aimed one found the 10.
 - **skid**: jerk, normalised by the flick's size and duration and measured
   against a minimum-jerk reach (how people move when they move smoothly). A
   shaky flick skids and loses up to 12% speed.
-- **aim**: the speed-weighted direction near release. **Spin**: sideways
-  acceleration at release, so a thumb that hooks makes the ball hook.
-  **Line**: where across the lane you flicked.
 - **foul**: only a drag 140 pt past the crease. Flicks overshoot naturally.
+
+The roll plays at 1.4x recorded time (`Presentation.rollSpeed`): at real time
+the whole throw was over in 1.2 s. The phone buzzes continuously while the
+ball rolls, following its speed (Core Haptics), goes quiet in the air after
+one hard knock at the hump, and thumps on landing.
 
 Power maps to release speed in two parts: the bottom 12% ramps from a dud (2.0 m/s) to the first scoring speed (3.0), the rest covers 3.0-4.5, so most of the flick is spent where balls score; the 40 and 50 take 9% and 11% of power, twice what a linear 2-5 m/s gave. Calibrated with `skee flickprobe` on minimum-jerk flicks: power runs from 300
 to 3100 pt/s effective speed (lift-off and peak speed weighted evenly); smooth flicks measure jerk 2-8, shaky ones

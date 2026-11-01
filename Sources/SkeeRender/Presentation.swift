@@ -34,8 +34,11 @@ public enum Beat: Hashable, Sendable {
 /// few seconds and only then shows the new state. Pure value; the shell
 /// calls `advance(dt)` each frame and `scene(...)` to draw.
 public struct Presentation: Sendable {
-    /// Slow motion factor applied to recorded shot time (1 = real time).
-    public static let rollSpeed = 1.0
+    /// How many seconds of screen time each recorded second of a shot takes
+    /// (1 = real time). At real time the whole throw was over in 1.2 s and
+    /// read as a flick of light, not a heavy ball rolling up an alley; 1.4
+    /// gives the roll a second to watch and the hop its hang time.
+    public static let rollSpeed = 1.4
     /// Seconds per revealed tally step.
     public static let tallyStep = 0.15
     /// How slow time runs while a line-completing ball is in the air.

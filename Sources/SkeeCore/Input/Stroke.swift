@@ -10,9 +10,13 @@
 /// - skid: jerk, normalised by the flick's own size and duration, against a
 ///   minimum-jerk reach (how people move when they move smoothly); a shaky
 ///   flick skids the ball and loses speed,
-/// - aim: the speed-weighted direction near release,
-/// - spin: sideways acceleration at release (a thumb that hooks),
-/// - line: where across the lane the flick happened.
+/// - line: where the thumb touched down. The ball slides under it, so you
+///   see your line before you throw; this is the main lateral control,
+/// - aim: the direction of the flick up to its fastest point, as a small
+///   trim on the line,
+/// - no spin: a thumb pivots on its joint and curls at the end of every
+///   flick. Reading that curl as hook (or as aim, from the last few
+///   samples) made straight throws land anywhere.
 /// Touching well past the crease is a foul; flicks overshoot naturally, so the
 /// give is generous.
 public struct FlickSample: Hashable, Sendable, Codable {
@@ -53,17 +57,15 @@ public struct FlickTuning: Hashable, Sendable, Codable {
     /// Snap: release acceleration, in units of peak speed per flick
     /// duration, that changes speed by `snapGain`.
     public var snapGain = 0.06
-    /// Release angle off straight up (radians) for full aim.
-    public var fullAimAngle = 0.35
-    /// Sideways acceleration at release, in units of peak speed per flick
-    /// duration, for full spin.
-    public var fullSpin = 1.2
+    /// Flick angle off straight up (radians) for full aim. Wide on
+    /// purpose: a flick 10 degrees crooked moves the ball ~7 cm at the board.
+    public var fullAimAngle = 1.0
     /// Normalised jerk of a smooth flick, and how fast skid grows past it.
     public var smoothJerk = 7.0
     public var skidPerJerk = 0.1
-    /// How much of a lane half-width the flick's horizontal position moves
-    /// the release line.
-    public var lineReach = 0.85
+    /// Release line per lane half-width of thumb offset. Above 1 because the
+    /// ball's centre stops a radius short of the rail: 0.31 / 0.28.
+    public var lineReach = 1.1
 
     public static let standard = FlickTuning()
 }
@@ -74,6 +76,11 @@ public struct FlickMetrics: Hashable, Sendable {
     public var peak, release, duration, jerk, snap, side, speed: Double
 }
 nonisolated(unsafe) public private(set) var lastMetrics: FlickMetrics?
+
+/// The release line for a thumb landing at `touchX`: the ball sits under it.
+public func laneStart(touchX: Double, in g: FlickGeometry, tuning k: FlickTuning = .standard) -> Double {
+    clamp((touchX - g.laneCenterX) / g.laneHalfWidth * k.lineReach, -1, 1)
+}
 
 public func crossedFoulLine(_ samples: [FlickSample], in g: FlickGeometry) -> Bool {
     samples.contains { $0.y < g.foulY }
@@ -142,20 +149,16 @@ public func analyzeFlick(_ samples: [FlickSample], in g: FlickGeometry, fold: Do
     lastMetrics = FlickMetrics(peak: peak, release: release, duration: T, jerk: jerk,
                                snap: aUp / unitAccel, side: aSide / unitAccel, speed: speed)
 
-    // Aim: speed-weighted direction over the last part of the flick.
-    let dir = v.filter { $0.t >= end - 0.08 }
-    let wx = dir.reduce(0) { $0 + $1.x * max(0, $1.y) }, wy = dir.reduce(0) { $0 + $1.y * max(0, $1.y) }
-    let aim = _atan2(wx, max(wy, 1)) / k.fullAimAngle
-
-    // The line: horizontal position where the flick was fastest.
-    let fastest = v.max { $0.y < $1.y }!
-    let xAt = samples.min { abs($0.t - fastest.t) < abs($1.t - fastest.t) }!.x
-    let line = (xAt - g.laneCenterX) / g.laneHalfWidth * k.lineReach
+    // Aim: the chord from where the flick got going to where it was
+    // fastest. The curl comes after the peak, so the chord misses it.
+    let from = samples.last { $0.t <= startT } ?? first
+    let peakT = v.max { $0.y < $1.y }!.t
+    let to = samples.min { abs($0.t - peakT) < abs($1.t - peakT) }!
+    let aim = _atan2(to.x - from.x, max(from.y - to.y, 1)) / k.fullAimAngle
 
     return .release(Launch(
         power: (speed - k.slowest) / (k.fastest - k.slowest),
-        aim: aim, start: line, fold: fold,
-        spin: aSide / unitAccel / k.fullSpin,
+        aim: aim, start: laneStart(touchX: first.x, in: g, tuning: k), fold: fold,
         skid: skid))
 }
 

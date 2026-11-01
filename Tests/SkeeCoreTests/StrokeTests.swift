@@ -61,17 +61,37 @@ struct FlickTests {
         #expect(launch(flick(wobble: 9))!.skid > 0.4)
     }
 
-    @Test func hookingTheThumbAtTheEndSpins() {
+    /// A thumb pivots on its joint, so flicks curl at the end. Reading that
+    /// curl as a hook (or as the aim) made straight throws land anywhere.
+    @Test func aThumbThatCurlsAtTheEndStillRollsStraight() {
         let l = launch(flick(lateral: { u in u > 0.55 ? 90 * pow(u - 0.55, 2) * 10 : 0 }))!
-        #expect(l.spin > 0.3)
+        #expect(l.spin == 0)
+        #expect(abs(l.aim) < 0.1)
     }
 
     @Test func flickingRightAimsRight() {
-        #expect(launch(flick(lateral: { u in 40 * u }))!.aim > 0.2)
+        #expect(launch(flick(lateral: { u in 40 * u }))!.aim > 0.1)
     }
 
-    @Test func whereYouFlickSetsTheLine() {
-        #expect(launch(flick(x0: 120))!.start < -0.4)
+    /// The aim is a trim on the line, not the main control: a flick 10
+    /// degrees off straight moves the ball only a few centimetres at the board.
+    @Test func aSlightlyCrookedFlickIsOnlyATrim() {
+        let crooked = launch(flick(lateral: { u in 220 * tan(.pi / 18) * u }))!
+        let drift = tan(crooked.aim * LaneSpec.standard.maxAimAngle) * (LaneSpec.standard.length + 0.58)
+        #expect(drift > 0.02 && drift < 0.08)
+    }
+
+    /// The ball sits under the thumb from the moment it lands, so where you
+    /// touch down is the line, whatever the thumb does after.
+    @Test func whereYouTouchDownSetsTheLine() {
+        let l = launch(flick(x0: 120, lateral: { u in 80 * u }))!
+        #expect(abs(l.start - laneStart(touchX: 120, in: duoLane)) < 1e-9)
+        #expect(l.start < -0.7)
+    }
+
+    @Test func touchingTheLaneCentreRollsDownTheMiddle() {
+        #expect(laneStart(touchX: 313, in: duoLane) == 0)
+        #expect(laneStart(touchX: 313 + 260, in: duoLane) == 1)
     }
 
     @Test func liftingOffJustPastTheCreaseIsFine() {

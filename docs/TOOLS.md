@@ -57,6 +57,7 @@ skee frame --save run.json --t 0.8 --out out/f.png  # 3D + HUD, mid-throw
 skee frame --save run.json --settle --select 2      # prize counter, stamp selected
 skee frame --shop [--title] --size outer           # prize shop (or title) with a sample shelf
 skee frame --coach 3 --size outer                  # walkthrough card for step 3 (0...6)
+skee frame --line 0.6                              # waiting ball on a release line, with its guide
 skee frame --title
 skee scenefilm --save run.json --from 0.5 --frames 8 --dt 0.12   # contact sheet
 ```

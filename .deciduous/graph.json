@@ -510,6 +510,16 @@
       "to_change_id": "ffb74d6b-a9b7-47d3-ab06-3e0eb81fc138",
       "weight": 1.0
     },
+    "76bb696ee5e17927f5f3": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-01T10:32:20.629440-05:00",
+      "edge_id": "76bb696ee5e17927f5f3",
+      "edge_type": "leads_to",
+      "from_change_id": "e94066c6-423d-4e3b-aff3-5980946a9d74",
+      "rationale": "deployed",
+      "to_change_id": "bc0af5cb-2356-4680-84b6-b8f29e3eb507",
+      "weight": 1.0
+    },
     "76c10dd2a4a29d4912bf": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T16:54:01.012459-04:00",
@@ -2176,6 +2186,19 @@
       "status": "pending",
       "title": "Building velocity: ball rolls faster as the thumb speeds up and carries that exact velocity into the throw",
       "updated_at": "2026-10-30T09:34:47.928169-04:00"
+    },
+    "bc0af5cb-2356-4680-84b6-b8f29e3eb507": {
+      "author": "Bobby Grayson",
+      "change_id": "bc0af5cb-2356-4680-84b6-b8f29e3eb507",
+      "created_at": "2026-11-01T10:32:20.448145-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 80
+      },
+      "node_type": "outcome",
+      "status": "pending",
+      "title": "Throw rework installed and launched on the Duo; awaiting feel test",
+      "updated_at": "2026-11-01T10:32:20.448145-05:00"
     },
     "bc6b7206-254a-4b57-abfd-52a79338e5ba": {
       "author": "Bobby Grayson",

@@ -45,6 +45,18 @@ public enum Room: String, Hashable, Sendable, Codable, CaseIterable, Comparable 
         }
     }
 
+    /// How much more each room asks than the Boardwalk. Richer machines
+    /// score more on the same throws, so without this the rooms you earn
+    /// would be easier than the one you left.
+    public var targetScale: Double {
+        switch self {
+        case .boardwalk: 1
+        case .neonLounge: 1.8
+        case .highRoller: 1.45
+        case .penthouse: 1.95
+        }
+    }
+
     /// The alley. Only the board moves; the lane and hinge are the same
     /// everywhere, so your flick carries from room to room.
     public var table: Table {

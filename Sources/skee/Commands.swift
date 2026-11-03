@@ -156,6 +156,12 @@ func balanceCommand() {
     let seed0 = UInt64(flag("seed") ?? "1000") ?? 1000
     let room = flag("room").flatMap(Room.init) ?? .boardwalk
     var books: [Table: AimBook] = [:]
+    // --bases a,b,...: try a target curve without recompiling. --scale x
+    // multiplies on top of the room's own scale.
+    var config = RunConfig.standard
+    if let b = flag("bases") { config.anteBase = b.split(separator: ",").compactMap { Int($0) } }
+    if let x = flag("scale").flatMap(Double.init) { config.targetScale = x }
+    var targets = config; targets.targetScale *= room.targetScale
     for skill in skillsFromFlag() {
         var reached = [Int](repeating: 0, count: 10)
         var wins = 0, balls = 0, rattles = 0, jackpots = 0, frames = 0, pairs = 0, triples = 0
@@ -166,7 +172,7 @@ func balanceCommand() {
         var feverFrames = 0
         var ticketsEarned = 0, purchases = 0
         for k in 0..<runs {
-            let run = playBotRun(seed: seed0 + UInt64(k), skill: skill, room: room, books: &books)
+            let run = playBotRun(seed: seed0 + UInt64(k), skill: skill, config: config, room: room, books: &books)
             let s = run.final
             reached[min(s.ante, 9)] += 1
             if s.phase == .won { wins += 1 }
@@ -182,10 +188,10 @@ func balanceCommand() {
                     ticketsEarned += f.tickets
                 case .roundCleared(let sc, let t, let p):
                     margins.append(Double(sc) / Double(t)); ticketsEarned += p.total
-                    anteMargins[anteOf(t), default: []].append(Double(sc) / Double(t))
+                    anteMargins[anteOf(t, targets), default: []].append(Double(sc) / Double(t))
                 case .roundFailed(let sc, let t):
                     margins.append(Double(sc) / Double(t))
-                    anteMargins[anteOf(t), default: []].append(Double(sc) / Double(t))
+                    anteMargins[anteOf(t, targets), default: []].append(Double(sc) / Double(t))
                 case .bought: purchases += 1
                 default: break
                 }
@@ -214,8 +220,7 @@ func balanceCommand() {
 }
 
 /// Which ante a target belongs to (targets are unique per ante and kind).
-func anteOf(_ target: Int) -> Int {
-    let c = RunConfig.standard
+func anteOf(_ target: Int, _ c: RunConfig) -> Int {
     for a in 1...c.antes { for k in RoundKind.allCases where c.target(ante: a, kind: k) == target { return a } }
     return 0
 }

@@ -5,6 +5,8 @@
 public func newRun(seed: UInt64, config: RunConfig = .standard, room: Room = .boardwalk, extraTickets: Int = 0) -> RunState {
     var rng = SplitMix64(seed: seed)
     let boss = rng.pick(Boss.allCases)
+    var config = config
+    config.targetScale *= room.targetScale
     var s = RunState(
         config: config, room: room, rng: rng, seed: seed, ante: 1, boss: boss,
         round: RoundState(kind: .warmup, target: 0, framesTotal: 0),

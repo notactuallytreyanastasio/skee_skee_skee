@@ -33,7 +33,9 @@ public struct RunConfig: Hashable, Sendable, Codable {
     /// next frame plays at double mult.
     public var feverHeat = 10
     /// Target for the warm-up of each ante; feature and boss scale it.
-    public var anteBase = [360, 780, 1320, 1920, 2760, 3720, 4800, 6240]
+    public var anteBase = [700, 1500, 2600, 3600, 4800, 6200, 7400, 9000]
+    /// Every target times this: how much a room asks of the same run.
+    public var targetScale = 1.0
     public var kindScale: [RoundKind: Double] = [.warmup: 1, .feature: 1.5, .boss: 2]
     public var roundTickets: [RoundKind: Int] = [.warmup: 3, .feature: 4, .boss: 5]
     /// One bonus ticket per this fraction of overkill above the target.
@@ -48,6 +50,6 @@ public struct RunConfig: Hashable, Sendable, Codable {
 
     public func target(ante: Int, kind: RoundKind) -> Int {
         let base = anteBase[clamp(ante, 1, anteBase.count) - 1]
-        return Int((Double(base) * (kindScale[kind] ?? 1)).rounded())
+        return Int((Double(base) * (kindScale[kind] ?? 1) * targetScale).rounded())
     }
 }

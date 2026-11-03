@@ -14,7 +14,7 @@ public func playBotRun(seed: UInt64, skill: Skill, config: RunConfig = .standard
     var hand = SplitMix64(seed: seed ^ 0xB07)
     var actions: [Action] = []
     var events: [GameEvent] = []
-    var rates: [RateKey: [Hole: Double]] = [:]
+    var rates: [RateKey: [Hole: [Hole: Double]]] = [:]
     func act(_ a: Action) -> Bool {
         guard case .success(let step) = apply(a, to: s) else { return false }
         s = step.state; actions.append(a); events += step.events
@@ -34,7 +34,7 @@ public func playBotRun(seed: UInt64, skill: Skill, config: RunConfig = .standard
             if books[t] == nil { books[t] = AimBook(table: t) }
             let book = books[t]!
             let key = RateKey(table: t, skill: skill)
-            if rates[key] == nil { rates[key] = hitRates(book, t, skill) }
+            if rates[key] == nil { rates[key] = landings(book, t, skill) }
             let want = chooseHole(s, book, rates[key]!)
             let ideal = book.best[want]?.launch ?? Launch(power: 0.6, aim: 0)
             _ = act(.throwBall(skill.perturb(ideal, rng: &hand)))
@@ -75,37 +75,48 @@ private let Self_charmPreference: [Charm] = [
 
 struct RateKey: Hashable { var table: Table; var skill: Skill }
 
-/// Monte Carlo: how often this hand actually lands each hole when aiming at
-/// the centre of its best window. Seeded, so bots stay deterministic.
-func hitRates(_ book: AimBook, _ table: Table, _ skill: Skill, samples: Int = 48) -> [Hole: Double] {
+/// Monte Carlo: where this hand's balls really land when it aims at the
+/// centre of each hole's best window, as a share per landing hole. Seeded,
+/// so bots stay deterministic.
+func landings(_ book: AimBook, _ table: Table, _ skill: Skill, samples: Int = 64) -> [Hole: [Hole: Double]] {
     var rng = SplitMix64(seed: 0x5EED)
-    var out: [Hole: Double] = [:]
+    var out: [Hole: [Hole: Double]] = [:]
     // Iterate in a fixed order: dictionary order is not stable, and the
     // shared rng would hand different noise to different holes.
     for hole in BoardSetup.reelHoles {
         guard let w = book.best[hole] else { continue }
-        var hits = 0
-        for _ in 0..<samples where simulateShot(skill.perturb(w.launch, rng: &rng), on: table).hole == hole {
-            hits += 1
-        }
-        out[hole] = Double(hits) / Double(samples)
+        var spread: [Hole: Double] = [:]
+        for _ in 0..<samples { spread[simulateShot(skill.perturb(w.launch, rng: &rng), on: table).hole, default: 0] += 1 / Double(samples) }
+        out[hole] = spread
     }
     return out
 }
 
-/// Expected-value aiming: measured hit rate for each hole times what the
-/// hole is worth now, counting how much it improves the frame's payline.
-private func chooseHole(_ s: RunState, _ book: AimBook, _ rates: [Hole: Double]) -> Hole {
+/// Expected-value aiming over everything a shot can do, not just the hole
+/// aimed at. Hit rate times value is the obvious version and it is wrong: a
+/// missed pocket is a gutter, a missed ring is usually another ring, and
+/// ignoring that made a steady hand chase pockets into 39% gutters and lose
+/// to a shakier one that could not be tempted.
+private func chooseHole(_ s: RunState, _ book: AimBook, _ rates: [Hole: [Hole: Double]]) -> Hole {
     let have = s.round.currentBalls.map(\.symbol)
     let lineNow = Payline.evaluate(have).addedMult
-    var best: (Hole, Double) = (.ring10, -1)
-    for hole in BoardSetup.reelHoles {
-        let hit = rates[hole] ?? 0
-        let lineGain = Payline.evaluate(have + [s.showing(hole)]).addedMult - lineNow
+    func value(_ hole: Hole) -> Double {
+        // A throw that matches no target breaks the combo, and a gutter
+        // always does: the streak is worth what its next link would pay.
+        let streak = 40 * TopSlot.comboMult(hits: 1, level: s.round.combo + 1)
+        guard hole != .gutter else { return s.round.combo > 0 ? -streak : 0 }
+        let symbol = s.showing(hole)
+        let lineGain = Payline.evaluate(have + [symbol]).addedMult - lineNow
         var chips = s.setup.chips(for: hole)
         if s.round.kind == .boss { chips = s.boss.chips(for: hole, base: chips) }
-        let value = Double(chips) + 40 * lineGain
-        if hit * value > best.1 { best = (hole, hit * value) }
+        let hits = s.topSlot.hits(symbol)
+        let combo = hits > 0 ? 40 * TopSlot.comboMult(hits: hits, level: s.round.combo + 1) : (s.round.combo > 0 ? -streak : 0)
+        return Double(chips) + 40 * lineGain + combo
+    }
+    var best: (Hole, Double) = (.ring10, -1)
+    for hole in BoardSetup.reelHoles {
+        let ev = (rates[hole] ?? [:]).reduce(0) { $0 + $1.value * value($1.key) }
+        if ev > best.1 { best = (hole, ev) }
     }
     return best.0
 }

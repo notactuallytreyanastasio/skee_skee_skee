@@ -95,17 +95,24 @@ Not done, or not verified:
   the code assumes π is flat open.
 - **`FlickTuning` has been tuned against synthetic flicks**, with only brief
   feedback from a real thumb.
-- **The Neon Lounge is too hard for a regular player.** Bot win rates, 100 runs
-  each:
+- **The difficulty curve is being retuned and is currently too hard.** The
+  first pass at new targets overshot. Bot win rates, 150 runs each:
 
   | | Boardwalk | Neon Lounge | High Roller | Penthouse |
   |-|-----------|-------------|-------------|-----------|
-  | expert | 34% | 20% | 43% | 51% |
-  | regular | 20% | 1% | 21% | 8% |
+  | expert | 6% | 0.7% | 2% | 0% |
+  | regular | 2.7% | 0% | 0% | 0% |
+  | novice | 0% | 0% | 0% | 0% |
 
-  The rooms do not get steadily harder, and they should.
+  The old curve was the opposite problem: scores ran 7-17x the target on ante 1,
+  under 3% of rounds were close, and rooms did not get harder. An earlier
+  version of this README blamed the Neon Lounge for a 1% win rate. That was a
+  bot bug, not the room: it ignored where misses land and chased pockets into
+  the gutter.
 - **Jackpot triples are too common:** about 12 a run for an expert bot.
 - **Only one art style (cel).** The several-styles-across-levels idea has not
   been rebuilt in 3D.
 - **Changing a rule changes how old saves replay,** because a save is a seed
-  plus actions, with no rules version stamped in it. Trailer seeds move too.
+  plus actions, with no rules version stamped in it.
+- **The edit in `skee film` is out of date.** Its seeds and captions were picked
+  from the old bot and targets, so rerun `skee moments` before rendering again.

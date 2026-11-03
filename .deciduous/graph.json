@@ -70,6 +70,16 @@
       "to_change_id": "1b730ae0-f224-4ff9-a7e2-dcd3c1dbcfa6",
       "weight": 1.0
     },
+    "08d2edee349b147873d2": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T18:04:53.229377-05:00",
+      "edge_id": "08d2edee349b147873d2",
+      "edge_type": "leads_to",
+      "from_change_id": "ef51ee38-cd8e-41a4-9d5e-ee716efaca0e",
+      "rationale": "committed",
+      "to_change_id": "2bf9820d-1ef6-4b4c-bf4d-a2340361365a",
+      "weight": 1.0
+    },
     "0a086071caef4469b61f": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T10:37:36.802474-04:00",
@@ -188,6 +198,26 @@
       "from_change_id": "9dc303fc-554c-4bcd-b787-ff8b5317e328",
       "rationale": "result",
       "to_change_id": "710749f0-3d87-44cd-ab2d-a6b60dd88852",
+      "weight": 1.0
+    },
+    "22887edcba89bbfe1553": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T17:14:43.140902-05:00",
+      "edge_id": "22887edcba89bbfe1553",
+      "edge_type": "leads_to",
+      "from_change_id": "1bbb905e-fd74-48ea-9a13-0df311d66fec",
+      "rationale": "implementation",
+      "to_change_id": "ef51ee38-cd8e-41a4-9d5e-ee716efaca0e",
+      "weight": 1.0
+    },
+    "2313705ed97ebfee8040": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T17:13:04.472400-05:00",
+      "edge_id": "2313705ed97ebfee8040",
+      "edge_type": "leads_to",
+      "from_change_id": "e3cbf14e-93c9-42bf-af58-0e2bef082b18",
+      "rationale": "option",
+      "to_change_id": "393c2364-6378-4f84-9039-ea2e292f093e",
       "weight": 1.0
     },
     "258368ee76319a5222b5": {
@@ -510,6 +540,16 @@
       "to_change_id": "5819bd39-c604-4318-9154-188e376f542d",
       "weight": 1.0
     },
+    "6478fc6d3647547f32a6": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T18:04:36.073230-05:00",
+      "edge_id": "6478fc6d3647547f32a6",
+      "edge_type": "leads_to",
+      "from_change_id": "e3cbf14e-93c9-42bf-af58-0e2bef082b18",
+      "rationale": "shipping the repo publicly",
+      "to_change_id": "20e37db0-8b5a-475e-a58c-f97715d79687",
+      "weight": 1.0
+    },
     "66957b0b18aeb3e0e8be": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T16:53:51.140371-04:00",
@@ -608,6 +648,16 @@
       "from_change_id": "1b730ae0-f224-4ff9-a7e2-dcd3c1dbcfa6",
       "rationale": "implementation",
       "to_change_id": "cb2c2cf2-8a5b-4490-9120-06048fd22046",
+      "weight": 1.0
+    },
+    "7f2d8bbc08e2c2e4a690": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T17:13:05.099232-05:00",
+      "edge_id": "7f2d8bbc08e2c2e4a690",
+      "edge_type": "leads_to",
+      "from_change_id": "393c2364-6378-4f84-9039-ea2e292f093e",
+      "rationale": "rejected: outer display only, no audio",
+      "to_change_id": "1bbb905e-fd74-48ea-9a13-0df311d66fec",
       "weight": 1.0
     },
     "7ff1eb72eae347b89385": {
@@ -720,6 +770,16 @@
       "to_change_id": "d659e919-a722-48f5-b681-a782478d41b1",
       "weight": 1.0
     },
+    "913adc28780f489cf4c2": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T17:13:04.975518-05:00",
+      "edge_id": "913adc28780f489cf4c2",
+      "edge_type": "leads_to",
+      "from_change_id": "d730cb71-dd1b-446c-9a54-61b7399cc897",
+      "rationale": "chosen",
+      "to_change_id": "1bbb905e-fd74-48ea-9a13-0df311d66fec",
+      "weight": 1.0
+    },
     "9bed6c9e5181c48d7e41": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:13:19.377151-04:00",
@@ -738,6 +798,16 @@
       "from_change_id": "59f8fb99-74c2-4375-9887-b325a620e006",
       "rationale": "user push on fun",
       "to_change_id": "4b0a365d-e251-475d-82c6-d53445d10c02",
+      "weight": 1.0
+    },
+    "a2f892d5d074940e9989": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T18:04:53.512182-05:00",
+      "edge_id": "a2f892d5d074940e9989",
+      "edge_type": "leads_to",
+      "from_change_id": "20e37db0-8b5a-475e-a58c-f97715d79687",
+      "rationale": "result",
+      "to_change_id": "343dd004-34eb-44b2-99ed-a907c90bd6e9",
       "weight": 1.0
     },
     "a2fcfd5d641e9d0ea53e": {
@@ -950,6 +1020,16 @@
       "to_change_id": "353833fe-5d1e-4abe-8939-06b00ece291a",
       "weight": 1.0
     },
+    "c43322664279a1615978": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T17:21:31.267660-05:00",
+      "edge_id": "c43322664279a1615978",
+      "edge_type": "leads_to",
+      "from_change_id": "ef51ee38-cd8e-41a4-9d5e-ee716efaca0e",
+      "rationale": "checked against real SCNView",
+      "to_change_id": "265d66e4-e838-4680-bbdd-4ecde8f6c33c",
+      "weight": 1.0
+    },
     "c58575db0d48d1074434": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:03:19.834018-04:00",
@@ -1010,6 +1090,16 @@
       "from_change_id": "277b5d09-28b3-4dc7-9c20-7827539af0b4",
       "rationale": "implementation",
       "to_change_id": "081c9a91-845e-4d29-8ec4-d370c025187e",
+      "weight": 1.0
+    },
+    "d011743a7523718daea0": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T17:33:29.990535-05:00",
+      "edge_id": "d011743a7523718daea0",
+      "edge_type": "leads_to",
+      "from_change_id": "ef51ee38-cd8e-41a4-9d5e-ee716efaca0e",
+      "rationale": "result",
+      "to_change_id": "f037facd-ae39-48fe-a036-db8bc08e3fcd",
       "weight": 1.0
     },
     "d13bbbe89e6e50b0372f": {
@@ -1190,6 +1280,16 @@
       "from_change_id": "7d6378e2-1990-4137-a62e-48a317ba6ff1",
       "rationale": "result",
       "to_change_id": "3809c5fe-8cf7-4f5c-b47b-5fa697766448",
+      "weight": 1.0
+    },
+    "edd11a4395893f983719": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T17:13:04.724703-05:00",
+      "edge_id": "edd11a4395893f983719",
+      "edge_type": "leads_to",
+      "from_change_id": "e3cbf14e-93c9-42bf-af58-0e2bef082b18",
+      "rationale": "option",
+      "to_change_id": "d730cb71-dd1b-446c-9a54-61b7399cc897",
       "weight": 1.0
     },
     "eeb4c66a216df9c37118": {
@@ -1434,6 +1534,19 @@
       "title": "Flick input from full curve + rings-as-reels with glow hints",
       "updated_at": "2026-10-30T10:32:15.115717-04:00"
     },
+    "1bbb905e-fd74-48ea-9a13-0df311d66fec": {
+      "author": "Bobby Grayson",
+      "change_id": "1bbb905e-fd74-48ea-9a13-0df311d66fec",
+      "created_at": "2026-11-03T17:13:04.850886-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 85
+      },
+      "node_type": "decision",
+      "status": "pending",
+      "title": "Render the trailer headless with skee film over simulator recording: sim is stuck folded, silent, and cannot reach rare moments on demand",
+      "updated_at": "2026-11-03T17:13:04.850886-05:00"
+    },
     "1d989370-48e8-492d-88c6-db528f7f2783": {
       "author": "Bobby Grayson",
       "change_id": "1d989370-48e8-492d-88c6-db528f7f2783",
@@ -1460,6 +1573,22 @@
       "status": "pending",
       "title": "Juice pass: timed cues, jackpot-chance slow-mo with camera lean and drum roll, star bursts and ring flash, synthesised sound, faster tally; installed on Duo",
       "updated_at": "2026-10-30T10:43:44.029195-04:00"
+    },
+    "20e37db0-8b5a-475e-a58c-f97715d79687": {
+      "author": "Bobby Grayson",
+      "change_id": "20e37db0-8b5a-475e-a58c-f97715d79687",
+      "created_at": "2026-11-03T18:04:35.856568-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 90,
+        "files": [
+          "README.md"
+        ]
+      },
+      "node_type": "action",
+      "status": "pending",
+      "title": "README rewritten for the pull machine, rooms, host, flick, sound and film tools; stale claims removed",
+      "updated_at": "2026-11-03T18:04:35.856568-05:00"
     },
     "212544ce-6851-480c-9842-78d18bf43b6e": {
       "author": "Bobby Grayson",
@@ -1501,6 +1630,19 @@
       "title": "99 tests pass; 220pt flick now 0.60 power -> 50 (was 0.35 -> gutter); all symbols readable on both displays in renders; feel unverified on device",
       "updated_at": "2026-10-30T16:54:01.138104-04:00"
     },
+    "265d66e4-e838-4680-bbdd-4ecde8f6c33c": {
+      "author": "Bobby Grayson",
+      "change_id": "265d66e4-e838-4680-bbdd-4ecde8f6c33c",
+      "created_at": "2026-11-03T17:21:31.081778-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 90
+      },
+      "node_type": "observation",
+      "status": "pending",
+      "title": "Simulator SCNView shows the same dense drop burst as skee film: far above the 54 stars birthRate x emissionDuration implies, so the look is the game's, not a film artifact",
+      "updated_at": "2026-11-03T17:21:31.081778-05:00"
+    },
     "277b5d09-28b3-4dc7-9c20-7827539af0b4": {
       "author": "Bobby Grayson",
       "change_id": "277b5d09-28b3-4dc7-9c20-7827539af0b4",
@@ -1540,6 +1682,20 @@
       "title": "Keep the flick; the touch-down x sets the line, the whole flick's direction trims the aim, no thumb hook; slower roll playback, continuous rolling haptics, a hump thunk",
       "updated_at": "2026-11-01T07:30:31.206561-05:00"
     },
+    "2bf9820d-1ef6-4b4c-bf4d-a2340361365a": {
+      "author": "Bobby Grayson",
+      "change_id": "2bf9820d-1ef6-4b4c-bf4d-a2340361365a",
+      "created_at": "2026-11-03T18:04:53.043282-05:00",
+      "metadata": {
+        "branch": "main",
+        "commit": "1b71bed1d10a3cb607b7a152e2a9eab87b46a845",
+        "confidence": 90
+      },
+      "node_type": "action",
+      "status": "pending",
+      "title": "Committed skee film, skee moments and the shared Synth",
+      "updated_at": "2026-11-03T18:04:53.043282-05:00"
+    },
     "2e90e1ad-4339-42bb-8140-8ffc0cdafdc0": {
       "author": "Bobby Grayson",
       "change_id": "2e90e1ad-4339-42bb-8140-8ffc0cdafdc0",
@@ -1553,6 +1709,20 @@
       "status": "pending",
       "title": "Shared CoreGraphics renderer (SkeeRender) driven by a pure scene description; one style per ante pair: pixel, cel, 3D, vector neon",
       "updated_at": "2026-10-30T08:13:19.231522-04:00"
+    },
+    "343dd004-34eb-44b2-99ed-a907c90bd6e9": {
+      "author": "Bobby Grayson",
+      "change_id": "343dd004-34eb-44b2-99ed-a907c90bd6e9",
+      "created_at": "2026-11-03T18:04:53.404739-05:00",
+      "metadata": {
+        "branch": "main",
+        "commit": "1059385cd6762b1d19dcb066ed70e7e66049005d",
+        "confidence": 90
+      },
+      "node_type": "outcome",
+      "status": "pending",
+      "title": "README committed with current features, verified status and per-room bot win rates",
+      "updated_at": "2026-11-03T18:04:53.404739-05:00"
     },
     "353833fe-5d1e-4abe-8939-06b00ece291a": {
       "author": "Bobby Grayson",
@@ -1593,6 +1763,19 @@
       "status": "pending",
       "title": "146 core + 13 presentation tests pass; measured rates in band; bots 28/14/12% after retune",
       "updated_at": "2026-11-01T10:48:13.687177-05:00"
+    },
+    "393c2364-6378-4f84-9039-ea2e292f093e": {
+      "author": "Bobby Grayson",
+      "change_id": "393c2364-6378-4f84-9039-ea2e292f093e",
+      "created_at": "2026-11-03T17:13:04.369031-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 40
+      },
+      "node_type": "option",
+      "status": "pending",
+      "title": "Record the Duo simulator with -autoplay via simctl io recordVideo",
+      "updated_at": "2026-11-03T17:13:04.369031-05:00"
     },
     "4067a26c-4d2f-4921-ba29-7d629748a1ff": {
       "author": "Bobby Grayson",
@@ -2581,6 +2764,19 @@
       "title": "SceneKit 3D for the presentation; SwiftUI overlay for HUD; core physics gets real ring holes",
       "updated_at": "2026-10-30T09:03:51.302015-04:00"
     },
+    "d730cb71-dd1b-446c-9a54-61b7399cc897": {
+      "author": "Bobby Grayson",
+      "change_id": "d730cb71-dd1b-446c-9a54-61b7399cc897",
+      "created_at": "2026-11-03T17:13:04.593561-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 85
+      },
+      "node_type": "option",
+      "status": "pending",
+      "title": "skee film: drive real apply()/Presentation/Cabinet/HUD headless, one PNG per frame at the inner-display size, real cue timeline through the game's own synth, on seeds searched for real jackpots and free games",
+      "updated_at": "2026-11-03T17:13:04.593561-05:00"
+    },
     "d87f55c7-5f1e-4843-80d8-f84980174af9": {
       "author": "Bobby Grayson",
       "change_id": "d87f55c7-5f1e-4843-80d8-f84980174af9",
@@ -2608,6 +2804,20 @@
       "status": "pending",
       "title": "Keep fixed symbols and just raise targets",
       "updated_at": "2026-10-30T08:25:40.007700-04:00"
+    },
+    "e3cbf14e-93c9-42bf-af58-0e2bef082b18": {
+      "author": "Bobby Grayson",
+      "change_id": "e3cbf14e-93c9-42bf-af58-0e2bef082b18",
+      "created_at": "2026-11-03T17:12:09.095244-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 80,
+        "prompt": "record a trailer for the game that shows everything off to let us share this out"
+      },
+      "node_type": "goal",
+      "status": "pending",
+      "title": "Shareable trailer video showing off the whole game",
+      "updated_at": "2026-11-03T17:12:09.095244-05:00"
     },
     "e94066c6-423d-4e3b-aff3-5980946a9d74": {
       "author": "Bobby Grayson",
@@ -2650,6 +2860,24 @@
       "title": "Build in native Swift with functional core / imperative shell split",
       "updated_at": "2026-10-30T08:03:18.766901-04:00"
     },
+    "ef51ee38-cd8e-41a4-9d5e-ee716efaca0e": {
+      "author": "Bobby Grayson",
+      "change_id": "ef51ee38-cd8e-41a4-9d5e-ee716efaca0e",
+      "created_at": "2026-11-03T17:14:43.036592-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 85,
+        "files": [
+          "Sources/skee/FilmCommand.swift",
+          "Sources/SkeeRender/Synth.swift",
+          "App/Sources/Sound.swift"
+        ]
+      },
+      "node_type": "action",
+      "status": "pending",
+      "title": "skee moments scanner over bot runs; game synth extracted from the iOS target into SkeeRender so the film tool plays the same sounds",
+      "updated_at": "2026-11-03T17:14:43.036592-05:00"
+    },
     "ef7d9a4c-e5a3-4afc-b4f9-18021b110ded": {
       "author": "Bobby Grayson",
       "change_id": "ef7d9a4c-e5a3-4afc-b4f9-18021b110ded",
@@ -2662,6 +2890,23 @@
       "status": "pending",
       "title": "Marquee spins at release and settles mid-flight (pure luck relative to aim)",
       "updated_at": "2026-10-30T17:01:19.966396-04:00"
+    },
+    "f037facd-ae39-48fe-a036-db8bc08e3fcd": {
+      "author": "Bobby Grayson",
+      "change_id": "f037facd-ae39-48fe-a036-db8bc08e3fcd",
+      "created_at": "2026-11-03T17:33:29.775687-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 85,
+        "files": [
+          "out/trailer/trailer-16x9.mp4",
+          "out/trailer/trailer-9x16.mp4"
+        ]
+      },
+      "node_type": "outcome",
+      "status": "pending",
+      "title": "Trailer rendered: 72s, 60fps, 16:9 and 9:16 in out/trailer, -15.9 LUFS; 161 core + 20 presentation tests pass; app builds with shared Synth; music not heard by a person; not committed",
+      "updated_at": "2026-11-03T17:33:29.775687-05:00"
     },
     "f1ec666a-62ce-4658-8129-e71d54ff71c4": {
       "author": "Bobby Grayson",

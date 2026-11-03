@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skee Skee Skee Decision Tree</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* One visual world: an arcade at closing time. The tree is the lane, the timeline is the ticket strip.
+   Layout: header, then tree canvas | detail panel, then a full-width timeline scrubber. */
+:root {
+  --bg: #13151b;
+  --panel: #1b1e26;
+  --line: #2c303b;
+  --ink: #ebe6da;
+  --muted: #9a9688;
+  --accent: #ff7a3d;
+  --goal: #f2c14e;
+  --option: #8ea2c0;
+  --decision: #ff6b57;
+  --action: #4fb3d9;
+  --outcome: #7bd389;
+  --observation: #c792ea;
+  --display: "Bricolage Grotesque", "Helvetica Neue", Arial, sans-serif;
+  --body: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  background: var(--bg); color: var(--ink); font: 14px/1.5 var(--body);
+  display: grid; grid-template-rows: auto 1fr auto; overflow: hidden;
+}
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+header {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 28px;
+  padding: 14px 20px 12px; border-bottom: 1px solid var(--line);
+}
+h1 { font: 800 22px/1.1 var(--display); margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
+h1 span { color: var(--accent); }
+.stats { display: flex; flex-wrap: wrap; gap: 4px 18px; color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+.stats b { color: var(--ink); font-weight: 600; }
+.flow { margin-left: auto; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 12px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px 3px 7px;
+  border: 1px solid var(--line); border-radius: 999px; background: transparent; font-size: 12px; line-height: 1.4;
+}
+.chip i { width: 9px; height: 9px; border-radius: 50%; background: var(--c); flex: none; }
+.chip[aria-pressed="false"] { opacity: 0.38; }
+.chip .n { color: var(--muted); font-variant-numeric: tabular-nums; }
+.flow .arrow { color: var(--muted); }
+
+main { display: grid; grid-template-columns: 1fr 380px; min-height: 0; }
+#stage { position: relative; min-width: 0; min-height: 0; }
+#tree { width: 100%; height: 100%; display: block; cursor: grab; }
+#tree:active { cursor: grabbing; }
+.tools { position: absolute; top: 12px; left: 16px; display: flex; gap: 8px; align-items: center; }
+.tools input {
+  width: 220px; padding: 6px 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px;
+}
+.tools button, .controls button {
+  padding: 6px 11px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; font-size: 13px;
+}
+.tools button:hover, .controls button:hover { border-color: var(--muted); }
+.hint { position: absolute; bottom: 10px; left: 16px; color: var(--muted); font-size: 12px; pointer-events: none; }
+
+aside {
+  border-left: 1px solid var(--line); background: var(--panel); overflow-y: auto; min-height: 0;
+  padding: 18px 20px 28px; display: flex; flex-direction: column; gap: 14px;
+}
+aside h2 { font: 600 17px/1.3 var(--display); margin: 0; text-wrap: balance; }
+aside h3 { font: 600 11px/1 var(--body); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 6px 0 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 14px; color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.typechip { color: var(--bg); background: var(--c); border-radius: 4px; padding: 1px 7px; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; }
+blockquote {
+  margin: 0; padding: 10px 12px; border-left: 3px solid var(--goal); background: #22252e;
+  font: 13px/1.55 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.commit { border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; display: grid; gap: 4px; }
+.commit code { font: 500 12px var(--mono); color: var(--accent); }
+.commit .subj { font-weight: 600; }
+.commit .body { color: var(--muted); font-size: 12.5px; white-space: pre-wrap; max-height: 9.5em; overflow-y: auto; }
+.links { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.links button {
+  display: flex; gap: 8px; align-items: baseline; width: 100%; text-align: left;
+  background: none; border: 0; padding: 4px 6px; border-radius: 4px;
+}
+.links button:hover { background: #262a34; }
+.links i { width: 8px; height: 8px; border-radius: 50%; background: var(--c); flex: none; transform: translateY(-1px); }
+.links small { color: var(--muted); display: block; font-size: 12px; }
+.conf { height: 4px; background: var(--line); border-radius: 2px; overflow: hidden; width: 90px; display: inline-block; vertical-align: middle; }
+.conf b { display: block; height: 100%; background: var(--c); }
+.back { align-self: flex-start; background: none; border: 0; padding: 0; color: var(--muted); font-size: 12px; }
+.back:hover { color: var(--ink); }
+.lede { color: var(--muted); margin: 0; max-width: 65ch; }
+.files { font: 12px var(--mono); color: var(--muted); }
+
+footer { border-top: 1px solid var(--line); padding: 8px 20px 10px; display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: center; }
+.controls { display: flex; gap: 8px; align-items: center; font-variant-numeric: tabular-nums; }
+.controls #play { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 600; min-width: 128px; }
+.controls .clock { color: var(--muted); font-size: 12px; min-width: 112px; }
+#timeline { width: 100%; height: 110px; display: block; cursor: pointer; }
+
+svg text { fill: var(--ink); font-family: var(--body); }
+.link { fill: none; stroke: #3d4250; stroke-width: 1.4; }
+.link.cross { stroke: var(--accent); stroke-dasharray: 3 4; stroke-opacity: 0.55; }
+.link.lit { stroke: var(--ink); stroke-opacity: 0.9; stroke-width: 2; }
+.node text { font-size: 12px; paint-order: stroke; stroke: var(--bg); stroke-width: 4px; stroke-linejoin: round; }
+.node.goal text { font-weight: 600; font-size: 13px; fill: var(--goal); }
+.node { cursor: pointer; }
+.node .halo { fill: none; stroke: var(--ink); stroke-width: 2; opacity: 0; }
+.node.sel .halo { opacity: 1; }
+.dim { opacity: 0.16; }
+.hidden { display: none; }
+.axis text { fill: var(--muted); font: 11px var(--body); }
+.axis line, .axis path { stroke: var(--line); }
+.tl-row { fill: var(--muted); font: 10px var(--body); text-transform: uppercase; letter-spacing: 0.06em; }
+
+@media (max-width: 860px) {
+  body { overflow: auto; grid-template-rows: auto auto auto; }
+  main { grid-template-columns: 1fr; }
+  #stage { height: 62vh; }
+  aside { border-left: 0; border-top: 1px solid var(--line); }
+  .flow { margin-left: 0; }
+  footer { grid-template-columns: 1fr; }
+  .tools input { width: 150px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Skee Skee Skee <span>/</span> how it got decided</h1>
+  <div class="stats" id="stats"></div>
+  <div class="flow" id="legend" aria-label="Node types, in the order the graph flows"></div>
+</header>
+<main>
+  <div id="stage">
+    <svg id="tree" role="img" aria-label="Decision tree of the Skee Skee Skee project"></svg>
+    <div class="tools">
+      <label for="q" class="hidden">Search nodes</label>
+      <input id="q" type="search" placeholder="Search titles, prompts, commits">
+      <button id="fit" type="button">Fit</button>
+    </div>
+    <div class="hint">Drag to pan, scroll to zoom. Dashed orange lines are second parents: a node that two threads lead into.</div>
+  </div>
+  <aside id="panel" aria-live="polite"></aside>
+</main>
+<footer>
+  <div class="controls">
+    <button id="play" type="button">Play the build</button>
+    <button id="prev" type="button" aria-label="Step back one node">&larr;</button>
+    <button id="next" type="button" aria-label="Step forward one node">&rarr;</button>
+    <button id="speed" type="button" aria-label="Playback speed">1x</button>
+    <span class="clock" id="clock"></span>
+  </div>
+  <svg id="timeline" aria-label="Timeline: every node by the time it was logged, commits above"></svg>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+const DATA = /*__DATA__*/null;
+const TYPES = ["goal", "option", "decision", "action", "outcome", "observation"];
+const css = getComputedStyle(document.documentElement);
+const color = Object.fromEntries(TYPES.map(t => [t, css.getPropertyValue("--" + t).trim()]));
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const nodes = DATA.nodes.map((n, i) => ({ ...n, i, date: new Date(n.t) }));
+const byId = new Map(nodes.map(n => [n.id, n]));
+const parents = new Map(nodes.map(n => [n.id, []]));
+const kids = new Map(nodes.map(n => [n.id, []]));
+for (const e of DATA.edges) { parents.get(e.t).push(e); kids.get(e.s).push(e); }
+
+// The graph is a DAG: 11 nodes have more than one parent. The tree uses the most recent parent
+// (the thread the node was logged in); the others are drawn as dashed cross-links.
+const treeParent = new Map();
+for (const n of nodes) {
+  const ps = parents.get(n.id).map(e => byId.get(e.s)).sort((a, b) => b.date - a.date);
+  treeParent.set(n.id, ps.length ? ps[0].id : "ROOT");
+}
+const crossEdges = DATA.edges.filter(e => treeParent.get(e.t) !== e.s);
+
+/* ---------- header ---------- */
+const fmtTime = d3.timeFormat("%H:%M");
+const fmtDay = d3.timeFormat("%b %-d, %H:%M");
+const goals = nodes.filter(n => n.type === "goal");
+const span = nodes[nodes.length - 1].date - nodes[0].date;
+const counts = d3.rollup(nodes, v => v.length, d => d.type);
+d3.select("#stats").html([
+  `<span><b>${goals.length}</b> asks</span>`,
+  `<span><b>${nodes.length}</b> nodes</span>`,
+  `<span><b>${DATA.edges.length}</b> edges</span>`,
+  `<span><b>${Object.keys(DATA.commits).length}</b> commits tied to nodes</span>`,
+  `<span><b>${Math.floor(span / 36e5)}h ${Math.round(span % 36e5 / 6e4)}m</b> from first ask to last outcome</span>`,
+].join(""));
+
+const shown = new Set(TYPES);
+const legend = d3.select("#legend");
+TYPES.forEach((t, k) => {
+  if (k && k < 5) legend.append("span").attr("class", "arrow").text("→");
+  if (k === 5) legend.append("span").attr("class", "arrow").text("+");
+  legend.append("button").attr("class", "chip").attr("type", "button").attr("aria-pressed", "true")
+    .style("--c", color[t])
+    .html(`<i></i>${t}<span class="n">${counts.get(t) || 0}</span>`)
+    .on("click", function () {
+      shown.has(t) ? shown.delete(t) : shown.add(t);
+      this.setAttribute("aria-pressed", shown.has(t));
+      restyle();
+    });
+});
+
+/* ---------- tree layout ---------- */
+const root = d3.stratify().id(d => d.id).parentId(d => d.id === "ROOT" ? null : treeParent.get(d.id))
+  ([{ id: "ROOT" }, ...nodes]);
+root.sort((a, b) => (a.data.i ?? -1) - (b.data.i ?? -1));
+const DX = 26, DY = 250;
+d3.tree().nodeSize([DX, DY]).separation((a, b) => a.parent === b.parent ? 1 : 1.3)(root);
+const pos = new Map(root.descendants().map(d => [d.id, d]));
+
+const svg = d3.select("#tree");
+const g = svg.append("g");
+const gLinks = g.append("g"), gCross = g.append("g"), gNodes = g.append("g");
+
+const hlink = d3.linkHorizontal().x(d => d.y).y(d => d.x);
+const treeLinks = root.links().filter(l => l.source.id !== "ROOT").map(l => ({ s: l.source.id, t: l.target.id }));
+const linkSel = gLinks.selectAll("path").data(treeLinks).join("path").attr("class", "link")
+  .attr("d", l => hlink({ source: pos.get(l.s), target: pos.get(l.t) }));
+const crossSel = gCross.selectAll("path").data(crossEdges).join("path").attr("class", "link cross")
+  .attr("d", e => {
+    const a = pos.get(e.s), b = pos.get(e.t);
+    const mx = (a.y + b.y) / 2, bend = Math.min(160, Math.abs(a.x - b.x) * 0.25 + 30);
+    return `M${a.y},${a.x} C${mx + bend},${a.x} ${mx - bend},${b.x} ${b.y},${b.x}`;
+  });
+
+const shapes = { goal: d3.symbolCircle, option: d3.symbolDiamond, decision: d3.symbolSquare,
+  action: d3.symbolCircle, outcome: d3.symbolTriangle, observation: d3.symbolStar };
+const sizes = { goal: 260, option: 70, decision: 120, action: 90, outcome: 100, observation: 80 };
+const clip = (s, n) => s.length > n ? s.slice(0, n - 1).trimEnd() + "…" : s;
+
+const nodeSel = gNodes.selectAll("g").data(nodes).join("g")
+  .attr("class", d => "node " + d.type)
+  .attr("transform", d => `translate(${pos.get(d.id).y},${pos.get(d.id).x})`)
+  .attr("tabindex", 0).attr("role", "button")
+  .attr("aria-label", d => `${d.type}: ${d.title}`)
+  .on("click", (ev, d) => { stop(); select(d.id, true); })
+  .on("keydown", (ev, d) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); stop(); select(d.id, true); } });
+const inner = nodeSel.append("g").attr("class", "inner");
+inner.append("circle").attr("class", "halo").attr("r", d => d.type === "goal" ? 13 : 10);
+inner.append("path").attr("d", d => d3.symbol(shapes[d.type], sizes[d.type])())
+  .attr("fill", d => d.type === "goal" ? "var(--bg)" : color[d.type])
+  .attr("stroke", d => color[d.type]).attr("stroke-width", d => d.type === "goal" ? 3 : 0);
+inner.append("text").attr("x", d => d.type === "goal" ? 15 : 10).attr("dy", "0.34em")
+  .text(d => clip(d.title, d.type === "goal" ? 34 : 32));
+nodeSel.append("title").text(d => d.title);
+
+/* ---------- zoom ---------- */
+const zoom = d3.zoom().scaleExtent([0.2, 2.5]).on("zoom", ev => g.attr("transform", ev.transform));
+svg.call(zoom).on("dblclick.zoom", null);
+function fit(animate) {
+  const { width, height } = svg.node().getBoundingClientRect();
+  const xs = root.descendants().filter(d => d.id !== "ROOT");
+  const x0 = d3.min(xs, d => d.x) - 30, x1 = d3.max(xs, d => d.x) + 30;
+  const y0 = d3.min(xs, d => d.y) - 20, y1 = d3.max(xs, d => d.y) + 240;
+  // The tree is wide and short: fit its height, and let it run off to the right rather than shrink to unreadable.
+  const kw = (width - 40) / (y1 - y0), kh = (height - 90) / (x1 - x0);
+  const k = Math.min(1.1, kh, Math.max(kw, 0.8));
+  const t = d3.zoomIdentity.translate(20 - y0 * k, 56 - x0 * k + Math.max(0, (height - 90 - (x1 - x0) * k) / 2)).scale(k);
+  (animate && !reduced ? svg.transition().duration(600) : svg).call(zoom.transform, t);
+}
+function focusOn(id) {
+  const p = pos.get(id), k = Math.max(d3.zoomTransform(svg.node()).k, 0.85);
+  const { width, height } = svg.node().getBoundingClientRect();
+  const t = d3.zoomIdentity.translate(width * 0.38 - p.y * k, height / 2 - p.x * k).scale(k);
+  (reduced ? svg : svg.transition().duration(500)).call(zoom.transform, t);
+}
+d3.select("#fit").on("click", () => fit(true));
+
+/* ---------- state: visibility (playback), filter, selection ---------- */
+let upto = nodes.length;   // nodes[0..upto) are built
+let selected = null;
+let query = "";
+
+function lineage(id) {
+  const up = new Set([id]), down = new Set([id]);
+  const walk = (k, set, next) => { for (const e of next.get(k)) { const o = next === parents ? e.s : e.t; if (!set.has(o)) { set.add(o); walk(o, set, next); } } };
+  walk(id, up, parents); walk(id, down, kids);
+  return new Set([...up, ...down]);
+}
+function matches(n) {
+  if (!query) return true;
+  const c = DATA.commits[n.commit];
+  return (n.title + " " + n.desc + " " + n.prompt + " " + (c ? c.subject + " " + c.body : "")).toLowerCase().includes(query);
+}
+function restyle() {
+  const lit = selected ? lineage(selected) : null;
+  const vis = d => d.i < upto;
+  const on = d => shown.has(d.type) && matches(d) && (!lit || lit.has(d.id));
+  nodeSel.classed("hidden", d => !vis(d)).classed("dim", d => !on(d)).classed("sel", d => d.id === selected);
+  const edgeVis = (s, t) => vis(byId.get(s)) && vis(byId.get(t));
+  const edgeLit = (s, t) => lit && lit.has(s) && lit.has(t);
+  linkSel.classed("hidden", l => !edgeVis(l.s, l.t)).classed("lit", l => edgeLit(l.s, l.t))
+    .classed("dim", l => (lit && !edgeLit(l.s, l.t)) || !(on(byId.get(l.s)) && on(byId.get(l.t))));
+  crossSel.classed("hidden", e => !edgeVis(e.s, e.t)).classed("lit", e => edgeLit(e.s, e.t))
+    .classed("dim", e => (lit && !edgeLit(e.s, e.t)) || !(on(byId.get(e.s)) && on(byId.get(e.t))));
+  tlDots.attr("opacity", d => d.i < upto ? (on(d) ? 1 : 0.2) : 0.12).attr("r", d => d.id === selected ? 5.5 : 3.2);
+  const last = nodes[Math.max(0, upto - 1)];
+  playhead.attr("transform", `translate(${tx(last.date)},0)`);
+  d3.select("#clock").text(`${upto} / ${nodes.length}  ·  ${fmtTime(last.date)}`);
+}
+d3.select("#q").on("input", function () { query = this.value.trim().toLowerCase(); restyle(); });
+
+/* ---------- panel ---------- */
+const panel = d3.select("#panel");
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+function linkItem(n, note) {
+  return `<li><button type="button" data-id="${n.id}" style="--c:${color[n.type]}"><i></i><span>${esc(n.title)}<small>${n.type}${note ? " · " + esc(note) : ""}</small></span></button></li>`;
+}
+function showAsks() {
+  panel.html(`
+    <h2>Fifteen asks, one day</h2>
+    <p class="lede">Every gold ring is something the user typed, stored word for word. Under each ask is what was considered, what was chosen, what was built, and what came of it. Press <b>Play the build</b> to watch the graph grow in the order it was logged, or pick an ask.</p>
+    <h3>The asks, in order</h3>
+    <ul class="links">${goals.map(n => linkItem(n, fmtTime(n.date))).join("")}</ul>`);
+  bindLinks();
+}
+function showNode(n) {
+  const c = DATA.commits[n.commit];
+  const ins = parents.get(n.id), outs = kids.get(n.id);
+  panel.html(`
+    <button class="back" type="button" id="back">&larr; All asks</button>
+    <div class="meta"><span class="typechip" style="--c:${color[n.type]}">${n.type}</span>
+      <span>${fmtDay(n.date)}</span>
+      ${n.confidence != null ? `<span>confidence ${n.confidence} <span class="conf" style="--c:${color[n.type]}"><b style="width:${n.confidence}%"></b></span></span>` : ""}
+      <span>#${n.i + 1} of ${nodes.length}</span></div>
+    <h2>${esc(n.title)}</h2>
+    ${n.prompt ? `<h3>What the user typed</h3><blockquote>${esc(n.prompt)}</blockquote>` : ""}
+    ${n.desc ? `<p class="lede">${esc(n.desc)}</p>` : ""}
+    ${c ? `<h3>Commit</h3><div class="commit"><code>${c.short}</code><span class="subj">${esc(c.subject)}</span>
+      <span class="meta">${esc(c.stat)}</span>${c.body ? `<div class="body">${esc(c.body)}</div>` : ""}</div>` : ""}
+    ${n.files.length ? `<h3>Files</h3><div class="files">${n.files.map(esc).join("<br>")}</div>` : ""}
+    ${ins.length ? `<h3>Came from</h3><ul class="links">${ins.map(e => linkItem(byId.get(e.s), e.r)).join("")}</ul>` : ""}
+    ${outs.length ? `<h3>Led to</h3><ul class="links">${outs.map(e => linkItem(byId.get(e.t), e.r)).join("")}</ul>` : ""}`);
+  d3.select("#back").on("click", () => { stop(); select(null); });
+  bindLinks();
+}
+function bindLinks() {
+  panel.selectAll(".links button").on("click", function () { stop(); select(this.dataset.id, true); });
+}
+function select(id, pan) {
+  selected = id;
+  if (id && byId.get(id).i >= upto) upto = byId.get(id).i + 1;
+  id ? showNode(byId.get(id)) : showAsks();
+  restyle();
+  if (id && pan) focusOn(id);
+}
+
+/* ---------- timeline ---------- */
+const tl = d3.select("#timeline");
+const TM = { l: 92, r: 16, t: 20, b: 20 };
+// Work came in bursts. Any quiet stretch over 45 minutes is squeezed to a fixed 28px break
+// (a polylinear time scale), so the bursts get the width.
+const GAP = 45 * 6e4, BREAK = 28;
+const gaps = [];
+for (let k = 1; k < nodes.length; k++) if (nodes[k].date - nodes[k - 1].date > GAP) gaps.push([nodes[k - 1].date, nodes[k].date]);
+const tx = d3.scaleTime();
+const inGap = d => gaps.some(([a, b]) => d > a && d < b);
+const ty = d3.scalePoint().domain(TYPES).padding(0.5);
+const tlBreaks = tl.append("g");
+const tlAxis = tl.append("g").attr("class", "axis");
+const tlRows = tl.append("g");
+const tlCommits = tl.append("g");
+const tlDotsG = tl.append("g");
+const playhead = tl.append("g");
+playhead.append("line").attr("y1", 4).attr("stroke", "var(--accent)").attr("stroke-width", 2);
+let tlDots = tlDotsG.selectAll("circle").data(nodes).join("circle").attr("fill", d => color[d.type]);
+function layoutTimeline() {
+  const w = tl.node().getBoundingClientRect().width, h = 110;
+  const t0 = nodes[0].date, t1 = nodes[nodes.length - 1].date;
+  const busy = (t1 - t0) - d3.sum(gaps, ([a, b]) => b - a);
+  const px = (w - TM.l - TM.r - BREAK * gaps.length) / busy;
+  const dom = [t0], rng = [TM.l];
+  let x = TM.l, prev = t0;
+  for (const [a, b] of gaps) { x += (a - prev) * px; dom.push(a, b); rng.push(x, x + BREAK); x += BREAK; prev = b; }
+  dom.push(t1); rng.push(w - TM.r);
+  tx.domain(dom).range(rng); ty.range([TM.t, h - TM.b]);
+  const ticks = d3.timeMinute.every(30).range(t0, t1).filter(d => !inGap(d))
+    .filter((d, k, a) => k === 0 || tx(d) - tx(a[k - 1]) > 44);
+  tlAxis.attr("transform", `translate(0,${h - TM.b + 2})`)
+    .call(d3.axisBottom(tx).tickValues(ticks).tickFormat(fmtTime).tickSize(3));
+  tlBreaks.selectAll("g").data(gaps).join(enter => {
+      const b = enter.append("g");
+      b.append("rect").attr("fill", "var(--line)").attr("opacity", 0.5);
+      b.append("text").attr("class", "tl-row").style("text-transform", "none").attr("text-anchor", "middle");
+      return b;
+    })
+    .call(b => b.select("rect").attr("x", ([a]) => tx(a) + 4).attr("width", BREAK - 8).attr("y", TM.t - 6).attr("height", h - TM.t - TM.b + 12).attr("rx", 3))
+    .call(b => b.select("text").attr("x", ([a]) => tx(a) + BREAK / 2).attr("y", h - 2)
+      .text(([a, b]) => { const m = Math.round((b - a) / 6e4); return m >= 60 ? `${Math.floor(m / 60)}h${m % 60 ? String(m % 60).padStart(2, "0") : ""}` : m + "m"; }));
+  tlRows.selectAll("text").data(TYPES).join("text").attr("class", "tl-row")
+    .attr("x", TM.l - 10).attr("y", d => ty(d)).attr("dy", "0.32em").attr("text-anchor", "end").text(d => d);
+  const cs = DATA.log.map(c => ({ ...c, d: new Date(c.date) })).filter(c => c.d >= tx.domain()[0] && c.d <= tx.domain().at(-1) && !inGap(c.d));
+  tlCommits.selectAll("path").data(cs).join("path")
+    .attr("d", c => `M${tx(c.d)},2 l4,6 l-8,0 z`).attr("fill", "var(--muted)")
+    .selectAll("title").data(c => [c]).join("title").text(c => `${c.hash}  ${c.subject}`);
+  tlDots.attr("cx", d => tx(d.date)).attr("cy", d => ty(d.type));
+  playhead.select("line").attr("y2", h - TM.b);
+}
+const scrub = ev => {
+  stop();
+  const t = tx.invert(Math.max(TM.l, d3.pointer(ev, tl.node())[0]));
+  upto = Math.max(1, d3.bisector(d => d.date).right(nodes, t));
+  if (selected && byId.get(selected).i >= upto) selected = null;
+  select(selected ?? nodes[upto - 1].id, false);
+};
+tl.on("click", scrub).call(d3.drag().on("drag", scrub));
+tlDots.on("click", (ev, d) => { ev.stopPropagation(); stop(); select(d.id, true); })
+  .append("title").text(d => `${fmtTime(d.date)}  ${d.type}: ${d.title}`);
+
+/* ---------- playback ---------- */
+let timer = null, speed = 1;
+const SPEEDS = [1, 2, 4];
+function stop() { if (timer) { timer.stop(); timer = null; d3.select("#play").text(upto < nodes.length ? "Resume" : "Play the build"); } }
+function step(dir) {
+  upto = Math.min(nodes.length, Math.max(1, upto + dir));
+  const n = nodes[upto - 1];
+  selected = n.id;
+  showNode(n); restyle();
+  if (dir > 0 && !reduced) {
+    d3.select(nodeSel.nodes()[n.i]).select(".inner").attr("transform", "scale(0.1)")
+      .transition().duration(380).ease(d3.easeBackOut).attr("transform", "scale(1)");
+  }
+  focusOn(n.id);
+}
+function play() {
+  if (timer) return stop();
+  if (upto >= nodes.length) upto = 0;
+  d3.select("#play").text("Pause");
+  let last = -Infinity;
+  timer = d3.timer(el => {
+    // Goals hold the screen longer: their prompt is the thing to read.
+    const prev = nodes[Math.max(0, upto - 1)];
+    const hold = (prev && prev.type === "goal" && upto > 0 ? 2600 : 900) / speed;
+    if (el - last < hold) return;
+    last = el;
+    if (upto >= nodes.length) { stop(); return; }
+    step(1);
+  });
+}
+d3.select("#play").on("click", play);
+d3.select("#next").on("click", () => { stop(); step(1); });
+d3.select("#prev").on("click", () => { stop(); step(-1); });
+d3.select("#speed").on("click", function () { speed = SPEEDS[(SPEEDS.indexOf(speed) + 1) % SPEEDS.length]; this.textContent = speed + "x"; });
+window.addEventListener("keydown", ev => {
+  if (ev.target.closest("input, button, [role=button]")) return;
+  if (ev.key === " ") { ev.preventDefault(); play(); }
+  else if (ev.key === "ArrowRight") { stop(); step(1); }
+  else if (ev.key === "ArrowLeft") { stop(); step(-1); }
+  else if (ev.key === "Escape") { stop(); select(null); }
+});
+
+/* ---------- go ---------- */
+layoutTimeline();
+fit(false);
+select(null);
+window.addEventListener("resize", () => { layoutTimeline(); restyle(); });
+</script>
+</body>
+</html>

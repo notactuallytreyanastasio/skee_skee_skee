@@ -180,6 +180,16 @@
       "to_change_id": "212544ce-6851-480c-9842-78d18bf43b6e",
       "weight": 1.0
     },
+    "20554eec8080174e4f96": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T18:11:08.225364-05:00",
+      "edge_id": "20554eec8080174e4f96",
+      "edge_type": "leads_to",
+      "from_change_id": "cdfb98ad-c71e-4941-b898-1b0ea4925455",
+      "rationale": "found before tuning",
+      "to_change_id": "70ac7ca0-353d-4a50-98e4-43283ba53504",
+      "weight": 1.0
+    },
     "210ac6dc38317e0b0871": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T09:03:50.031049-04:00",
@@ -288,6 +298,16 @@
       "from_change_id": "a6e5c0ac-620d-4e88-a1ab-3b68dbd4eb81",
       "rationale": "option",
       "to_change_id": "e973e3a0-0155-45e1-b132-b9ea909c7cfb",
+      "weight": 1.0
+    },
+    "2f02b7b1ca14065b9686": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T18:13:03.845622-05:00",
+      "edge_id": "2f02b7b1ca14065b9686",
+      "edge_type": "leads_to",
+      "from_change_id": "cdfb98ad-c71e-4941-b898-1b0ea4925455",
+      "rationale": "option",
+      "to_change_id": "59df5b27-e22e-476d-ad9c-ee49a42cf015",
       "weight": 1.0
     },
     "2f1fff41bad058e78d35": {
@@ -428,6 +448,16 @@
       "from_change_id": "a6e5c0ac-620d-4e88-a1ab-3b68dbd4eb81",
       "rationale": "user-specified cel look",
       "to_change_id": "a288fb15-4cf7-49f5-a576-26b2dae7df2b",
+      "weight": 1.0
+    },
+    "555831eaa4bb8410bf22": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T18:11:08.506749-05:00",
+      "edge_id": "555831eaa4bb8410bf22",
+      "edge_type": "leads_to",
+      "from_change_id": "70ac7ca0-353d-4a50-98e4-43283ba53504",
+      "rationale": "fix the yardstick first",
+      "to_change_id": "2666a1d0-b33e-4c26-aead-b97b7cdde85f",
       "weight": 1.0
     },
     "564d6c15b6e7706f21ae": {
@@ -630,6 +660,16 @@
       "to_change_id": "8b016f98-5074-41f0-8a95-258570885fa3",
       "weight": 1.0
     },
+    "7bb00c655c2446c15388": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T18:13:04.349289-05:00",
+      "edge_id": "7bb00c655c2446c15388",
+      "edge_type": "leads_to",
+      "from_change_id": "59df5b27-e22e-476d-ad9c-ee49a42cf015",
+      "rationale": "rejected: punishes good builds",
+      "to_change_id": "7275c26b-c9a3-491e-864f-daee34443037",
+      "weight": 1.0
+    },
     "7e3ae8fb65016dfa8bdc": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:50:00.609367-04:00",
@@ -738,6 +778,16 @@
       "from_change_id": "71b53359-8302-42f6-89d9-fe32162a069f",
       "rationale": "chosen",
       "to_change_id": "a8d7cac7-046a-4b8e-b975-36f92536aa44",
+      "weight": 1.0
+    },
+    "8825f4b58e69fb389db0": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T18:13:04.090840-05:00",
+      "edge_id": "8825f4b58e69fb389db0",
+      "edge_type": "leads_to",
+      "from_change_id": "3603f042-8e6a-48f4-802b-aa0393ff5e55",
+      "rationale": "chosen",
+      "to_change_id": "7275c26b-c9a3-491e-864f-daee34443037",
       "weight": 1.0
     },
     "8e5bb1c558160ecc5836": {
@@ -860,6 +910,16 @@
       "to_change_id": "c807069d-e911-4d48-985f-93d912cec18a",
       "weight": 1.0
     },
+    "a907b0d0c071985535be": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T18:13:04.226226-05:00",
+      "edge_id": "a907b0d0c071985535be",
+      "edge_type": "leads_to",
+      "from_change_id": "bb080649-b659-479b-9331-317f386d06d6",
+      "rationale": "rejected: kills the big frames",
+      "to_change_id": "7275c26b-c9a3-491e-864f-daee34443037",
+      "weight": 1.0
+    },
     "a90810101b5fb79488d6": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T09:09:11.691503-04:00",
@@ -910,6 +970,16 @@
       "to_change_id": "50f6ba77-976f-4a37-9d13-3078c82578d4",
       "weight": 1.0
     },
+    "b67785e9d7010832a671": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T18:15:37.755151-05:00",
+      "edge_id": "b67785e9d7010832a671",
+      "edge_type": "leads_to",
+      "from_change_id": "89367a6c-a98b-4456-bce0-f2f5993340cc",
+      "rationale": "result",
+      "to_change_id": "acbb6d27-f7be-45ef-b022-a5f5f5874976",
+      "weight": 1.0
+    },
     "b7121b1ebab461c77b4e": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T10:32:15.366016-04:00",
@@ -940,6 +1010,16 @@
       "to_change_id": "b366c17e-d75c-4365-8c6d-dd6e27394c7d",
       "weight": 1.0
     },
+    "b7d52fe1e36df477f6fe": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T18:13:03.716139-05:00",
+      "edge_id": "b7d52fe1e36df477f6fe",
+      "edge_type": "leads_to",
+      "from_change_id": "cdfb98ad-c71e-4941-b898-1b0ea4925455",
+      "rationale": "option",
+      "to_change_id": "bb080649-b659-479b-9331-317f386d06d6",
+      "weight": 1.0
+    },
     "b7e96e7f3fa401a5f2b8": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:13:19.930240-04:00",
@@ -968,6 +1048,16 @@
       "from_change_id": "58025ef7-e154-40ed-9ce3-db111ac495bf",
       "rationale": "approach",
       "to_change_id": "f5787b78-b411-413d-b9be-205a35f2a41d",
+      "weight": 1.0
+    },
+    "bc07cc34f4715b3060a7": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T18:13:04.612865-05:00",
+      "edge_id": "bc07cc34f4715b3060a7",
+      "edge_type": "leads_to",
+      "from_change_id": "7275c26b-c9a3-491e-864f-daee34443037",
+      "rationale": "implementation",
+      "to_change_id": "89367a6c-a98b-4456-bce0-f2f5993340cc",
       "weight": 1.0
     },
     "bd2ad4930f4bff42f16e": {
@@ -1210,6 +1300,16 @@
       "from_change_id": "594e64b4-5603-4742-9e25-f69e2f24e088",
       "rationale": "result",
       "to_change_id": "6176341e-c2bf-444a-9a87-59d00a5f62fb",
+      "weight": 1.0
+    },
+    "dcdeb3e6c0a56b28c1c3": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T18:13:03.576341-05:00",
+      "edge_id": "dcdeb3e6c0a56b28c1c3",
+      "edge_type": "leads_to",
+      "from_change_id": "cdfb98ad-c71e-4941-b898-1b0ea4925455",
+      "rationale": "option",
+      "to_change_id": "3603f042-8e6a-48f4-802b-aa0393ff5e55",
       "weight": 1.0
     },
     "e02e068f8b2e3e279fd3": {
@@ -1643,6 +1743,22 @@
       "title": "Simulator SCNView shows the same dense drop burst as skee film: far above the 54 stars birthRate x emissionDuration implies, so the look is the game's, not a film artifact",
       "updated_at": "2026-11-03T17:21:31.081778-05:00"
     },
+    "2666a1d0-b33e-4c26-aead-b97b7cdde85f": {
+      "author": "Bobby Grayson",
+      "change_id": "2666a1d0-b33e-4c26-aead-b97b7cdde85f",
+      "created_at": "2026-11-03T18:11:08.372093-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 85,
+        "files": [
+          "Sources/SkeeCore/Bots/BotPlayer.swift"
+        ]
+      },
+      "node_type": "action",
+      "status": "pending",
+      "title": "Bot aims by expected value over the measured landing distribution, misses included",
+      "updated_at": "2026-11-03T18:11:08.372093-05:00"
+    },
     "277b5d09-28b3-4dc7-9c20-7827539af0b4": {
       "author": "Bobby Grayson",
       "change_id": "277b5d09-28b3-4dc7-9c20-7827539af0b4",
@@ -1736,6 +1852,19 @@
       "status": "pending",
       "title": "Two-part curve keeps duds and doubles windows",
       "updated_at": "2026-10-30T17:44:13.896178-04:00"
+    },
+    "3603f042-8e6a-48f4-802b-aa0393ff5e55": {
+      "author": "Bobby Grayson",
+      "change_id": "3603f042-8e6a-48f4-802b-aa0393ff5e55",
+      "created_at": "2026-11-03T18:13:03.124252-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 80
+      },
+      "node_type": "option",
+      "status": "pending",
+      "title": "Reshape anteBase so score/target falls steadily, and scale targets per room",
+      "updated_at": "2026-11-03T18:13:03.124252-05:00"
     },
     "37b6071b-f2b2-45ab-a9ce-7cbba2ac6049": {
       "author": "Bobby Grayson",
@@ -1831,6 +1960,20 @@
       "status": "pending",
       "title": "Walkthrough state machine + practiceRun in core, CoachView over ball tray with SKIP/GOT IT, parks and restores real run, HOW TO PLAY on title",
       "updated_at": "2026-10-30T17:20:05.063251-04:00"
+    },
+    "422cb85a-1927-45c8-aed1-9fe7b49edbed": {
+      "author": "Bobby Grayson",
+      "change_id": "422cb85a-1927-45c8-aed1-9fe7b49edbed",
+      "created_at": "2026-11-03T18:13:38.800364-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 70,
+        "prompt": "we coudl maybe add different kinds of balls that make it harder or easier too and give more points for playing with more chaotic balls or something"
+      },
+      "node_type": "goal",
+      "status": "pending",
+      "title": "Chaos balls: ball types that change difficulty, paying more for riskier ones",
+      "updated_at": "2026-11-03T18:13:38.800364-05:00"
     },
     "42862e1f-5d1d-432b-9ed8-e3750779fb5c": {
       "author": "Bobby Grayson",
@@ -2089,6 +2232,19 @@
       "title": "Launch speed was a separate screen-speed mapping and physics restarted at s=0, so release was discontinuous with the held ball",
       "updated_at": "2026-10-30T09:34:48.328482-04:00"
     },
+    "59df5b27-e22e-476d-ad9c-ee49a42cf015": {
+      "author": "Bobby Grayson",
+      "change_id": "59df5b27-e22e-476d-ad9c-ee49a42cf015",
+      "created_at": "2026-11-03T18:13:03.452066-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 15
+      },
+      "node_type": "option",
+      "status": "pending",
+      "title": "Rubber-band targets to the build's strength",
+      "updated_at": "2026-11-03T18:13:03.452066-05:00"
+    },
     "59f8fb99-74c2-4375-9887-b325a620e006": {
       "author": "Bobby Grayson",
       "change_id": "59f8fb99-74c2-4375-9887-b325a620e006",
@@ -2157,6 +2313,20 @@
       "title": "Simulator boots the Duo folded; only outer display 466x678pt is capturable",
       "updated_at": "2026-10-30T08:46:37.400743-04:00"
     },
+    "6e0cd2ce-244e-41cb-ae10-24e292e46c5b": {
+      "author": "Bobby Grayson",
+      "change_id": "6e0cd2ce-244e-41cb-ae10-24e292e46c5b",
+      "created_at": "2026-11-03T18:13:38.933982-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 70,
+        "prompt": "and add some wild animations and interesting behaviors that keep throwing fun"
+      },
+      "node_type": "goal",
+      "status": "pending",
+      "title": "Wild animations and interesting behaviors that keep throwing fun",
+      "updated_at": "2026-11-03T18:13:38.933982-05:00"
+    },
     "6e9758f5-ac60-4e1f-983e-cb924c2c40f0": {
       "author": "Bobby Grayson",
       "change_id": "6e9758f5-ac60-4e1f-983e-cb924c2c40f0",
@@ -2187,6 +2357,19 @@
       "status": "pending",
       "title": "Built iOS app shell: Canvas renderer, swipe/tap gestures, UIHingeInteraction fold, haptics, save/replay, debug launch args",
       "updated_at": "2026-10-30T08:46:36.861025-04:00"
+    },
+    "70ac7ca0-353d-4a50-98e4-43283ba53504": {
+      "author": "Bobby Grayson",
+      "change_id": "70ac7ca0-353d-4a50-98e4-43283ba53504",
+      "created_at": "2026-11-03T18:11:08.011351-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 95
+      },
+      "node_type": "observation",
+      "status": "pending",
+      "title": "Balance yardstick is broken: skill order inverts (Neon novice 19% vs regular 0.7%) because chooseHole values hit x value and ignores where misses land; regular gutters 39% chasing pockets. Published Neon Lounge claim was a bot artefact",
+      "updated_at": "2026-11-03T18:11:08.011351-05:00"
     },
     "70d9c395-7e30-4cb4-9806-8ba4d6d659e7": {
       "author": "Bobby Grayson",
@@ -2228,6 +2411,19 @@
       "status": "pending",
       "title": "Lower flick speed range to 300-3100 pt/s, even lift-off/peak weight; board symbols as camera-facing coins, fewer and bigger; slot moved under the rings",
       "updated_at": "2026-10-30T16:53:51.016185-04:00"
+    },
+    "7275c26b-c9a3-491e-864f-daee34443037": {
+      "author": "Bobby Grayson",
+      "change_id": "7275c26b-c9a3-491e-864f-daee34443037",
+      "created_at": "2026-11-03T18:13:03.971796-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 80
+      },
+      "node_type": "decision",
+      "status": "pending",
+      "title": "Reshape targets and scale per room; keep scoring so big frames survive, no rubber-banding because a good build must really win. Accept: skill order holds, rooms harden in order, deaths move late, close rounds well above 2.4%",
+      "updated_at": "2026-11-03T18:13:03.971796-05:00"
     },
     "72cd587a-eca3-46f8-9df8-ec7b3284aa95": {
       "author": "Bobby Grayson",
@@ -2282,6 +2478,25 @@
       "status": "pending",
       "title": "128 core + 12 presentation tests pass; straight shots stay on their line; guide renders; unfelt on device (Duo offline)",
       "updated_at": "2026-11-01T07:48:43.561815-05:00"
+    },
+    "89367a6c-a98b-4456-bce0-f2f5993340cc": {
+      "author": "Bobby Grayson",
+      "change_id": "89367a6c-a98b-4456-bce0-f2f5993340cc",
+      "created_at": "2026-11-03T18:13:04.482080-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 80,
+        "files": [
+          "Sources/SkeeCore/Run/Config.swift",
+          "Sources/SkeeCore/Meta/Room.swift",
+          "Sources/SkeeCore/Bots/BotPlayer.swift",
+          "Sources/skee/Commands.swift"
+        ]
+      },
+      "node_type": "action",
+      "status": "pending",
+      "title": "RunConfig.targetScale, Room.targetScale, skee balance --bases sweep, combo-aware bot valuation",
+      "updated_at": "2026-11-03T18:13:04.482080-05:00"
     },
     "89ce6e47-d9c9-4c86-afa2-648418fef3c8": {
       "author": "Bobby Grayson",
@@ -2532,6 +2747,20 @@
       "title": "Physics tests pass: deterministic, mirror-symmetric, every hole reachable, lips rattle",
       "updated_at": "2026-10-30T08:10:01.942383-04:00"
     },
+    "acbb6d27-f7be-45ef-b022-a5f5f5874976": {
+      "author": "Bobby Grayson",
+      "change_id": "acbb6d27-f7be-45ef-b022-a5f5f5874976",
+      "created_at": "2026-11-03T18:15:37.604956-05:00",
+      "metadata": {
+        "branch": "main",
+        "commit": "4a5f710f2b24be735057e5a35b313b48d3d3bd62",
+        "confidence": 90
+      },
+      "node_type": "outcome",
+      "status": "pending",
+      "title": "Bot fixed, skill order holds; first target pass overshot (wins 0-6%, close rounds 4-15%); pushed as work in progress at the user's request",
+      "updated_at": "2026-11-03T18:15:37.604956-05:00"
+    },
     "b321742b-db07-4936-bd77-d68386e32c17": {
       "author": "Bobby Grayson",
       "change_id": "b321742b-db07-4936-bd77-d68386e32c17",
@@ -2599,6 +2828,19 @@
       "status": "pending",
       "title": "Building velocity: ball rolls faster as the thumb speeds up and carries that exact velocity into the throw",
       "updated_at": "2026-10-30T09:34:47.928169-04:00"
+    },
+    "bb080649-b659-479b-9331-317f386d06d6": {
+      "author": "Bobby Grayson",
+      "change_id": "bb080649-b659-479b-9331-317f386d06d6",
+      "created_at": "2026-11-03T18:13:03.328228-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 30
+      },
+      "node_type": "option",
+      "status": "pending",
+      "title": "Cut scoring (mult caps, smaller line wins) to shrink overkill",
+      "updated_at": "2026-11-03T18:13:03.328228-05:00"
     },
     "bc0af5cb-2356-4680-84b6-b8f29e3eb507": {
       "author": "Bobby Grayson",
@@ -2709,6 +2951,20 @@
       "status": "pending",
       "title": "All four styles render correctly from CLI; contact sheets show roll, hinge flight, tally and reel spin",
       "updated_at": "2026-10-30T08:42:56.914404-04:00"
+    },
+    "cdfb98ad-c71e-4941-b898-1b0ea4925455": {
+      "author": "Bobby Grayson",
+      "change_id": "cdfb98ad-c71e-4941-b898-1b0ea4925455",
+      "created_at": "2026-11-03T18:10:01.042461-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 75,
+        "prompt": "yes push and lets make the game have a better hardness curve next and keep it FUN"
+      },
+      "node_type": "goal",
+      "status": "pending",
+      "title": "Better difficulty curve across rooms and antes, and keep it fun",
+      "updated_at": "2026-11-03T18:10:01.042461-05:00"
     },
     "cf7cf4c1-aa43-4dc6-8b54-289bd2647939": {
       "author": "Bobby Grayson",

@@ -69,18 +69,21 @@ func sceneFilmCommand() {
 @MainActor
 func composeFrame(_ p: Presentation, cab: Cabinet, presenter: ScenePresenter, size: CGSize, scale: CGFloat = 2,
                   screen: HUDState.Screen = .game, selectedOffer: Int? = nil, wallet: Wallet? = nil, coach: CoachCard? = nil,
-                  line: Double? = nil, host: HostState? = nil) -> CGImage? {
-    guard let scene3D = snapshot(cab, size: CGSize(width: size.width * scale, height: size.height * scale)) else { return nil }
+                  line: Double? = nil, host: HostState? = nil, bet: Bet = .one, snapper: Snapper? = nil, time: TimeInterval = 0,
+                  tweak: (inout HUDState) -> Void = { _ in }) -> CGImage? {
+    let pixels = CGSize(width: size.width * scale, height: size.height * scale)
+    guard let scene3D = snapper?.image(size: pixels, time: time) ?? snapshot(cab, size: pixels) else { return nil }
     let a = Float(size.width / size.height)
     var hud = HUDState.make(p, holeOnScreen: { hole in
         let w = cab.world
         let f = presenter.rig.project(w.board(w.table.board.holeCenter(hole)), aspect: a)
         return CGPoint(x: CGFloat(f.x) * size.width, y: CGFloat(f.y) * size.height)
-    }, center: CGPoint(x: size.width / 2, y: size.height * 0.2), selectedOffer: selectedOffer, screen: screen)
+    }, center: CGPoint(x: size.width / 2, y: size.height * 0.2), selectedOffer: selectedOffer, screen: screen, bet: bet)
     if let wallet { hud.wallet = wallet; hud.shopOpen = screen == .game }
     hud.coach = coach
     hud.host = host
     if let line { hud.guide = presenter.guide(line: line, size: size); hud.aiming = true }
+    tweak(&hud)
     let renderer = ImageRenderer(content: HUDView(state: hud).frame(width: size.width, height: size.height))
     renderer.scale = scale
     guard let overlay = renderer.cgImage else { return scene3D }

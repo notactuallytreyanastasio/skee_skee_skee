@@ -28,6 +28,10 @@ skee — play and measure Skee Skee Skee from the terminal
       A full app frame, 3D scene plus HUD, at the phone's size.
   skee scenefilm [--save run.json] [--from secs] [--frames n] [--dt secs] [--cols n] [--scale k]
       Contact sheet of the last action's animation in 3D.
+  skee moments [--runs n] [--room name] [--skill name]
+      Scan bot runs for trailer moments, by seed and action index.
+  skee film [--out dir] [--fps n] [--only 0,3]
+      Render the trailer, 16:9 and 9:16, from real runs. Needs ffmpeg.
 """
 
 let argv = Array(CommandLine.arguments.dropFirst())
@@ -76,5 +80,7 @@ case "scenefilm": MainActor.assumeIsolated { sceneFilmCommand() }
 case "frame": MainActor.assumeIsolated { frameCommand() }
 case "flickprobe": flickProbe()
 case "haggle": haggleCommand()
+case "moments": momentsCommand()
+case "film": MainActor.assumeIsolated { filmCommand() }
 default: print(usage); exit(1)
 }

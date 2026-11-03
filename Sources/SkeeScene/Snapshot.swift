@@ -18,6 +18,29 @@ public func snapshot(_ cab: Cabinet, size: CGSize, time: TimeInterval = 0) -> CG
     #endif
 }
 
+/// Repeated offscreen renders of one cabinet: `snapshot` builds a renderer
+/// per call, which is fine for a PNG and ruinous for a film.
+public final class Snapper {
+    let cab: Cabinet
+    let renderer: SCNRenderer
+    public init?(_ cab: Cabinet) {
+        guard let device = MTLCreateSystemDefaultDevice() else { return nil }
+        self.cab = cab
+        renderer = SCNRenderer(device: device, options: nil)
+        renderer.scene = cab.scene
+        renderer.pointOfView = cab.camera
+        renderer.isJitteringEnabled = false
+    }
+    public func image(size: CGSize, time: TimeInterval) -> CGImage? {
+        let img = renderer.snapshot(atTime: time, with: size, antialiasingMode: .multisampling4X)
+        #if canImport(UIKit)
+        return img.cgImage
+        #else
+        return img.cgImage(forProposedRect: nil, context: nil, hints: nil)
+        #endif
+    }
+}
+
 /// A look-at camera as plain numbers, so framing can be solved without
 /// touching SceneKit nodes.
 public struct CameraRig: Hashable, Sendable {

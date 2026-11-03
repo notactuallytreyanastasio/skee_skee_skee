@@ -68,6 +68,22 @@ skee scenefilm --save run.json --from 0.5 --frames 8 --dt 0.12   # contact sheet
 The framing, the exposure, the lane UV flip and the tray count were all found
 by looking at these.
 
+## The trailer
+
+```
+skee moments --runs 300            # scan bot runs for jackpots, combos, big frames, by seed and action
+skee film --out out/trailer --fps 60             # 16:9 and 9:16 mp4s, about three minutes
+skee film --out /tmp/t --only 2,3                # just those shots, to check an edit
+```
+
+Every frame is a real reducer step from a real bot run, through the real
+`Presentation`, cabinet and HUD, at the inner display's size. Sound is the
+game's `Synth` on the game's cues. Two things are made for the film: the thumb
+trail, and the music bed. The edit is the list at the bottom of
+`Sources/skee/FilmCommand.swift`; the host lines there are a transcript of a
+live `skee haggle`, not writing. Needs `ffmpeg` on the path. Changing the
+physics or the rules moves the seeds: rerun `moments` and check the edit.
+
 ## The simulator
 
 ```

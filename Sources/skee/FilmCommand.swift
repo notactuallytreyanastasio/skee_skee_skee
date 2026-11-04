@@ -365,14 +365,14 @@ final class Film {
         music.append((time, 0.35))
         var h = Haggle(room: room, seed: seed)
         let k = Take(state: newRun(seed: 1, room: room), wallet: Wallet(), aspect: Float(gameSize.width / gameSize.height))
-        hold(k, 1.0, text: text, sub: sub, host: HostState(haggle: h, thinking: false, error: nil))
+        hold(k, 1.0, text: text, sub: sub, host: HostState(haggle: h, thinking: false))
         for (line, reply) in turns {
             h.say(line)
-            hold(k, 0.5, text: text, sub: sub, host: HostState(haggle: h, thinking: true, error: nil))
+            hold(k, 0.5, text: text, sub: sub, host: HostState(haggle: h, thinking: true))
             h.hear(reply)
-            hold(k, 3.2, text: text, sub: sub, host: HostState(haggle: h, thinking: false, error: nil))
+            hold(k, 3.2, text: text, sub: sub, host: HostState(haggle: h, thinking: false))
         }
-        toBeat(k, text: text, sub: sub, host: HostState(haggle: h, thinking: false, error: nil))
+        toBeat(k, text: text, sub: sub, host: HostState(haggle: h, thinking: false))
         music.append((time, 0.8))
     }
 

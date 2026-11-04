@@ -80,23 +80,43 @@ final class GameModel {
     /// The coached practice warm-up, while it runs. The real run waits in
     /// `parked` and comes back when the walkthrough ends or is skipped.
     var walkthrough: Walkthrough?
+    /// Sal's line at the door, while it's showing.
+    var arrival: Int?
+    var guideOpen = false
+    /// A first-time card over a real game.
+    var tip: Tip?
+    /// What's been introduced, and the balls thrown since the last card.
+    var known = TipStore.seen
+    @ObservationIgnored private var sinceTip = Int.max
     @ObservationIgnored private var parked: (seed: UInt64, actions: [Action], state: RunState)?
 
     @ObservationIgnored let cabinet: Cabinet
     /// The comp negotiation, while the host is at the table.
     var haggle: Haggle?
     var hostThinking = false
-    var hostError: String?
-    @ObservationIgnored private let deepseek = DeepSeek(key: GameModel.deepseekKey)
+    var hostGreeting = false
+    @ObservationIgnored private let deepseek = GameModel.hostClient
     /// The app swaps in a fresh model (new cabinet, new room) through this.
     @ObservationIgnored var rebuild: (_ toGame: Bool) -> Void = { _ in }
     @ObservationIgnored private var extraTickets = 0
 
-    /// Baked into Info.plist from App/Secrets.xcconfig at build time. An
-    /// unexpanded "$(...)" means the build had no key.
-    static var deepseekKey: String {
-        let k = Bundle.main.object(forInfoDictionaryKey: "DeepSeekAPIKey") as? String ?? ""
-        return k.hasPrefix("$(") ? "" : k
+    /// The window's safe area. The app root ignores it so the cabinet can
+    /// fill the screen, which leaves the window as the place to ask.
+    static var safeArea: UIEdgeInsets {
+        let scene = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first
+        return scene?.keyWindow?.safeAreaInsets ?? .zero
+    }
+
+    /// The App Store build talks to the relay, which holds the key. Debug and
+    /// Device builds have no relay set and use the key from Secrets.xcconfig.
+    /// An unexpanded "$(...)" means the build had no value.
+    static var hostClient: DeepSeek {
+        func setting(_ name: String) -> String {
+            let v = Bundle.main.object(forInfoDictionaryKey: name) as? String ?? ""
+            return v.hasPrefix("$(") ? "" : v
+        }
+        if let relay = URL(string: setting("HostRelayURL")), relay.scheme == "https" { return DeepSeek(relay: relay) }
+        return DeepSeek(key: setting("DeepSeekAPIKey"))
     }
     @ObservationIgnored let presenter: ScenePresenter
     @ObservationIgnored let stage: Stage
@@ -147,8 +167,8 @@ final class GameModel {
         self.driver = RenderDriver(stage: stage, presenter: presenter)
         self.screen = args.skipTitle || !actions.isEmpty || !args.autoplay.isEmpty ? .game : .title
         // First time in this version: show the title, whose TAP TO PLAY
-        // starts the walkthrough.
-        if !WalkthroughStore.done && args.autoplay.isEmpty && !args.skipTitle { self.screen = .title }
+        // walks in the door.
+        if !(WalkthroughStore.done && ArrivalStore.done) && args.autoplay.isEmpty && !args.skipTitle { self.screen = .title }
         if toGame { self.screen = .game }
         if let f = args.fold { fold = f }
         self.autoplay = args.autoplay
@@ -162,6 +182,17 @@ final class GameModel {
         l.preferredFrameRateRange = CAFrameRateRange(minimum: 60, maximum: 120, preferred: 120)
         l.add(to: .main, forMode: .common)
         link = l
+        switch LaunchArguments().panel {
+        case "host":
+            var h = Haggle(room: .boardwalk, seed: 7, visit: .arrival)
+            for line in ["Any chance of an extra night, please?", "You're the best, Sal. How about some tickets?"] {
+                h.say(line); h.hear(h.scriptedReply)
+            }
+            seat(h)
+        case "guide": guideOpen = true
+        case "shop": shopOpen = true
+        default: break
+        }
     }
 
     func resized(_ size: CGSize) {
@@ -205,15 +236,31 @@ final class GameModel {
            selectedOffer: selectedOffer, selectedCharm: selectedCharm, screen: screen, bet: affordableBet)
         hud.machine?.progressive = wallet.progressive
         hud.trail = trail
-        hud.host = haggle.map { HostState(haggle: $0, thinking: hostThinking, error: hostError) }
+        hud.topInset = Self.safeArea.top
+        hud.bottomInset = Self.safeArea.bottom
+        hud.host = haggle.map {
+            var state = HostState(haggle: $0, thinking: hostThinking || hostGreeting)
+            state.greeting = hostGreeting
+            if deepseek.canCall {
+                state.aiChat = HostConsent.answer == true
+                state.asking = HostConsent.answer == nil
+            }
+            return state
+        }
         hud.guide = canThrow ? presenter.guide(line: line, size: viewSize) : []
         hud.aiming = aiming
         hud.wallet = wallet
         hud.shopOpen = shopOpen
         hud.confirmNew = confirmNew
+        hud.guideOpen = guideOpen
+        hud.arrival = arrival
+        hud.known = known
+        hud.machine?.showBets = known.contains(.bets)
         if let w = walkthrough, !w.finished {
             hud.coach = w.card
             hud.over = nil   // the last card says it instead
+        } else if let tip {
+            hud.coach = tip.card
         }
     }
 
@@ -314,10 +361,16 @@ final class GameModel {
         a.arm = { [weak self] i in self?.send(.arm(i)) }
         a.start = { [weak self] in
             guard let self else { return }
-            if WalkthroughStore.done { screen = .game } else { startWalkthrough() }
+            if !ArrivalStore.done { arrival = 0 }
+            else if WalkthroughStore.done { screen = .game }
+            else { startWalkthrough(fresh: true) }
             haptics.tap()
         }
-        a.howToPlay = { [weak self] in self?.startWalkthrough(); self?.haptics.tap() }
+        a.howToPlay = { [weak self] in self?.guideOpen = true; self?.haptics.tap() }
+        a.openGuide = { [weak self] in self?.guideOpen = true; self?.haptics.tap() }
+        a.closeGuide = { [weak self] in self?.guideOpen = false; self?.haptics.tap() }
+        a.replayLesson = { [weak self] in self?.startWalkthrough(); self?.haptics.tap() }
+        a.arrivalNext = { [weak self] in self?.arrivalNext(); self?.haptics.tap() }
         a.pull = { [weak self] in
             guard let self, !busy, state.round.pull == nil else { return }
             send(.pull(affordableBet))
@@ -327,12 +380,18 @@ final class GameModel {
         a.pickRoom = { [weak self] r in self?.pickRoom(r) }
         a.openHost = { [weak self] in self?.openHost(); self?.haptics.tap() }
         a.hostSay = { [weak self] t in self?.hostSay(t) }
-        a.hostRetry = { [weak self] in self?.askHost() }
+        a.hostConsent = { [weak self] in HostConsent.answer = $0; self?.askGreeting() }
+        a.hostReconsider = { HostConsent.answer = nil }
         a.hostDeal = { [weak self] in self?.hostDeal() }
         a.closeHost = { [weak self] in self?.closeHost() }
-        a.skipWalkthrough = { [weak self] in self?.endWalkthrough(); self?.haptics.tap() }
+        a.skipWalkthrough = { [weak self] in
+            guard let self else { return }
+            if tip != nil { tip = nil } else { endWalkthrough() }
+            haptics.tap()
+        }
         a.gotIt = { [weak self] in
             guard let self else { return }
+            if tip != nil { tip = nil; haptics.tap(); return }
             walkthrough?.gotIt()
             if walkthrough?.finished == true { endWalkthrough() }
             haptics.tap()
@@ -357,7 +416,10 @@ final class GameModel {
     /// The bet on the machine, kept between pulls; never more than the
     /// tickets cover.
     @ObservationIgnored var bet: Bet = .one
-    var affordableBet: Bet { Bet.allCases.last { $0 <= bet && $0.cost <= state.tickets } ?? .one }
+    var affordableBet: Bet {
+        guard known.contains(.bets) else { return .one }
+        return Bet.allCases.last { $0 <= bet && $0.cost <= state.tickets } ?? .one
+    }
 
     func send(_ action: Action) {
         switch apply(action, to: state) {
@@ -385,14 +447,25 @@ final class GameModel {
                 default: break
                 }
             }
+            if case .throwBall = action { sinceTip = sinceTip == .max ? .max : sinceTip + 1 }
+            if tip == nil, let t = Tip.next(after: step.events, in: state, seen: known, sinceLast: sinceTip) {
+                tip = t
+                known.insert(t)
+                TipStore.mark(t)
+                sinceTip = 0
+            }
             if case .throwBall = action { haptics.launch() } else { haptics.tap() }
         }
     }
 
     /// Park the real run and play the coached practice warm-up.
-    func startWalkthrough() {
-        if walkthrough == nil { parked = (seed, actions, state) }
+    /// - Parameter fresh: an untouched run isn't parked, so the game after
+    ///   the lesson checks in with the loadout just haggled for.
+    func startWalkthrough(fresh: Bool = false) {
+        if walkthrough == nil { parked = fresh && actions.isEmpty ? nil : (seed, actions, state) }
         walkthrough = Walkthrough()
+        guideOpen = false
+        tip = nil
         state = practiceRun(room: wallet.room)
         actions = []
         let fresh = Presentation(state: state)
@@ -458,8 +531,33 @@ final class GameModel {
 
     func openHost() {
         guard let room = wallet.hostDue else { return }
-        haggle = Haggle(room: room, seed: UInt64(Date().timeIntervalSince1970), returning: wallet.rooms.contains(room))
-        hostError = deepseek.key.isEmpty ? "The host can't be reached: this build has no DeepSeek key (run scripts/secrets.sh, then rebuild)." : nil
+        seat(Haggle(room: room, seed: UInt64(Date().timeIntervalSince1970),
+                    visit: wallet.rooms.contains(room) ? .returning : .newRoom))
+    }
+
+    /// Sal's next line at the door; after the last, the first haggle.
+    func arrivalNext() {
+        guard let beat = arrival else { return }
+        if beat + 1 < Arrival.beats.count { arrival = beat + 1; return }
+        arrival = nil
+        seat(Haggle(room: .boardwalk, seed: UInt64(Date().timeIntervalSince1970), visit: .arrival))
+    }
+
+    private func seat(_ h: Haggle) {
+        haggle = h
+        askGreeting()
+    }
+
+    /// DeepSeek writes the hello as well, once the player has said yes. The
+    /// stock line stays hidden until it answers, and shows if it can't.
+    func askGreeting() {
+        guard let h = haggle, h.lines.count == 1, deepseek.canCall, HostConsent.answer == true else { return }
+        hostGreeting = true
+        let client = deepseek
+        Task {
+            if let hello = try? await client.greeting(in: h) { haggle?.greet(hello) }
+            hostGreeting = false
+        }
     }
 
     func hostSay(_ text: String) {
@@ -469,23 +567,26 @@ final class GameModel {
         askHost()
     }
 
-    /// Ask for the host's reply to the last thing said. Also the retry
-    /// after a failed call: the player's line is already on the table.
+    /// Ask for the host's reply to the last thing said. DeepSeek plays the
+    /// host. If it can't be reached, or the relay's limit is hit, or the
+    /// player said no to AI chat, the scripted host answers: a bad connection
+    /// must never leave anyone stuck at the table.
     func askHost() {
         guard let h = haggle, h.status == .open, h.lines.last?.speaker == .player else { return }
         hostThinking = true
-        hostError = nil
         let client = deepseek
         Task {
-            do {
-                let reply = try await client.reply(in: h)
-                haggle?.hear(reply)
-                haptics.tap()
-                if let h = haggle, h.status != .open { settle(h) }
-            } catch {
-                hostError = "\(error)"
-                haptics.reject()
+            var reply = h.scriptedReply
+            if client.canCall, HostConsent.answer == true, h.wantsModel {
+                do { reply = try await client.guardedReply(in: h) }
+                catch { print("host call failed, scripted host answers: \(error)") }
+            } else {
+                // A beat to think: an instant answer reads as a form, not a host.
+                try? await Task.sleep(for: .milliseconds(900))
             }
+            haggle?.hear(reply)
+            haptics.tap()
+            if let h = haggle, h.status != .open { settle(h) }
             hostThinking = false
         }
     }
@@ -500,12 +601,14 @@ final class GameModel {
     private func settle(_ h: Haggle) {
         wallet.close(h)
         WalletStore.save(wallet)
+        if h.visit == .arrival { ArrivalStore.done = true }
     }
 
     /// Leave the table. A finished deal checks you into the new room.
     func closeHost() {
         guard let h = haggle else { return }
         haggle = nil
+        if h.visit == .arrival { startWalkthrough(fresh: true); return }
         if h.status != .open { stop(); rebuild(true) }
     }
 
@@ -522,6 +625,15 @@ private final class DisplayTarget {
 /// Debug and screenshot hooks, read from the launch arguments.
 ///   -seed 42   -fresh   -ante 5   -fold 0.6   -skipTitle
 ///   -autoplay "0.62,0;0.55,0.1"   throw these launches (power,aim[,start])
+/// The player's answer to the AI chat card. Nil until they've given one, and
+/// nothing typed leaves the phone until it's yes.
+enum HostConsent {
+    static var answer: Bool? {
+        get { UserDefaults.standard.object(forKey: "hostConsent") as? Bool }
+        set { UserDefaults.standard.set(newValue, forKey: "hostConsent") }
+    }
+}
+
 struct LaunchArguments {
     var seed: UInt64?
     var fresh = false
@@ -529,6 +641,9 @@ struct LaunchArguments {
     var fold: Double?
     var autoplay: [Launch] = []
     var skipTitle = false
+    /// Open on a panel: host, guide or shop. For screenshots and layout
+    /// checks, which can't tap their way there.
+    var panel: String?
 
     init(_ argv: [String] = ProcessInfo.processInfo.arguments) {
         func value(_ k: String) -> String? {
@@ -540,11 +655,31 @@ struct LaunchArguments {
         ante = value("-ante").flatMap(Int.init)
         fold = value("-fold").flatMap(Double.init)
         skipTitle = argv.contains("-skipTitle")
+        panel = value("-panel")
         autoplay = (value("-autoplay") ?? "").split(separator: ";").compactMap { item in
             let n = item.split(separator: ",").compactMap { Double($0) }
             guard n.count >= 2 else { return nil }
             return Launch(power: n[0], aim: n[1], start: n.count > 2 ? n[2] : 0)
         }
+    }
+}
+
+/// Whether the player has been through the door and haggled with Sal. Its
+/// own key, so people who played before there was a door still get it, once.
+enum ArrivalStore {
+    static var done: Bool {
+        get { UserDefaults.standard.bool(forKey: "arrivalDone") }
+        set { UserDefaults.standard.set(newValue, forKey: "arrivalDone") }
+    }
+}
+
+/// Which first-time cards have been shown.
+enum TipStore {
+    static var seen: Set<Tip> {
+        Set((UserDefaults.standard.stringArray(forKey: "tipsSeen") ?? []).compactMap(Tip.init))
+    }
+    static func mark(_ t: Tip) {
+        UserDefaults.standard.set(seen.union([t]).map(\.rawValue), forKey: "tipsSeen")
     }
 }
 

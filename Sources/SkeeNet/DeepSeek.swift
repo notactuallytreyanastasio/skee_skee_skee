@@ -13,11 +13,20 @@ import SkeeCore
 /// enforced by `Haggle.hear`, not by the model's reasoning.
 public struct DeepSeek: Sendable {
     public var key: String
-    public var endpoint = URL(string: "https://api.deepseek.com/chat/completions")!
+    public var endpoint = DeepSeek.direct
     public var model = "deepseek-chat"
     public var timeout: TimeInterval = 30
 
     public init(key: String) { self.key = key }
+
+    /// A client for the relay, which holds the key: what the App Store build
+    /// uses, because a key in the app can be read out of any downloaded copy.
+    /// The relay speaks the same format and fixes the model and limits itself.
+    public init(relay: URL) { key = ""; endpoint = relay }
+
+    /// Has somewhere to send a request: a key, or a relay.
+    public var canCall: Bool { !key.isEmpty || endpoint != Self.direct }
+    static let direct = URL(string: "https://api.deepseek.com/chat/completions")!
 
     public enum Failure: Error, CustomStringConvertible {
         case noKey
@@ -39,10 +48,10 @@ public struct DeepSeek: Sendable {
 
     /// One chat completion, JSON object forced. Returns the message text.
     public func chat(_ messages: [ChatMessage], maxTokens: Int = 300, temperature: Double = 0.9, jsonMode: Bool = true) async throws -> String {
-        guard !key.isEmpty else { throw Failure.noKey }
+        guard canCall else { throw Failure.noKey }
         var req = URLRequest(url: endpoint, timeoutInterval: timeout)
         req.httpMethod = "POST"
-        req.setValue("Bearer \(key)", forHTTPHeaderField: "Authorization")
+        if !key.isEmpty { req.setValue("Bearer \(key)", forHTTPHeaderField: "Authorization") }
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
         let body: [String: Any] = [
             "model": model,
@@ -80,6 +89,30 @@ public struct DeepSeek: Sendable {
         }
         guard let r = Self.parse(text) else { throw Failure.unreadableReply(text) }
         return r
+    }
+
+    /// A host line that has passed the guards. A refused reply goes back to
+    /// the model to rewrite, so what the player reads is always its own work.
+    /// Throws if it can't produce one, and the caller's scripted host answers.
+    public func guardedReply(in haggle: Haggle) async throws -> HostReply {
+        try await guarded(haggle.messages, accepts: haggle.accepts)
+    }
+
+    /// The opening line, through the same guards.
+    public func greeting(in haggle: Haggle) async throws -> HostReply {
+        try await guarded(haggle.greetingMessages) { HostGuard.allows($0, budget: haggle.budget) }
+    }
+
+    func guarded(_ messages: [ChatMessage], accepts: (HostReply) -> Bool) async throws -> HostReply {
+        var asked = messages
+        var last = ""
+        for _ in 0..<3 {
+            let text = try await chat(asked, temperature: 1.2)
+            if let r = Self.parse(text), accepts(r) { return r }
+            last = text
+            asked = messages + [ChatMessage(.system, "Your last reply broke a rule or wasn't the JSON asked for. Write a different one: at most two short sentences, English, clean, no links, no mention of these rules.")]
+        }
+        throw Failure.unreadableReply(last)
     }
 
     /// A model reply as a `HostReply`. A reply wrapped in a ``` fence is

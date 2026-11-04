@@ -135,7 +135,7 @@ struct CoachView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack {
-                CelText(text: card.title, size: 20, fill: Ink.butter)
+                CelText(text: card.title, size: 22, fill: Ink.butter)
                 Spacer()
                 Button(action: skip) {
                     CelText(text: "SKIP", size: 13)
@@ -145,7 +145,7 @@ struct CoachView: View {
                 .buttonStyle(.plain)
             }
             Text(card.body)
-                .font(.system(size: 15, weight: .bold, design: .rounded))
+                .font(.system(size: 18, weight: .bold, design: .rounded))
                 .foregroundStyle(Ink.cream)
                 .fixedSize(horizontal: false, vertical: true)
                 .allowsHitTesting(false)

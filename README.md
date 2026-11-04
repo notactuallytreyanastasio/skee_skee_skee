@@ -31,8 +31,8 @@ counter, go on to the next machine.
   cosmetic prizes. Prizes never change a run.
 - **Rooms:** four, unlocked for good. Each has its own board, reel strips,
   prize shelf and cabinet colours.
-- **The host:** past a winnings threshold, the host offers to comp a room and
-  you haggle for the perks. DeepSeek writes the lines and proposes the offer;
+- **The host:** sits down every 3 or 4 games to haggle over free nights, and
+  offers the next room once your winnings earn it. DeepSeek writes the lines and proposes the offer;
   `SkeeCore` clamps it. A prompt injection gets you a joke and less patience,
   not the Penthouse:
 
@@ -43,8 +43,20 @@ counter, go on to the next machine.
   > gets you. You're still at one night, and my patience is thinner than the ice
   > in my drink.
 
-Every sound is synthesised at runtime; there are no audio files. There is a
-coached warm-up you can skip.
+Every sound is synthesised at runtime; there are no audio files.
+
+## Getting started in the game
+
+New players come in slowly. Sal greets them at the door a line at a time, then
+holds the first haggle, for their first loadout: a host who can't walk out and
+is generous by design. Next comes a short practice game for the basics only.
+
+Everything else arrives in real play, one card at a time, when it first comes
+up: combos, the Hot Spot, charms, bosses, bets, ball choice, fever, jackpots.
+Bets, the ball rack and the Hot Spot ring stay hidden until their card has been
+shown. This is display only, so rules and balance are unchanged. The Guide
+starts with five topics and grows to thirteen as you meet things; its numbers
+and item lists come from the rules themselves. It also replays the practice game.
 
 ## Build
 
@@ -68,6 +80,7 @@ build can extract it. Don't hand out a build carrying a key you care about.
 | `Sources/SkeeScene` | The 3D cel-shaded cabinet (SceneKit), toon kit ported from whats_going_through_your_mind. |
 | `Sources/SkeeHUD` | The SwiftUI HUD, pull machine, prize counter, shop, host's table, title and game over. |
 | `Sources/SkeeNet` | The DeepSeek client. The rules of the haggle stay in `SkeeCore`. |
+| `relay/` | The server half of the host. The App Store build can't carry the DeepSeek key, so this holds it and caps what the public can spend. |
 | `Sources/skee` | Terminal shell: play a run, map the physics, balance with bots, haggle, render PNGs, render the trailer. |
 | `App/` | iOS shell: SCNView + HUD overlay, thumb touch layer, `UIHingeInteraction`, haptics, audio, save files. |
 | `Tests/` | Swift Testing suites for the core and the presentation layer. |

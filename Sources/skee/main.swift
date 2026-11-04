@@ -18,7 +18,7 @@ skee — play and measure Skee Skee Skee from the terminal
       | arm <i> | buy <i> [hole] | reroll | sell <i> | leave
   skee balance [--runs n] [--skill expert|regular|novice|perfect|all] [--seed s] [--room boardwalk|neonLounge|highRoller|penthouse]
       Monte Carlo bot runs with fun metrics.
-  skee haggle [--room neonLounge|highRoller|penthouse] [--seed n] [--say "line|line|deal"]
+  skee haggle [--room neonLounge|highRoller|penthouse] [--seed n] [--say "line|line|deal"] [--relay url]
       Negotiate a room comp with the host, live against DeepSeek (key from .env; scripts/secrets.sh).
   skee bot <seed> [--skill name]
       Narrate one bot run round by round.
@@ -82,5 +82,6 @@ case "flickprobe": flickProbe()
 case "haggle": haggleCommand()
 case "moments": momentsCommand()
 case "film": MainActor.assumeIsolated { filmCommand() }
+case "icon": iconCommand()
 default: print(usage); exit(1)
 }

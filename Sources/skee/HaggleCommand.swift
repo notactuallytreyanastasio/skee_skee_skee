@@ -10,11 +10,15 @@ func haggleCommand() {
     let room = flag("room").flatMap(Room.init) ?? .neonLounge
     let seed = UInt64(flag("seed") ?? "1") ?? 1
     let root = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
-    guard let key = DeepSeek.key(envFile: root.appendingPathComponent(".env")) else {
-        fail("no DeepSeek key: run scripts/secrets.sh or set DEEPSEEK_API_KEY")
+    let client: DeepSeek
+    if let relay = flag("relay").flatMap(URL.init) {
+        client = DeepSeek(relay: relay)
+    } else if let key = DeepSeek.key(envFile: root.appendingPathComponent(".env")) {
+        client = DeepSeek(key: key)
+    } else {
+        fail("no DeepSeek key: run scripts/secrets.sh, set DEEPSEEK_API_KEY, or pass --relay url")
     }
-    let client = DeepSeek(key: key)
-    var h = Haggle(room: room, seed: seed, returning: has("returning"))
+    var h = Haggle(room: room, seed: seed, visit: has("first") ? .arrival : has("returning") ? .returning : .newRoom)
     var script = flag("say").map { $0.split(separator: "|").map(String.init) }
     print("[\(room.name)] budget \(h.budget) (hidden from the player), patience \(h.patience)")
     print("\(h.host.name): \(h.lines[0].text)")
@@ -35,9 +39,10 @@ func haggleCommand() {
         h.say(line)
         let started = Date()
         let now = h
-        let result = blocking { try await client.reply(in: now) }
+        // The same path as the app: the guards, then the rules.
+        let result = blocking { try await client.guardedReply(in: now) }
         switch result {
-        case .failure(let e): fail("\(e)")
+        case .failure(let e): print("  [scripted host answers: \(e)]"); let r = now.scriptedReply; h.hear(r); print("\(h.host.name): \(r.say)")
         case .success(let r):
             let asked = r.offer
             h.hear(r)

@@ -158,7 +158,7 @@ public struct Wallet: Hashable, Sendable, Codable {
         guard h.status != .open else { return }
         let deal = h.final
         rooms.insert(deal.room)
-        room = deal.room
+        if h.visit != .arrival { room = deal.room }
         var stay = deal
         if let old = comps[deal.room] {
             stay.nights += old.nights
@@ -166,8 +166,10 @@ public struct Wallet: Hashable, Sendable, Codable {
         }
         comps[deal.room] = stay
         credit(deal.credit)
-        gamesSinceHost = 0
-        hostVisits += 1
+        if h.visit != .arrival {
+            gamesSinceHost = 0
+            hostVisits += 1
+        }
     }
 
     /// Start a run in the current room: use a comped night if one is left.

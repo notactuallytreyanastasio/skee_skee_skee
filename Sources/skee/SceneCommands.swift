@@ -118,12 +118,21 @@ func frameCommand() {
                                  // --shop: the prize shop with a sample shelf (on the title with --title).
                                  wallet: has("shop") || has("title") ? Wallet(balance: 1340, lifetime: 2000, owned: [.sticker, .rubberDuck, .yoyo]) : nil,
                                  // --coach 0...6: the walkthrough card for that step.
-                                 coach: flag("coach").flatMap(Int.init).flatMap(WalkthroughStep.init).map { Walkthrough(step: $0).card },
+                                 coach: flag("coach").flatMap(Int.init).flatMap(WalkthroughStep.init).map { Walkthrough(step: $0).card }
+                                    ?? flag("tip").flatMap(Tip.init)?.card,
                                  line: line,
                                  // --host: the host's table mid-haggle, scripted (no network).
                                  host: has("host") ? sampleHaggle() : nil,
                                  // --confirm: the new-game question.
-                                 tweak: { $0.confirmNew = has("confirm") })
+                                 tweak: {
+                                     $0.confirmNew = has("confirm")
+                                     // --guide [--topic n]: the Guide. --arrival n: Sal at the door.
+                                     $0.guideOpen = has("guide")
+                                     $0.guideStart = flag("topic").flatMap(Int.init)
+                                     $0.arrival = flag("arrival").flatMap(Int.init)
+                                     // --new: as a new player sees it, before any card.
+                                     if has("new") { $0.known = []; $0.machine?.showBets = false }
+                                 })
             else { fail("render failed") }
     try? FileManager.default.createDirectory(atPath: (out as NSString).deletingLastPathComponent, withIntermediateDirectories: true)
     writePNG(img, out)
@@ -161,5 +170,12 @@ func sampleHaggle() -> HostState {
     h.say("I've been telling everyone on the boardwalk the Lounge is where the real players go. Make me look right?")
     h.hear(HostReply(say: "Now that's a compliment with legs. One ticket a night, and you keep talking us up on that boardwalk.",
                      offer: .init(nights: 2, tickets: 1, credit: 0), mood: 1))
-    return HostState(haggle: h, thinking: false, error: nil)
+    if has("first") {
+        var f = Haggle(room: .boardwalk, seed: 1, visit: .arrival)
+        if has("signed") { f.accept() }
+        h = f
+    }
+    var s = HostState(haggle: h, thinking: false)
+    if has("typing") { s.keyboard = 336 }
+    return s
 }

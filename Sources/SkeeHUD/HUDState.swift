@@ -43,6 +43,7 @@ public struct HUDState: Sendable {
         public var teasing: Bool
         public var room: Room = .boardwalk
         public var progressive = Progressive()
+        public var showBets = true
     }
     /// This frame's three reel stops so far (nil = not thrown yet).
     public var frame: [Symbol?] = [nil, nil, nil]
@@ -72,6 +73,15 @@ public struct HUDState: Sendable {
     public var shopOpen = false
     /// "Start a new game?" is on screen.
     public var confirmNew = false
+    /// The Guide is open, and the topic to open it on (for screenshots).
+    public var guideOpen = false
+    public var guideStart: Int?
+    /// What the player has been introduced to. Bets, the ball rack and the
+    /// Hot Spot ring wait for their card, and the Guide for its topics.
+    /// Everything by default: the shell narrows it, screenshots don't.
+    public var known = Set(Tip.allCases)
+    /// Which of Sal's lines at the door is showing.
+    public var arrival: Int?
     /// The ball in hand, and whether the rack is out to change it.
     public var ball = BallKind.classic
     public var rack = false
@@ -82,6 +92,11 @@ public struct HUDState: Sendable {
     public var shower = 0.0
     /// The host's table, while a comp is being negotiated.
     public var host: HostState?
+    /// The device's top and bottom safe areas. The cabinet fills the whole
+    /// screen, but the Dynamic Island would sit on the score and on every
+    /// panel's title, so the HUD keeps its reading clear of these.
+    public var topInset: CGFloat = 0
+    public var bottomInset: CGFloat = 0
     /// The thumb's recent path, for a fading trail. Age 0...1.
     public var trail: [(CGPoint, Double)] = []
     /// The waiting ball's line: a straight flick rolls along it and lands

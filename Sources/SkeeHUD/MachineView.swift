@@ -11,7 +11,8 @@ struct MachineView: View {
 
     var body: some View {
         VStack(spacing: 8) {
-            meters
+            // Jackpots need a max bet, so the meters arrive with the bets.
+            if m.showBets { meters }
             HStack(alignment: .center, spacing: 10) {
                 window.frame(width: 210, height: 210)
                 Lever(enabled: m.canPull, pull: pull).frame(width: 44, height: 200)
@@ -19,7 +20,7 @@ struct MachineView: View {
             if m.free {
                 CelText(text: "FREE GAME · x2 · \(m.freeLeft) MORE", size: 18, fill: Ink.butter)
             } else {
-                bets
+                if m.showBets { bets }
                 Button(action: pull) {
                     Pill(fill: m.canPull ? Ink.mint : Ink.cream.opacity(0.5), radius: 18) {
                         CelText(text: m.canPull ? "SPIN" : "...", size: 24)

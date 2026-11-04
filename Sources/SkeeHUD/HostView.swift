@@ -1,14 +1,24 @@
 import SkeeCore
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#endif
 
 /// What the host's table shows: the conversation, the offer, the host's
 /// patience, and whether a reply is on its way.
 public struct HostState: Sendable {
     public var haggle: Haggle
     public var thinking: Bool
-    public var error: String?
-    public init(haggle: Haggle, thinking: Bool, error: String?) {
-        self.haggle = haggle; self.thinking = thinking; self.error = error
+    /// Lay out as if a keyboard this tall were up, for the CLI's screenshots.
+    public var keyboard: CGFloat = 0
+    /// Nil when this build has no live host. False asks for permission
+    /// before anything typed leaves the phone; see `consentCard`.
+    public var aiChat: Bool?
+    public var asking = false
+    /// The model is writing the hello, so the stock one stays hidden.
+    public var greeting = false
+    public init(haggle: Haggle, thinking: Bool) {
+        self.haggle = haggle; self.thinking = thinking
     }
 }
 
@@ -17,29 +27,83 @@ public struct HostState: Sendable {
 struct HostView: View {
     let host: HostState
     let say: (String) -> Void
-    let retry: () -> Void
     let deal: () -> Void
     let close: () -> Void
+    let consent: (Bool) -> Void
+    let reconsider: () -> Void
     @State private var draft = ""
+    @State private var keyboardUp: CGFloat = 0
+    @FocusState private var writing: Bool
 
     var h: Haggle { host.haggle }
+    var keyboard: CGFloat { max(keyboardUp, host.keyboard) }
+    /// The app ignores the keyboard so the cabinet never resizes, so this
+    /// screen has to get out of its way. With half the screen gone, only
+    /// what the host said and the box to answer in stay.
+    var typing: Bool { keyboard > 0 }
 
     var body: some View {
-        ZStack {
-            Ink.violet.ignoresSafeArea()
-            StripeBackdrop().ignoresSafeArea()
-            VStack(spacing: 10) {
-                VStack(spacing: 0) {
-                    CelText(text: h.host.name.uppercased(), size: 26, fill: Ink.butter)
-                    CelText(text: "your host · \(h.room.name)", size: 12)
+        GeometryReader { geo in
+            ZStack {
+                Ink.violet.ignoresSafeArea()
+                StripeBackdrop().ignoresSafeArea()
+                VStack(spacing: 10) {
+                    if !typing {
+                        VStack(spacing: 0) {
+                            CelText(text: h.host.name.uppercased(), size: 26, fill: Ink.butter)
+                            if let on = host.aiChat {
+                                Button(action: reconsider) {
+                                    CelText(text: on ? "AI CHAT IS ON · TAP TO CHANGE" : "AI CHAT IS OFF · TAP TO CHANGE", size: 10, fill: Ink.sky)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                            CelText(text: h.visit == .arrival ? "your first loadout" : "your host · \(h.room.name)", size: 14)
+                        }
+                        offerCard
+                    }
+                    transcript
+                    if h.status == .open { controls } else { ending }
                 }
-                offerCard
-                transcript
-                if h.status == .open { controls } else { ending }
+                .padding(.horizontal, 14)
+                .padding(.top, 26)
+                .padding(.bottom, typing ? keyboard + 8 : 20)
+                if host.asking { consentCard }
             }
-            .padding(.horizontal, 14)
-            .padding(.top, 26)
-            .padding(.bottom, 20)
+            .onKeyboard { top, seconds in
+                let covered = max(0, geo.frame(in: .global).maxY - top)
+                withAnimation(.easeOut(duration: seconds)) { keyboardUp = covered }
+            }
+        }
+    }
+
+    /// Apple asks for this before anything typed goes to an outside AI, and
+    /// it has to say where it goes. The privacy policy names the provider.
+    var consentCard: some View {
+        ZStack {
+            Ink.ink.opacity(0.7).ignoresSafeArea()
+            VStack(spacing: 12) {
+                CelText(text: "TALK TO AN AI HOST?", size: 22, fill: Ink.butter)
+                Text("\(h.host.name) can be played by an AI. If you say yes, what you type at this table goes through our server to a third-party AI model, which writes the replies. Your name and contacts are not sent, and we don't keep your chats. Please don't type anything private.")
+                    .font(.system(size: 17, weight: .semibold, design: .rounded))
+                    .foregroundStyle(Ink.cream)
+                    .fixedSize(horizontal: false, vertical: true)
+                Button { consent(true) } label: {
+                    Pill(fill: Ink.mint, radius: 16) { CelText(text: "YES, USE THE AI", size: 18) }
+                }
+                .buttonStyle(.plain)
+                Button { consent(false) } label: {
+                    Pill(fill: Ink.sky, radius: 16) { CelText(text: "NO, KEEP IT ON MY PHONE", size: 15) }
+                }
+                .buttonStyle(.plain)
+                Text("With no, \(h.host.name) sticks to simpler replies. You can change this at the top of this screen.")
+                    .font(.system(size: 14, weight: .medium, design: .rounded))
+                    .foregroundStyle(Ink.cream.opacity(0.85))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(18)
+            .background(RoundedRectangle(cornerRadius: 18).fill(Ink.violet))
+            .overlay(RoundedRectangle(cornerRadius: 18).strokeBorder(Ink.ink, lineWidth: 3))
+            .padding(20)
         }
     }
 
@@ -57,6 +121,7 @@ struct HostView: View {
                         .overlay(Circle().strokeBorder(Ink.ink, lineWidth: 1.5)).frame(width: 12, height: 12)
                 }
             }
+            CelText(text: "a night = one game with bonus tickets · credit buys prizes", size: 11)
         }
         .padding(10)
         .frame(maxWidth: .infinity)
@@ -76,25 +141,20 @@ struct HostView: View {
     var transcript: some View {
         VStack(alignment: .leading, spacing: 8) {
             Spacer(minLength: 0)
-            ForEach(Array(h.lines.enumerated()), id: \.offset) { _, line in bubble(line) }
+            ForEach(Array(h.lines.enumerated()).dropFirst(host.greeting ? 1 : 0), id: \.offset) { _, line in bubble(line) }
             if host.thinking {
                 Text("\(h.host.name) is thinking…").font(.system(size: 14, weight: .bold, design: .rounded))
                     .foregroundStyle(Ink.cream.opacity(0.8))
             }
-            if let e = host.error {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(e).font(.system(size: 13, weight: .semibold, design: .monospaced)).foregroundStyle(Ink.butter)
-                    if h.lines.last?.speaker == .player {
-                        Button(action: retry) { Pill(fill: Ink.sky, radius: 12) { CelText(text: "ASK AGAIN", size: 14) } }
-                            .buttonStyle(.plain)
-                    }
-                }
-            }
         }
         .padding(10)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+        // minHeight 0: without it the bubbles' fixed height sets a floor, and
+        // a long chat pushes DEAL off the bottom of the outer display.
+        .frame(maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .bottom)
         .clipped()
         .background(RoundedRectangle(cornerRadius: 14).fill(Ink.ink.opacity(0.35)))
+        .contentShape(Rectangle())
+        .onTapGesture { writing = false }
     }
 
     func bubble(_ line: HaggleLine) -> some View {
@@ -104,6 +164,9 @@ struct HostView: View {
             Text(line.text)
                 .font(.system(size: 15, weight: line.speaker == .stage ? .heavy : .bold, design: .rounded))
                 .italic(line.speaker == .stage)
+                // Short of room, lose the oldest line off the top, not the
+                // end of the sentence being answered.
+                .fixedSize(horizontal: false, vertical: true)
                 .foregroundStyle(mine ? Ink.ink : Ink.cream)
                 .padding(.horizontal, 12).padding(.vertical, 8)
                 .background(RoundedRectangle(cornerRadius: 14).fill(mine ? Ink.butter : (line.speaker == .stage ? Ink.mult : Ink.lilac)))
@@ -115,40 +178,54 @@ struct HostView: View {
     /// Type anything; or use a nudge; or shake on what's on the table.
     var controls: some View {
         VStack(spacing: 8) {
-            HStack(spacing: 6) {
-                ForEach(["One more night?", "Tickets would help.", "Some credit?"], id: \.self) { s in
-                    Button { say(s) } label: {
-                        Text(s).font(.system(size: 12, weight: .heavy, design: .rounded)).foregroundStyle(Ink.cream)
-                            .padding(.horizontal, 8).padding(.vertical, 6)
-                            .background(Capsule().fill(Ink.ink.opacity(0.55)))
+            if !typing {
+                HStack(spacing: 6) {
+                    ForEach(["One more night?", "Tickets would help.", "Some credit?"], id: \.self) { s in
+                        Button { say(s) } label: {
+                            Text(s).font(.system(size: 12, weight: .heavy, design: .rounded)).foregroundStyle(Ink.cream)
+                                .padding(.horizontal, 8).padding(.vertical, 6)
+                                .background(Capsule().fill(Ink.ink.opacity(0.55)))
+                        }
+                        .buttonStyle(.plain)
                     }
-                    .buttonStyle(.plain)
                 }
+                .disabled(host.thinking)
             }
-            .disabled(host.thinking)
             HStack(spacing: 6) {
                 TextField("Make your case…", text: $draft)
+                    .onChange(of: draft) { _, text in
+                        if text.count > HostGuard.maxLine { draft = String(text.prefix(HostGuard.maxLine)) }
+                    }
                     .font(.system(size: 16, weight: .semibold, design: .rounded))
                     .padding(10)
                     .background(RoundedRectangle(cornerRadius: 12).fill(Ink.cream))
                     .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(Ink.ink, lineWidth: 2))
                     .submitLabel(.send)
+                    .focused($writing)
                     .onSubmit(send)
                 Button(action: send) { Pill(fill: Ink.sky, radius: 12) { CelText(text: "SAY", size: 16) } }
                     .buttonStyle(.plain)
+                if typing {
+                    Button(action: deal) { Pill(fill: Ink.mint, radius: 12) { CelText(text: "DEAL", size: 16) } }
+                        .buttonStyle(.plain)
+                }
             }
             .disabled(host.thinking)
-            Button(action: deal) {
-                Pill(fill: Ink.mint, radius: 18) { CelText(text: "DEAL", size: 24) }
+            if !typing {
+                Button(action: deal) {
+                    Pill(fill: Ink.mint, radius: 18) { CelText(text: "DEAL", size: 24) }
+                }
+                .buttonStyle(.plain)
+                .disabled(host.thinking)
             }
-            .buttonStyle(.plain)
-            .disabled(host.thinking)
         }
     }
 
+    /// Sending puts the keyboard away, so the reply and DEAL are both there.
     func send() {
         let t = draft
         draft = ""
+        writing = false
         say(t)
     }
 
@@ -157,10 +234,33 @@ struct HostView: View {
             CelText(text: h.status == .signed ? "DEAL!" : "\(h.host.name.uppercased()) LEFT", size: 26,
                     fill: h.status == .signed ? Ink.mint : Ink.mult)
             let f = h.final
-            CelText(text: "\(h.room.name) is yours · \(f.nights) night\(f.nights == 1 ? "" : "s") · +\(f.tickets) tix · \(f.credit) credit", size: 13)
-            Button(action: close) { Pill(fill: Ink.mint, radius: 18) { CelText(text: "CHECK IN", size: 24) } }
-                .buttonStyle(.plain)
+            let terms = "\(f.nights) night\(f.nights == 1 ? "" : "s") · +\(f.tickets) tix · \(f.credit) credit"
+            CelText(text: h.visit == .arrival ? "you start with \(terms)" : "\(h.room.name) is yours · \(terms)", size: 14)
+            Button(action: close) {
+                Pill(fill: Ink.mint, radius: 18) { CelText(text: h.visit == .arrival ? "LEARN TO PLAY" : "CHECK IN", size: 24) }
+            }
+            .buttonStyle(.plain)
         }
+    }
+}
+
+private extension View {
+    /// Calls back with the keyboard's top edge in screen points as it moves,
+    /// and how long the move takes.
+    @ViewBuilder func onKeyboard(_ moved: @escaping (CGFloat, Double) -> Void) -> some View {
+        #if canImport(UIKit)
+        onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillChangeFrameNotification)) { note in
+            guard let end = note.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+            moved(end.minY, note.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double ?? 0.25)
+        }
+        // Gone is gone, wherever the last frame said it was: a stale height
+        // here would leave the screen stuck in its typing layout.
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { note in
+            moved(.greatestFiniteMagnitude, note.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double ?? 0.25)
+        }
+        #else
+        self
+        #endif
     }
 }
 

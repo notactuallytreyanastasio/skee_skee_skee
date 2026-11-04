@@ -4,5 +4,9 @@
 <dict>
 	<key>DeepSeekAPIKey</key>
 	<string>$(DEEPSEEK_API_KEY)</string>
+	<key>HostRelayURL</key>
+	<string>$(HOST_RELAY_URL)</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>

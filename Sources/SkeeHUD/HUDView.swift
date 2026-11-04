@@ -17,6 +17,10 @@ public struct HUDActions {
     public var closeShop: () -> Void = {}
     public var buyPrize: (Prize) -> Void = { _ in }
     public var skipWalkthrough: () -> Void = {}
+    public var replayLesson: () -> Void = {}
+    public var closeGuide: () -> Void = {}
+    public var openGuide: () -> Void = {}
+    public var arrivalNext: () -> Void = {}
     public var gotIt: () -> Void = {}
     public var howToPlay: () -> Void = {}
     public var pull: () -> Void = {}
@@ -24,9 +28,10 @@ public struct HUDActions {
     public var pickRoom: (Room) -> Void = { _ in }
     public var openHost: () -> Void = {}
     public var hostSay: (String) -> Void = { _ in }
-    public var hostRetry: () -> Void = {}
     public var hostDeal: () -> Void = {}
     public var closeHost: () -> Void = {}
+    public var hostConsent: (Bool) -> Void = { _ in }
+    public var hostReconsider: () -> Void = {}
     public var chooseBall: (BallKind) -> Void = { _ in }
     public var askNewGame: () -> Void = {}
     public var keepPlaying: () -> Void = {}
@@ -124,22 +129,27 @@ public struct HUDView: View {
                         if state.isBoss { CelText(text: state.bossBlurb, size: 12, fill: Ink.butter).padding(.horizontal, 20) }
                         Spacer()
                     }
-                    .padding(.top, 8)
+                    .padding(.top, 8 + topClear)
                     .allowsHitTesting(false)
 
                     sideTrays(geo.size)
                     meter(geo.size)
                     guide()
                     trail()
-                    if let at = state.hotAt { HotSpotMark(clock: state.clock).position(at) }
+                    if let at = state.hotAt, state.known.contains(.hotSpot) { HotSpotMark(clock: state.clock).position(at) }
                     if state.over == nil && state.coach == nil {
                         Button(action: actions.askNewGame) {
                             Pill(fill: Ink.sky, radius: 12) { CelText(text: "NEW GAME", size: 13) }
                         }
                         .buttonStyle(.plain)
-                        .position(x: geo.size.width - 58, y: 72)
+                        .position(x: geo.size.width - 58, y: 72 + topClear)
+                        Button(action: actions.openGuide) {
+                            Pill(fill: Ink.mint, radius: 12) { CelText(text: "GUIDE", size: 13) }
+                        }
+                        .buttonStyle(.plain)
+                        .position(x: geo.size.width - 58, y: 108 + topClear)
                     }
-                    if state.rack && state.coach == nil {
+                    if state.rack && state.coach == nil && state.known.contains(.balls) {
                         BallRack(selected: state.ball, pick: actions.chooseBall)
                             .position(x: geo.size.width / 2, y: geo.size.height - 62)
                     }
@@ -176,6 +186,10 @@ public struct HUDView: View {
                             .position(x: geo.size.width / 2, y: geo.size.height * 0.5)
                     }
                 }
+                // A card to read holds the game still until it's been read.
+                if state.screen == .game, state.coach?.needsTap == true, !state.busy {
+                    Color.black.opacity(0.3).contentShape(Rectangle()).onTapGesture {}
+                }
                 if state.screen == .game, let card = state.coach, !state.busy {
                     // Low over the ball tray, out of the flick's path; high
                     // when the prize counter fills the bottom half.
@@ -193,13 +207,28 @@ public struct HUDView: View {
                 }
                 if state.shopOpen {
                     PrizeShopView(wallet: state.wallet, buy: actions.buyPrize, close: actions.closeShop)
+                        .safeAreaPadding(EdgeInsets(top: state.topInset, leading: 0, bottom: state.bottomInset, trailing: 0))
+                }
+                if state.guideOpen {
+                    GuideView(topics: Guide.topics(seen: state.known), start: state.guideStart, replay: actions.replayLesson, close: actions.closeGuide)
+                        .safeAreaPadding(EdgeInsets(top: state.topInset, leading: 0, bottom: state.bottomInset, trailing: 0))
+                }
+                if let beat = state.arrival {
+                    ArrivalView(beat: beat, next: actions.arrivalNext)
+                        .safeAreaPadding(EdgeInsets(top: state.topInset, leading: 0, bottom: state.bottomInset, trailing: 0))
                 }
                 if let host = state.host {
-                    HostView(host: host, say: actions.hostSay, retry: actions.hostRetry, deal: actions.hostDeal, close: actions.closeHost)
+                    HostView(host: host, say: actions.hostSay, deal: actions.hostDeal, close: actions.closeHost,
+                             consent: actions.hostConsent, reconsider: actions.hostReconsider)
+                        .safeAreaPadding(EdgeInsets(top: state.topInset, leading: 0, bottom: state.bottomInset, trailing: 0))
                 }
             }
         }
     }
+
+    /// How far the top bar drops. Just past the island, not the whole safe
+    /// area: every point here is a point of the board it covers.
+    var topClear: CGFloat { max(0, state.topInset - 10) }
 
     var topBar: some View {
         HStack(alignment: .top) {
@@ -235,7 +264,9 @@ public struct HUDView: View {
         VStack(spacing: 1) {
             if state.combo > 0 {
                 CelText(text: "COMBO x\(state.combo) · hit one to keep it", size: 11, fill: Ink.butter)
-            } else {
+            } else if state.topInset == 0 || !state.known.contains(.combo) {
+                // Under an island there's no room for it above the rings,
+                // once the combo card has said the same thing.
                 CelText(text: "TARGETS · hit one = combo", size: 10)
             }
             HStack(spacing: 3) {

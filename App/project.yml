@@ -3,17 +3,22 @@ options:
   bundleIdPrefix: com.bobbygrayson
   deploymentTarget:
     iOS: "18.0"
+configs:
+  Debug: debug
+  Device: release
+  Release: release
 packages:
   SkeeSkeeSkee:
     path: ..
 configFiles:
   Debug: Base.xcconfig
-  Release: Base.xcconfig
+  Device: Base.xcconfig
+  Release: Release.xcconfig
 targets:
   SkeeSkeeSkee:
     type: application
     platform: iOS
-    sources: [Sources]
+    sources: [Sources, Resources]
     dependencies:
       - package: SkeeSkeeSkee
         product: SkeeCore
@@ -31,14 +36,17 @@ targets:
         SWIFT_VERSION: "6.0"
         TARGETED_DEVICE_FAMILY: "1"
         GENERATE_INFOPLIST_FILE: YES
-        # Merged into the generated plist: carries DEEPSEEK_API_KEY in.
+        # Merged into the generated plist: the key (empty in Release) and
+        # the encryption answer App Store Connect would otherwise ask per build.
         INFOPLIST_FILE: Info.plist
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
         INFOPLIST_KEY_UIStatusBarHidden: YES
         INFOPLIST_KEY_UIRequiresFullScreen: YES
         INFOPLIST_KEY_CFBundleDisplayName: "Skee Skee Skee"
-        MARKETING_VERSION: "0.1"
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.casino-games
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        MARKETING_VERSION: "1.0"
         CURRENT_PROJECT_VERSION: "1"
         CODE_SIGN_STYLE: Automatic
         DEVELOPMENT_TEAM: NY422J2AAW

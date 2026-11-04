@@ -56,7 +56,11 @@ skee scene --out out/cabinet.png                    # the 3D cabinet alone
 skee frame --save run.json --t 0.8 --out out/f.png  # 3D + HUD, mid-throw
 skee frame --save run.json --settle --select 2      # prize counter, stamp selected
 skee frame --shop [--title] --size outer           # prize shop (or title) with a sample shelf
-skee frame --coach 3 --size outer                  # walkthrough card for step 3 (0...6)
+skee frame --coach 3 --size outer                  # lesson card for step 3 (0...11)
+skee frame --tip boss                              # a first-time card, by name (see Tip)
+skee frame --arrival 1                             # Sal's line at the door (0...4)
+skee frame --host --first [--signed]               # the first haggle, or its deal
+skee frame --guide [--topic 11]                    # the Guide, or one topic
 skee frame --line 0.6                              # waiting ball on a release line, with its guide
 skee frame --room penthouse --pulled               # a room's cabinet, machine already pulled at max bet
 skee frame --host                                  # the host's table mid-haggle (canned, no network)
@@ -115,3 +119,19 @@ skee windows --room penthouse                      # hole windows on a room's bo
 Each haggle turn prints the reply time, the model's mood, the offer it asked
 for, and the offer the rules allowed. A model that overreaches shows up as
 the two differing.
+
+## Building for the App Store
+
+Three build configurations, and the difference matters:
+
+| Configuration | How it reaches DeepSeek | Use |
+|---|---|---|
+| Debug | directly, with the key | Xcode |
+| Device | directly, with the key | your own phone, optimized |
+| Release | through the relay, no key in the app | the App Store |
+
+Every configuration asks permission before the first line is sent, and falls back to the scripted host if the player says no, the phone is offline or the relay's limit is hit.
+
+Release never includes `Secrets.xcconfig`, because anything in Info.plist can be read out of a downloaded app. `relay/` is the server half; its README has the setup. `scripts/archive.sh` builds the archive, fails if the key is in the bundle or the relay isn't set, and exports the .ipa. `--upload` sends it to App Store Connect, which is not a submission.
+
+`skee icon` redraws the app icon. Launch arguments `-seed 7 -skipTitle -panel host|guide|shop` open a screen in the simulator for screenshots. The listing, age rating answers and review notes are in `docs/appstore/LISTING.md`.

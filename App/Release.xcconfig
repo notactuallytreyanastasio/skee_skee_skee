@@ -1,0 +1,7 @@
+// The App Store build. It must never include Secrets.xcconfig: anything in
+// Info.plist can be read out of a downloaded app. It talks to DeepSeek through
+// the relay on the server, which holds the key (relay/). scripts/archive.sh
+// fails if the key turns up in the archive or the relay isn't set.
+DEEPSEEK_API_KEY =
+// $() keeps xcconfig from reading the // as a comment.
+HOST_RELAY_URL = https:/$()/bobbby.online/skee-host/chat

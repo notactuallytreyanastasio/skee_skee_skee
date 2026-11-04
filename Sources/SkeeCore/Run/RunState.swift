@@ -16,6 +16,8 @@ public struct RoundState: Hashable, Sendable, Codable {
     public var pull: Pull?
     /// Free games still to come; each is a frame the machine pulls itself.
     public var freeLeft = 0
+    /// The frame's Hot Spot: this hole pays double until the next pull.
+    public var hot: Hole?
     /// The last paid bet, which free games play at.
     public var lastBet: Bet = .one
 
@@ -37,6 +39,8 @@ public enum Phase: Hashable, Sendable, Codable {
 /// The whole run as a value. `(seed, [Action])` reproduces it exactly.
 public struct RunState: Hashable, Sendable, Codable {
     public var config: RunConfig
+    /// The ball in hand. It stays chosen until changed, across rounds.
+    public var ball: BallKind = .classic
     /// Where the run is played: its board, reels, machine.
     public var room: Room
     public var rng: SplitMix64
@@ -80,6 +84,8 @@ public enum Action: Hashable, Sendable, Codable {
     case throwBall(Launch)
     /// The thumb touched past the crease. The ball is spent, scores nothing.
     case foul
+    /// Pick the ball for the next throws. Free, any time you could throw.
+    case chooseBall(BallKind)
     /// Arm the power-up at this inventory index for the next throw.
     case arm(Int)
     /// Buy offer at index; stamps and gilds need a target hole.
@@ -130,6 +136,7 @@ public enum GameEvent: Hashable, Sendable {
     case sold(Charm)
     case rerolled
     case armed(PowerUp)
+    case ballChosen(BallKind)
     case roundStarted(RoundKind, target: Int)
     case anteStarted(Int, boss: Boss)
     case runWon

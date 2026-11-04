@@ -33,10 +33,13 @@ public struct RunConfig: Hashable, Sendable, Codable {
     /// next frame plays at double mult.
     public var feverHeat = 10
     /// Target for the warm-up of each ante; feature and boss scale it.
-    public var anteBase = [700, 1500, 2600, 3600, 4800, 6200, 7400, 9000]
+    /// Tuned to the novice bot, the closest thing to the player this is for:
+    /// someone who likes shiny things and should win often. Experts find
+    /// their difficulty in the chaos balls, not here.
+    public var anteBase = [400, 820, 1320, 1870, 2530, 3300, 4070, 4950]
     /// Every target times this: how much a room asks of the same run.
     public var targetScale = 1.0
-    public var kindScale: [RoundKind: Double] = [.warmup: 1, .feature: 1.5, .boss: 2]
+    public var kindScale: [RoundKind: Double] = [.warmup: 1, .feature: 1.3, .boss: 1.6]
     public var roundTickets: [RoundKind: Int] = [.warmup: 3, .feature: 4, .boss: 5]
     /// One bonus ticket per this fraction of overkill above the target.
     public var overkillStep = 0.5

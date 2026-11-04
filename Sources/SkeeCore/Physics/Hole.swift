@@ -36,3 +36,8 @@ public enum Hole: String, Hashable, Sendable, Codable, CaseIterable, Comparable 
     /// reversed: index 0 is the 40 cup (inside the smallest wall).
     static let byWallIndex: [Hole] = [.ring40, .ring30, .ring20, .ring10]
 }
+
+extension Hole {
+    /// Where a Hot Spot can land. Never the 10: double nothing much is no treat.
+    public static let hotSpots: [Hole] = [.ring20, .ring30, .ring40, .ring50, .pocketLeft, .pocketRight]
+}

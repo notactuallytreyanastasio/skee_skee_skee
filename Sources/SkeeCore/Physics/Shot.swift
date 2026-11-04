@@ -10,6 +10,8 @@ public enum ShotEvent: Hashable, Sendable, Codable {
     /// Ball came down on top of ring wall `ring` (0 = innermost) and bounced.
     case lip(ring: Int)
     case backwall
+    /// A jumping bean took off on its own.
+    case hop
     case dropped(Hole)
     case settled(Hole)
     case gutter

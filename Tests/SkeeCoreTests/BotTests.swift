@@ -29,9 +29,13 @@ struct BotTests {
     }
 
     @Test func skillMatters() {
+        // On the comet: the base game is tuned so a shaky hand wins often,
+        // which is the point, so skill shows where it is meant to.
         let seeds: [UInt64] = [1, 2, 3, 4, 5, 6]
-        let novice = seeds.map { playBotRun(seed: $0, skill: .novice).final.stats.roundsCleared }.reduce(0, +)
-        let expert = seeds.map { playBotRun(seed: $0, skill: .expert).final.stats.roundsCleared }.reduce(0, +)
+        var books: [Table: AimBook] = [:]
+        let novice = seeds.map { playBotRun(seed: $0, skill: .novice, ball: .comet, books: &books).final.stats.roundsCleared }.reduce(0, +)
+        books = [:]
+        let expert = seeds.map { playBotRun(seed: $0, skill: .expert, ball: .comet, books: &books).final.stats.roundsCleared }.reduce(0, +)
         #expect(expert > novice)
     }
 }

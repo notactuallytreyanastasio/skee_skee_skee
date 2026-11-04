@@ -235,7 +235,9 @@ struct PowerUpTests {
         s = try apply(.arm(0), to: s).get().state
         #expect(s.round.armed == .goldenBall)
         let (after, _) = try throwing(s, .ring30)
-        #expect(after.round.currentBalls[0].chips == 90)
+        // 30 x3, times the classic ball's pay, doubled on a Hot Spot.
+        let ball = after.round.currentBalls[0]
+        #expect(ball.chips == (ball.hot ? 216 : 108))
         #expect(after.round.armed == nil)
         #expect(after.powerUps.isEmpty)
     }

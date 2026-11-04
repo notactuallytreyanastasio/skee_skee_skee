@@ -1,7 +1,9 @@
 # Skee Skee Skee
 
 A skee-ball roguelike for the iPhone Duo, with a slot machine bolted on and a
-casino host who is a live LLM held in check by the rules.
+casino host who is a live LLM held in check by the rules. It was made for one
+player: someone in her sixties who likes shiny things on her phone. So the base
+game is kind, and anyone who wants it hard picks a harder ball.
 
 You pull a lever before every frame. The middle row of the 3×3 machine sets
 that frame's targets. Then you flick three balls up the lane, over the hinge
@@ -21,6 +23,10 @@ counter, go on to the next machine.
   (MINI, MINOR, MAJOR, GRAND) pay at max bet only.
 - **The combo:** a ball into a hole showing one of the frame's targets builds a
   combo that carries across throws and breaks on a miss.
+- **The balls:** free to swap before any throw. Marshmallow drifts toward the
+  bullseye (x1.1), Classic (x1.2), Jumping Bean hops at random (x2), Wobbler
+  snakes from side to side (x2), Comet is fast and ricochets (x3).
+- **The Hot Spot:** each frame one sparkling hole pays double.
 - **Winnings:** a currency separate from tickets, kept between runs, spent on
   cosmetic prizes. Prizes never change a run.
 - **Rooms:** four, unlocked for good. Each has its own board, reel strips,
@@ -43,7 +49,7 @@ coached warm-up you can skip.
 ## Build
 
 ```
-make test                                          # 161 core + 20 presentation tests
+make test                                          # core and presentation tests
 swift build -c release && .build/release/skee      # the terminal tools
 scripts/secrets.sh                                 # optional: the DeepSeek key, gitignored
 cd App && xcodegen generate && open SkeeSkeeSkee.xcodeproj
@@ -79,15 +85,28 @@ build can extract it. Don't hand out a build carrying a key you care about.
 
 ## Status
 
-The game runs in the iPhone Duo simulator (iOS 27.1). `skee film` renders the
-trailer from real seeded runs, in 16:9 and 9:16; the videos are not in the repo.
+The game runs in the iPhone Duo simulator (iOS 27.1) and is installed on a
+physical Duo. `skee film` renders the trailer from real seeded runs, in 16:9 and
+9:16; the videos are not in the repo.
+
+Targets are tuned to the novice bot. Bot win rates on the Boardwalk, 150 runs
+each, always throwing one ball:
+
+| Ball | expert | regular | novice |
+|------|--------|---------|--------|
+| Marshmallow | 97% | 79% | 53% |
+| Classic | 83% | 85% | 65% |
+| Jumping Bean | 57% | 71% | 66% |
+| Wobbler | 75% | 68% | 63% |
+| Comet | 89% | 49% | 5% |
+
+The Marshmallow was measured at x1 and now pays x1.1, so its row runs slightly low.
 
 Not done, or not verified:
 
-- **The pull machine, rooms and host have not been played on hardware.** They
-  pass their tests, render, and the host works live from the CLI, but this build
-  is not known to be installed on a Duo. The earlier throw rework is installed
-  and still waiting on a feel test.
+- **Nothing here has been confirmed by a person playing yet.** The latest build
+  is on a Duo, but feel, the balls and the effects are judged from renders and
+  bots. The music in the trailer has not been heard by a person either.
 - **The unfolded inner display has only been seen in renders.** The simulator
   boots folded and `simctl` cannot unfold it. `skee frame` and `skee film` draw
   the same scene and HUD at the same size.
@@ -95,24 +114,10 @@ Not done, or not verified:
   the code assumes π is flat open.
 - **`FlickTuning` has been tuned against synthetic flicks**, with only brief
   feedback from a real thumb.
-- **The difficulty curve is being retuned and is currently too hard.** The
-  first pass at new targets overshot. Bot win rates, 150 runs each:
-
-  | | Boardwalk | Neon Lounge | High Roller | Penthouse |
-  |-|-----------|-------------|-------------|-----------|
-  | expert | 6% | 0.7% | 2% | 0% |
-  | regular | 2.7% | 0% | 0% | 0% |
-  | novice | 0% | 0% | 0% | 0% |
-
-  The old curve was the opposite problem: scores ran 7-17x the target on ante 1,
-  under 3% of rounds were close, and rooms did not get harder. An earlier
-  version of this README blamed the Neon Lounge for a 1% win rate. That was a
-  bot bug, not the room: it ignored where misses land and chased pockets into
-  the gutter.
+- **Balance is measured by bots, not people.** Close rounds are still rare
+  (2-3%), because scores are heavy-tailed; a real hand may land elsewhere.
 - **Jackpot triples are too common:** about 12 a run for an expert bot.
 - **Only one art style (cel).** The several-styles-across-levels idea has not
   been rebuilt in 3D.
 - **Changing a rule changes how old saves replay,** because a save is a seed
   plus actions, with no rules version stamped in it.
-- **The edit in `skee film` is out of date.** Its seeds and captions were picked
-  from the old bot and targets, so rerun `skee moments` before rendering again.

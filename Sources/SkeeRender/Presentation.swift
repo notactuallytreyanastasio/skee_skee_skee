@@ -67,6 +67,8 @@ public struct Presentation: Sendable {
     public private(set) var trail: [PathSample] = []
     public private(set) var flash = 0.0
     public private(set) var shake = 0.0
+    /// A coin shower in progress, 1 down to 0.
+    public private(set) var celebration = 0.0
     /// The last ball's landing, kept on the board briefly.
     public private(set) var restingBall: (sample: PathSample, until: Double)?
     public private(set) var style: ArtStyle
@@ -127,7 +129,7 @@ public struct Presentation: Sendable {
                 beats.append(.banner("FREE GAMES", sub: "\(n) FREE FRAMES · EVERY ONE x2", seconds: 1.8))
             case .jackpot(let tier):
                 beats.append(.banner("\(tier.title) JACKPOT", sub: "PAID TO YOUR WINNINGS", seconds: 2.4))
-            case .counterOpened, .bought, .sold, .rerolled, .armed:
+            case .counterOpened, .bought, .sold, .rerolled, .armed, .ballChosen:
                 break
             }
         }
@@ -169,6 +171,7 @@ public struct Presentation: Sendable {
         clock += dt
         flash = max(0, flash - dt * 2.5)
         shake = max(0, shake - dt * 3)
+        celebration = max(0, celebration - dt / 2.4)
         popups = popups.compactMap { p in
             var q = p; q.age += dt / p.life; return q.age < 1 ? q : nil
         }
@@ -204,7 +207,10 @@ public struct Presentation: Sendable {
 
     mutating func begin(_ beat: Beat) {
         switch beat {
-        case .roll: trail = []; cues.append(.launch)
+        case .roll(_, let b):
+            trail = []
+            cues.append(.launch)
+            if b.ball == .comet { cues.append(.whoosh) }
         case .spin:
             spinFrom = reelPositions
             lastTick = 0
@@ -220,6 +226,7 @@ public struct Presentation: Sendable {
         case .banner(let t, _, _):
             flash = max(flash, 0.4)
             cues.append(t == "FOUL" ? .foul : .banner(t))
+            if t == "CLEARED" || t == "FREE GAMES" || t.hasSuffix("JACKPOT") || t == "YOU BEAT THE ARCADE" { celebration = 1 }
         case .commit, .restyle: break
         }
     }
@@ -232,13 +239,16 @@ public struct Presentation: Sendable {
             let a = before / Self.rollSpeed + t0, b = beatTime / Self.rollSpeed + t0
             for (e, et) in zip(r.events, r.eventTimes) where et > a && et <= b || (before == 0 && et == t0 && et <= b) {
                 switch e {
-                case .launched: cues.append(.hump)
+                case .launched:
+                    cues.append(.hump)
+                    if case .roll(_, let b) = beat { shake = max(shake, b.ball == .comet ? 0.8 : 0.25) }
                 case .lip: cues.append(.lip)
                 case .backwall: cues.append(.backwall)
                 case .landed: cues.append(.landed)
                 case .dropped(let h): cues.append(.drop(h))
                 case .gutter: cues.append(.gutter)
                 case .rail: cues.append(.rail)
+                case .hop: cues.append(.hop)
                 case .dud, .settled: break
                 }
             }
@@ -306,9 +316,20 @@ public struct Presentation: Sendable {
             recentThrows.append(ThrowMark(power: r.launch.power, hole: b.hole))
             if recentThrows.count > 6 { recentThrows.removeFirst() }
             trail = []
-            let text = b.hole == .gutter ? "GUTTER" : "+\(b.chips)"
+            let text = b.hole == .gutter ? (r.rattles > 0 ? "SO CLOSE!" : "GUTTER") : "+\(b.chips)"
             popups.append(Popup(text: text, anchor: .hole(b.hole), kind: b.hole == .gutter ? .bad : .chips))
             if r.rattles > 0 { shake = max(shake, 0.35) }
+            if b.hot {
+                popups.append(Popup(text: "HOT SPOT! x2", anchor: .center, kind: .jackpot, life: 1.5))
+                cues.append(.hotSpot)
+                celebration = max(celebration, 0.7)
+                flash = max(flash, 0.5)
+            } else if b.hole.faceValue >= 50 {
+                celebration = max(celebration, 0.45)
+            }
+            if b.scored && b.ball.pay >= 2 {
+                popups.append(Popup(text: "\(b.ball.short) \(b.ball.payLabel)!", anchor: .hud, kind: .tickets, life: 1.2))
+            }
             if b.slotHits > 0 {
                 let text = b.combo > 1 ? "COMBO x\(b.combo)" : "TOP SLOT!"
                 popups.append(Popup(text: text, anchor: .hud, kind: .mult, life: 1.4))
@@ -330,6 +351,7 @@ public struct Presentation: Sendable {
             }
             popups.append(Popup(text: line, anchor: .center, kind: f.isJackpot ? .jackpot : .mult, life: 1.6))
             cues.append(f.isJackpot ? .jackpot : (f.payline == .none ? .frameDone : .lineWon))
+            if f.payline != .none { celebration = max(celebration, f.isJackpot ? 1 : 0.6) }
             talliedBonus += f.total
         case .commit(let s):
             shown = s
@@ -425,7 +447,7 @@ public struct Presentation: Sendable {
 
 /// A moment worth a sound or an effect.
 public enum Cue: Hashable, Sendable {
-    case launch, rail, hump, lip, backwall, landed, drop(Hole), gutter
+    case launch, rail, hump, lip, backwall, landed, drop(Hole), gutter, hop, whoosh, hotSpot
     /// The lever going down; a pull's line wins, in chips.
     case lever, pullWin(Int)
     case reelTick, reelStop

@@ -11,6 +11,14 @@ import SkeeRender
 /// ball moves in step with the frames that draw it.
 public final class ScenePresenter: @unchecked Sendable {
     public let cabinet: Cabinet
+    struct Wave { var node: SCNNode; var age: Float; var size: Float }
+    var waves: [Wave] = []
+    var trail: SCNParticleSystem?
+    var trailKind = BallKind.classic
+    var hotGlitter: SCNParticleSystem?
+    let hotNode = SCNNode()
+    /// The ball's little swell on a bounce, 1 down to 0.
+    var pop: Float = 0
     public private(set) var rig: CameraRig
     var orientation = simd_quatf(angle: 0, axis: SIMD3(1, 0, 0))
     var lastCenter: SIMD3<Float>?
@@ -105,12 +113,15 @@ public final class ScenePresenter: @unchecked Sendable {
 
         // Bulbs: idle twinkle, a fast chase on fever, jackpots, banners and
         // while a jackpot-chance ball is in the air.
-        let excited = p.flash > 0.05 || s.fever || p.banner != nil || p.anticipation > 0
+        let excited = p.flash > 0.05 || s.fever || p.banner != nil || p.anticipation > 0 || p.celebration > 0
         let rate = excited ? 14.0 : 2.0
         cabinet.lightBulbs(phase: Int(p.clock * rate), level: excited ? 0.9 : 0.35)
         cabinet.ball.simdPosition = center
         cabinet.ball.simdOrientation = orientation
-        cabinet.ball.simdScale = SIMD3(repeating: scale)
+        cabinet.setBall(s.ball)
+        pop = max(0, pop - Float(dt) * 4)
+        cabinet.ball.simdScale = SIMD3(repeating: scale * s.ball.drawnSize * (1 + 0.35 * pop))
+        spectacle(p, center: center, moving: visible && p.current.map(isRoll) == true, dt: dt)
 
         // Drops: stars burst from the hole and its ring flashes.
         for cue in p.cues {
@@ -157,6 +168,158 @@ public final class ScenePresenter: @unchecked Sendable {
     }
 
     func isRoll(_ b: Beat) -> Bool { if case .roll = b { true } else { false } }
+
+    // MARK: spectacle
+
+    /// Everything shiny that happens around a throw, driven by the same cues
+    /// as the sound.
+    func spectacle(_ p: Presentation, center: SIMD3<Float>, moving: Bool, dt: Double) {
+        let kind = p.shown.ball
+        if trailKind != kind || trail == nil { makeTrail(kind) }
+        trail?.birthRate = moving ? trailRate(kind) : 0
+        for cue in p.cues {
+            switch cue {
+            case .hump:
+                pop = 1
+                shock(at: center, normal: world.laneNormal, size: kind == .comet ? 0.9 : 0.5)
+                spray(at: center, rate: kind == .comet ? 500 : 180, speed: 0.7, color: 0xFFE066)
+            case .lip:
+                pop = max(pop, 0.6)
+                spray(at: center, rate: 120, speed: 0.5, color: 0xFFFFFF)
+            case .hop:
+                pop = 1
+                shock(at: center, normal: world.boardNormal, size: 0.25)
+                spray(at: center, rate: 140, speed: 0.5, color: 0x7EDC7A)
+            case .landed:
+                pop = max(pop, 0.8)
+            case .backwall, .rail:
+                if kind == .comet { shock(at: center, normal: world.boardNormal, size: 0.4); spray(at: center, rate: 300, speed: 0.9, color: 0xFF7A1A) }
+            case .drop(let hole):
+                let at = world.board(world.table.board.holeCenter(hole), z: 0.02)
+                shock(at: at, normal: world.boardNormal, size: hole.faceValue >= 50 ? 1.1 : 0.55)
+            default:
+                break
+            }
+        }
+        // Rings of light grow and fade by the film-safe clock: `dt`, not
+        // SCNAction, so an offscreen render sees them too.
+        waves = waves.compactMap { w in
+            var w = w
+            w.age += Float(dt)
+            let u = w.age / 0.55
+            guard u < 1 else { w.node.removeFromParentNode(); return nil }
+            w.node.simdScale = SIMD3(repeating: w.size * (0.15 + u))
+            w.node.opacity = CGFloat(1 - u * u)
+            return w
+        }
+        // The Hot Spot glitters while it waits.
+        let hot = p.shown.round.pull != nil ? p.shown.round.hot : nil
+        if hotGlitter == nil { makeHotGlitter() }
+        hotGlitter?.birthRate = hot == nil ? 0 : 40
+        if let hot { hotNode.simdPosition = world.board(world.table.board.holeCenter(hot), z: 0.03) }
+    }
+
+    func trailRate(_ k: BallKind) -> CGFloat {
+        switch k {
+        case .marshmallow: 40
+        case .classic: 50
+        case .bean: 70
+        case .wobbler: 60
+        case .comet: 90
+        }
+    }
+
+    func makeTrail(_ k: BallKind) {
+        if let old = trail { cabinet.ball.removeParticleSystem(old) }
+        let ps = SCNParticleSystem()
+        ps.particleImage = k == .comet ? Textures.blob : Textures.star
+        ps.birthRate = 0
+        ps.loops = true
+        ps.particleLifeSpan = k == .comet ? 0.55 : 0.4
+        ps.particleLifeSpanVariation = 0.15
+        ps.particleVelocity = 0.06
+        ps.particleVelocityVariation = 0.06
+        ps.spreadingAngle = 180
+        ps.particleSize = k == .comet ? 0.024 : 0.016
+        ps.particleSizeVariation = 0.008
+        ps.particleAngularVelocity = 300
+        ps.blendMode = .alpha
+        ps.isLightingEnabled = false
+        switch k {
+        case .marshmallow: ps.particleColor = hex(0xFFD9E8)
+        case .classic: ps.particleColor = hex(0xFFE066)
+        case .bean: ps.particleColor = hex(0x7EDC7A)
+        case .wobbler:
+            ps.particleColor = hex(0xFF6FA5)
+            ps.particleColorVariation = SCNVector4(SIMD4<Float>(180, 0.2, 0.2, 0))
+        case .comet:
+            ps.particleColor = hex(0xFF7A1A)
+            ps.particleColorVariation = SCNVector4(SIMD4<Float>(25, 0.2, 0.2, 0))
+        }
+        cabinet.ball.addParticleSystem(ps)
+        trail = ps
+        trailKind = k
+    }
+
+    func makeHotGlitter() {
+        let ps = SCNParticleSystem()
+        ps.particleImage = Textures.star
+        ps.birthRate = 0
+        ps.loops = true
+        ps.particleLifeSpan = 0.6
+        ps.particleVelocity = 0.14
+        ps.particleVelocityVariation = 0.1
+        ps.spreadingAngle = 60
+        ps.emittingDirection = SCNVector3(world.boardNormal)
+        ps.particleSize = 0.014
+        ps.particleSizeVariation = 0.006
+        ps.particleColor = hex(0xFFD84D)
+        ps.blendMode = .alpha
+        ps.isLightingEnabled = false
+        cabinet.scene.rootNode.addChildNode(hotNode)
+        hotNode.addParticleSystem(ps)
+        hotGlitter = ps
+    }
+
+    /// A ring of light that races outward from a point.
+    func shock(at: SIMD3<Float>, normal: SIMD3<Float>, size: Float) {
+        let g = SCNPlane(width: 1, height: 1)
+        let m = SCNMaterial()
+        m.diffuse.contents = Textures.wave
+        m.lightingModel = .constant
+        m.isDoubleSided = true
+        m.writesToDepthBuffer = false
+        g.materials = [m]
+        let n = SCNNode(geometry: g)
+        n.simdPosition = at + normal * 0.01
+        n.simdOrientation = simd_quatf(from: SIMD3(0, 0, 1), to: normal)
+        n.simdScale = SIMD3(repeating: 0.01)
+        cabinet.scene.rootNode.addChildNode(n)
+        waves.append(Wave(node: n, age: 0, size: size))
+    }
+
+    /// A quick puff of sparks at a point.
+    func spray(at: SIMD3<Float>, rate: CGFloat, speed: CGFloat, color: UInt32) {
+        let ps = SCNParticleSystem()
+        ps.particleImage = Textures.star
+        ps.birthRate = rate
+        ps.emissionDuration = 0.05
+        ps.loops = false
+        ps.particleLifeSpan = 0.45
+        ps.particleLifeSpanVariation = 0.15
+        ps.particleVelocity = speed
+        ps.particleVelocityVariation = speed * 0.5
+        ps.spreadingAngle = 180
+        ps.particleSize = 0.014
+        ps.particleSizeVariation = 0.006
+        ps.particleAngularVelocity = 360
+        ps.particleColor = hex(color)
+        ps.blendMode = .alpha
+        ps.isLightingEnabled = false
+        var m = matrix_identity_float4x4
+        m.columns.3 = SIMD4(at, 1)
+        cabinet.scene.addParticleSystem(ps, transform: SCNMatrix4(m))
+    }
 
     /// Stars out of a hole.
     func burst(at hole: Hole, big: Bool) {

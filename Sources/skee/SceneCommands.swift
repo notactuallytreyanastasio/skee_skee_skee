@@ -121,7 +121,9 @@ func frameCommand() {
                                  coach: flag("coach").flatMap(Int.init).flatMap(WalkthroughStep.init).map { Walkthrough(step: $0).card },
                                  line: line,
                                  // --host: the host's table mid-haggle, scripted (no network).
-                                 host: has("host") ? sampleHaggle() : nil)
+                                 host: has("host") ? sampleHaggle() : nil,
+                                 // --confirm: the new-game question.
+                                 tweak: { $0.confirmNew = has("confirm") })
             else { fail("render failed") }
     try? FileManager.default.createDirectory(atPath: (out as NSString).deletingLastPathComponent, withIntermediateDirectories: true)
     writePNG(img, out)

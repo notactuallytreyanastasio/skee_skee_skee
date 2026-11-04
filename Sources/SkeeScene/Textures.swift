@@ -75,13 +75,33 @@ public enum Textures {
 
     /// Equirectangular: six gores alternating two tones, so the roll reads
     /// from any angle, plus a white star at each pole.
-    public static var ball: CGImage {
-        cached("ball") {
+    public static var ball: CGImage { ball(.classic) }
+
+    /// An expanding ring, for shockwaves.
+    public static var wave: CGImage {
+        cached("wave") {
+            let n = 256
+            let c = context(n, n)
+            let box = CGRect(x: 18, y: 18, width: n - 36, height: n - 36)
+            c.setStrokeColor(RGB(0xFFFFFF).cg()); c.setLineWidth(22); c.strokeEllipse(in: box)
+            c.setStrokeColor(RGB(0xFFD84D).cg()); c.setLineWidth(10); c.strokeEllipse(in: box)
+            return c.makeImage()!
+        }
+    }
+
+    public static func ball(_ kind: BallKind) -> CGImage {
+        cached("ball-\(kind.rawValue)") {
             let w = 512, h = 256
             let c = context(w, h)
-            let a = RGB(0xFF6F6F), b = RGB(0xFFE3C2)
+            let stripes: [UInt32] = switch kind {
+            case .marshmallow: [0xFFFFFF, 0xFFD9E8, 0xFFFFFF, 0xFFD9E8, 0xFFFFFF, 0xFFD9E8]
+            case .classic: [0xFF6F6F, 0xFFE3C2, 0xFF6F6F, 0xFFE3C2, 0xFF6F6F, 0xFFE3C2]
+            case .bean: [0x7EDC7A, 0x3FAE5A, 0x7EDC7A, 0x3FAE5A, 0x7EDC7A, 0x3FAE5A]
+            case .wobbler: [0xFF4D6D, 0xFFD84D, 0x7EDC7A, 0x5FC8FF, 0x9B83F2, 0xFF6FA5]
+            case .comet: [0xFFD84D, 0xFF7A1A, 0xFF3D2E, 0xFFD84D, 0xFF7A1A, 0xFF3D2E]
+            }
             for i in 0..<6 {
-                c.setFillColor((i % 2 == 0 ? a : b).cg())
+                c.setFillColor(RGB(stripes[i]).cg())
                 c.fill(CGRect(x: CGFloat(i) * CGFloat(w) / 6, y: 0, width: CGFloat(w) / 6 + 1, height: CGFloat(h)))
             }
             c.setStrokeColor(ink.cg(0.8)); c.setLineWidth(4)

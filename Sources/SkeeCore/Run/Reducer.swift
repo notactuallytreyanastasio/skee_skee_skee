@@ -30,7 +30,7 @@ public func table(for s: RunState) -> Table {
     var t = difficultyTable(ante: s.ante, base: s.room.table, antes: s.config.antes)
     if s.round.kind == .boss { t = s.boss.modify(t) }
     if let p = s.round.armed { t = p.modify(t) }
-    return t
+    return s.ball.modify(t)
 }
 
 /// The single entry point for changing a run. Pure: invalid actions are
@@ -42,6 +42,7 @@ public func apply(_ action: Action, to s: RunState) -> Result<Step, ActionError>
     case (.throwBall(let l), .throwing): .success(throwBall(l, s))
     case (.foul, .throwing): .success(foul(s))
     case (.arm(let i), .throwing): arm(i, s)
+    case (.chooseBall(let k), .throwing): .success(chooseBall(k, s))
     case (.buy(let i, let target), .prizeCounter(let c)): buy(i, target, c, s)
     case (.reroll, .prizeCounter(let c)): reroll(c, s)
     case (.sell(let i), .prizeCounter): sell(i, s)
@@ -69,6 +70,7 @@ private func spin(_ p: Pull, _ s0: RunState) -> Step {
     var events: [GameEvent] = [.pulled(p)]
     s.round.pull = p
     s.topSlot = TopSlot(symbols: p.targets)
+    s.round.hot = Hole.hotSpots[s.rng.nextInt(below: Hole.hotSpots.count)]
     s.stats.pulls += 1
     if p.triggersFreeGames {
         s.round.freeLeft += Pull.freeGamesAwarded
@@ -105,18 +107,21 @@ private func foul(_ s0: RunState) -> Step {
 private func throwBall(_ launch: Launch, _ s0: RunState) -> Step {
     var s = s0
     var events: [GameEvent] = []
-    let shot = simulateShot(launch, on: table(for: s))
+    let seed = s.ball.isRandom ? s.rng.next() : 0
+    let shot = simulateShot(launch, on: table(for: s), ball: s.ball, seed: seed)
     let armed = s.round.armed
     var chips = s.setup.chips(for: shot.hole)
     if s.round.kind == .boss { chips = s.boss.chips(for: shot.hole, base: chips) }
     if armed == .goldenBall { chips *= 3 }
+    let hot = shot.hole == s.round.hot
+    chips = Int((Double(chips) * s.ball.pay * (hot ? 2 : 1)).rounded())
     let symbol = armed == .wildBall && shot.hole != .gutter ? Symbol.clover : s.showing(shot.hole)
     let hits = s.topSlot.hits(symbol)
     s.round.combo = hits > 0 ? s.round.combo + 1 : 0
     let record = BallRecord(
         hole: shot.hole, symbol: symbol,
         chips: chips, rattles: shot.rattles, fold: launch.fold,
-        slotHits: hits, combo: s.round.combo)
+        slotHits: hits, combo: s.round.combo, ball: s.ball, hot: hot)
     s.round.armed = nil
     s.round.currentBalls.append(record)
     s.heat += shot.rattles + (shot.hole == .gutter ? 1 : 0)
@@ -189,6 +194,12 @@ private func endRound(_ s0: RunState, _ events0: [GameEvent]) -> Step {
     s.phase = .prizeCounter(PrizeCounter(offers: rollOffers(&s), rerollCost: 1))
     events.append(.counterOpened)
     return Step(state: s, events: events)
+}
+
+private func chooseBall(_ k: BallKind, _ s0: RunState) -> Step {
+    var s = s0
+    s.ball = k
+    return Step(state: s, events: [.ballChosen(k)])
 }
 
 private func arm(_ i: Int, _ s0: RunState) -> Result<Step, ActionError> {

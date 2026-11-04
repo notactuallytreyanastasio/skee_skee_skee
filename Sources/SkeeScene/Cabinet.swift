@@ -19,6 +19,7 @@ public final class Cabinet: @unchecked Sendable {
     public let world: World
     public let camera = SCNNode()
     public let ball: SCNNode
+    private var shownBall = BallKind.classic
     public let board = SCNNode()
     /// Soft shadow that follows the ball on the lane and board.
     public let shadow: SCNNode
@@ -382,6 +383,15 @@ public final class Cabinet: @unchecked Sendable {
     public func setReel(_ i: Int, _ symbol: Symbol?) {
         guard reels.indices.contains(i) else { return }
         reels[i].geometry?.materials[0].diffuse.contents = Textures.plate(symbol ?? .blank, lit: symbol != nil)
+    }
+
+    /// Dress the ball, and the ones waiting in the tray, as this kind.
+    public func setBall(_ kind: BallKind) {
+        guard kind != shownBall else { return }
+        shownBall = kind
+        let t = Textures.ball(kind)
+        ball.geometry?.firstMaterial?.diffuse.contents = t
+        for n in waiting { n.geometry?.firstMaterial?.diffuse.contents = t }
     }
 
     public func setWaiting(_ n: Int) {

@@ -172,7 +172,7 @@ func balanceCommand() {
         var feverFrames = 0
         var ticketsEarned = 0, purchases = 0
         for k in 0..<runs {
-            let run = playBotRun(seed: seed0 + UInt64(k), skill: skill, config: config, room: room, books: &books)
+            let run = playBotRun(seed: seed0 + UInt64(k), skill: skill, config: config, room: room, ball: flag("ball").flatMap(BallKind.init) ?? .classic, books: &books)
             let s = run.final
             reached[min(s.ante, 9)] += 1
             if s.phase == .won { wins += 1 }

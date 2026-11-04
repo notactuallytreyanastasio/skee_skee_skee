@@ -51,9 +51,9 @@ public enum Room: String, Hashable, Sendable, Codable, CaseIterable, Comparable 
     public var targetScale: Double {
         switch self {
         case .boardwalk: 1
-        case .neonLounge: 1.8
-        case .highRoller: 1.45
-        case .penthouse: 1.95
+        case .neonLounge: 1.3
+        case .highRoller: 1
+        case .penthouse: 1.4
         }
     }
 

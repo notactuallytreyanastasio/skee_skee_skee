@@ -70,6 +70,16 @@ public struct HUDState: Sendable {
     /// The walkthrough's card for this moment, if one is running.
     public var coach: CoachCard?
     public var shopOpen = false
+    /// "Start a new game?" is on screen.
+    public var confirmNew = false
+    /// The ball in hand, and whether the rack is out to change it.
+    public var ball = BallKind.classic
+    public var rack = false
+    /// Where this frame's Hot Spot is on screen.
+    public var hotAt: CGPoint?
+    public var clock = 0.0
+    /// Coin shower, 1 down to 0.
+    public var shower = 0.0
     /// The host's table, while a comp is being negotiated.
     public var host: HostState?
     /// The thumb's recent path, for a fading trail. Age 0...1.
@@ -126,6 +136,11 @@ public struct HUDState: Sendable {
                 teasing: p.teasing, room: s.room)
         }
         h.selectedOffer = selectedOffer; h.selectedCharm = selectedCharm
+        h.ball = s.ball
+        h.clock = p.clock
+        h.shower = p.celebration
+        h.rack = !p.isBusy && s.phase == .throwing && s.round.pull != nil
+        if s.phase == .throwing, s.round.pull != nil, pulling == nil, let hot = s.round.hot { h.hotAt = holeOnScreen(hot) }
         h.firstThrow = s.ante == 1 && s.round.kind == .warmup && s.round.frames.isEmpty && s.round.currentBalls.isEmpty
         if case .prizeCounter(let c) = s.phase, !p.isBusy { h.counter = c }
         if !p.isBusy {
@@ -155,7 +170,9 @@ public struct HUDState: Sendable {
         h.popups = p.popups.map { pop in
             let at: CGPoint = switch pop.anchor {
             case .hole(let hole): holeOnScreen(hole)
-            case .center, .hud: center
+            case .center: center
+            // Below the centre, so two at once can both be read.
+            case .hud: CGPoint(x: center.x, y: center.y + 52)
             }
             return ScreenPopup(text: pop.text, kind: pop.kind, at: at, age: pop.age)
         }

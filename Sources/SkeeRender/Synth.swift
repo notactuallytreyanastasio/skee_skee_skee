@@ -100,6 +100,14 @@ public struct Synth: Sendable {
         switch cue {
         case .launch:
             add([v(.noise, 0, amp: 0.12, decay: 0.08), v(.sine, 180, to: 320, glide: 0.12, amp: 0.15, decay: 0.08)])
+        case .whoosh:
+            add([v(.noise, 0, amp: 0.16, decay: 0.3), v(.sine, 900, to: 180, glide: 0.5, amp: 0.2, decay: 0.3)])
+        case .hotSpot:
+            add(arpeggio([1046, 1318, 1568, 2093], step: 0.05, amp: 0.2, decay: 0.3, wave: .tri) + bell(2093, amp: 0.22, delay: 0.2)
+                + (0..<14).map { i in v(.tri, 2600 + Float((i * 7) % 5) * 300, amp: 0.06, decay: 0.025, delay: 0.25 + Float(i) * 0.04) })
+        case .hop:
+            // Boing: a pitch that jumps up and falls back.
+            add([v(.sine, 220, to: 780, glide: 0.09, amp: 0.3, decay: 0.12), v(.tri, 440, to: 1100, glide: 0.09, amp: 0.1, decay: 0.08)])
         case .rail:
             add([v(.tri, 900, amp: 0.15, decay: 0.03)])
         case .hump:

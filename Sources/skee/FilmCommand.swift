@@ -17,7 +17,7 @@ func momentsCommand() {
     var found: [String: [(score: Int, line: String)]] = [:]
     func note(_ kind: String, _ score: Int, _ line: String) { found[kind, default: []].append((score, line)) }
     for seed in 1...UInt64(runs) {
-        let bot = playBotRun(seed: seed, skill: skill, room: room, books: &books)
+        let bot = playBotRun(seed: seed, skill: skill, room: room, ball: flag("ball").flatMap(BallKind.init) ?? .classic, books: &books)
         var s = newRun(seed: seed, room: room)
         for (i, a) in bot.actions.enumerated() {
             guard case .success(let step) = apply(a, to: s) else { fail("seed \(seed) does not replay at \(i)") }
@@ -147,7 +147,7 @@ final class Film {
     var music: [(Double, Float)] = [(0, 0.8)]
     var musicEnd = Double.infinity
     var bots: [String: BotRun] = [:]
-    var books: [SkeeCore.Table: AimBook] = [:]
+    var books: [BallKind: [SkeeCore.Table: AimBook]] = [:]
     var shot = 0
     let only: Set<Int>?
     /// Seconds per beat at the bed's 120 bpm: shots end on it.
@@ -188,10 +188,12 @@ final class Film {
         for _ in 0..<Int(seconds * Double(fps)) { for s in sinks { s.write(card: c) }; tickAudio(); frames += 1 }
     }
 
-    func bot(_ seed: UInt64, _ room: Room) -> BotRun {
-        let key = "\(seed)-\(room.rawValue)"
+    func bot(_ seed: UInt64, _ room: Room, _ ball: BallKind = .classic) -> BotRun {
+        let key = "\(seed)-\(room.rawValue)-\(ball.rawValue)"
         if let b = bots[key] { return b }
-        let b = playBotRun(seed: seed, skill: .expert, room: room, books: &books)
+        var book = books[ball] ?? [:]
+        let b = playBotRun(seed: seed, skill: .expert, room: room, ball: ball, books: &book)
+        books[ball] = book
         bots[key] = b
         return b
     }
@@ -283,12 +285,12 @@ final class Film {
     }
 
     /// Replay bot run `seed` to action `from`, then play through `through`.
-    func run(seed: UInt64, room: Room = .boardwalk, from: Int, through: Int, text: String, sub: String = "",
+    func run(seed: UInt64, room: Room = .boardwalk, ball: BallKind = .classic, from: Int, through: Int, text: String, sub: String = "",
              pace: Double = 1, lead: Double = 0.4, after: Double = 0.3, level: Float = 0.8, cap: Double = .infinity) {
         guard wants() else { return }
         music.append((time, level))
         let start = time
-        let actions = bot(seed, room).actions
+        let actions = bot(seed, room, ball).actions
         var s = newRun(seed: seed, room: room)
         var wallet = Wallet()
         for a in actions[..<from] {
@@ -314,6 +316,38 @@ final class Film {
             while k.p.isBusy && time - start < cap { step(k, pace: pace, text: text, sub: sub) }
         }
         if !k.p.isBusy { hold(k, after, text: text, sub: sub) }
+        toBeat(k, text: text, sub: sub)
+    }
+
+    /// The first throw in any bot run that does what a shot needs. The film
+    /// only shows things the game really did, so it searches for them.
+    func find(ball: BallKind, _ want: (ShotResult, BallRecord) -> Bool) -> (UInt64, Int) {
+        for seed in UInt64(1)...60 {
+            var s = newRun(seed: seed)
+            for (i, a) in bot(seed, .boardwalk, ball).actions.enumerated() {
+                guard case .success(let step) = apply(a, to: s) else { fail("seed \(seed) does not replay at \(i)") }
+                for case .shot(let r, let b) in step.events where want(r, b) { return (seed, i) }
+                s = step.state
+            }
+        }
+        fail("no \(ball.name) throw matched in 60 runs")
+    }
+
+    /// The rack, tapped through from gentle to wild.
+    func rack(seed: UInt64, text: String, sub: String) {
+        guard wants() else { return }
+        music.append((time, 0.8))
+        var s = newRun(seed: seed)
+        guard case .success(let pulled) = apply(bot(seed, .boardwalk).actions[0], to: s) else { fail("no pull") }
+        s = pulled.state
+        let k = Take(state: s, wallet: Wallet(), aspect: Float(gameSize.width / gameSize.height))
+        for ball in BallKind.allCases {
+            guard case .success(let step) = apply(.chooseBall(ball), to: s) else { fail("no pick") }
+            s = step.state
+            k.p.enqueue(step)
+            synth.play(.reelStop)
+            hold(k, 0.7, text: text, sub: sub)
+        }
         toBeat(k, text: text, sub: sub)
     }
 
@@ -425,14 +459,26 @@ func filmCommand() {
     film.screen(.title, wallet: shelf, seconds: 2, text: "SKEE\nSKEE\nSKEE", sub: "for iPhone Duo")
     film.run(seed: 1, from: 1, through: 1, text: "FLICK", sub: "thumb down on your line", cap: 3)
     film.screen(.game, wallet: Wallet(), seconds: 1.5, text: "LEARN BY\nPLAYING", sub: "a coached warm-up, or skip it", coach: Walkthrough(step: WalkthroughStep(rawValue: 0)!).card)
-    film.run(seed: 279, from: 188, through: 188, text: "PULL", sub: "every frame starts at the lever")
-    film.run(seed: 279, from: 191, through: 191, text: "CHIPS\nTIMES\nMULT", sub: "one frame. this one scored 108,735", pace: 1.25, cap: 9)
-    film.run(seed: 5, from: 244, through: 244, text: "THREE\nBONUS", sub: "free frames, every one x2", after: 0)
-    film.run(seed: 2, from: 143, through: 143, text: "JACKPOTS", sub: "progressives pay at max bet", after: 0.2)
-    film.run(seed: 3, from: 351, through: 351, text: "COMBO\nx15", sub: "chain the machine's targets", cap: 3.2)
+    film.run(seed: 119, from: 234, through: 234, text: "PULL", sub: "every frame starts at the lever")
+    film.rack(seed: 1, text: "PICK\nYOUR BALL", sub: "easy ones forgive. wild ones pay")
+    func moment(_ ball: BallKind, _ want: (ShotResult, BallRecord) -> Bool) -> (UInt64, Int) { film.find(ball: ball, want) }
+    let soft = moment(.marshmallow) { _, b in b.hole == .ring50 }
+    film.run(seed: soft.0, ball: .marshmallow, from: soft.1, through: soft.1, text: "MARSHMALLOW", sub: "drifts toward the bullseye", cap: 3.5)
+    let bean = moment(.bean) { r, b in r.events.filter { $0 == .hop }.count >= 3 && b.hole.faceValue >= 40 }
+    film.run(seed: bean.0, ball: .bean, from: bean.1, through: bean.1, text: "JUMPING\nBEAN", sub: "double points, if it behaves", cap: 4)
+    let wob = moment(.wobbler) { _, b in b.hole == .ring50 }
+    film.run(seed: wob.0, ball: .wobbler, from: wob.1, through: wob.1, text: "WOBBLER", sub: "snakes its way up the lane", cap: 3.5)
+    let comet = moment(.comet) { r, b in r.events.count >= 5 && b.scored && b.hole.faceValue >= 30 }
+    film.run(seed: comet.0, ball: .comet, from: comet.1, through: comet.1, text: "COMET\nx3", sub: "blazing fast. bounces off everything", cap: 4.5)
+    let hot = moment(.classic) { _, b in b.hot && b.hole.faceValue >= 40 }
+    film.run(seed: hot.0, from: hot.1, through: hot.1, text: "HOT SPOT", sub: "a new sparkling hole every frame", cap: 3)
+    film.run(seed: 74, from: 136, through: 136, text: "CHIPS\nTIMES\nMULT", sub: "one frame. this one scored 319,424", pace: 1.25, cap: 6)
+    film.run(seed: 1, from: 329, through: 329, text: "THREE\nBONUS", sub: "free frames, every one x2", after: 0)
+    film.run(seed: 103, from: 64, through: 64, text: "GRAND\nJACKPOT", sub: "progressives pay at max bet", after: 0.2)
+    film.run(seed: 38, from: 304, through: 304, text: "COMBO\nx21", sub: "chain the machine's targets", cap: 3.2)
     let buy = film.bot(5, .boardwalk).actions.firstIndex { if case .buy = $0 { true } else { false } } ?? 0
     film.run(seed: 5, from: buy, through: buy, text: "15 CHARMS", sub: "spend tickets, break the math", lead: 1.8, after: 0.7)
-    film.run(seed: 9, from: 327, through: 327, text: "7 BOSSES", sub: "8 antes between you and the door", cap: 2.5)
+    film.run(seed: 1, from: 323, through: 323, text: "7 BOSSES", sub: "8 antes between you and the door", cap: 2.5)
     film.screen(.game, wallet: shelf, shop: true, seconds: 2, text: "A PRIZE\nSHELF", sub: "winnings outlive the run")
     film.run(seed: 1, room: .neonLounge, from: 1, through: 1, text: "ROOMS\nYOU KEEP", sub: "The Neon Lounge", cap: 2.5)
     film.run(seed: 1, room: .highRoller, from: 1, through: 1, text: "ROOMS\nYOU KEEP", sub: "The High Roller Suite", cap: 2.5)
@@ -447,7 +493,7 @@ func filmCommand() {
          HostReply(say: "Cute. Try that line on the slot machines and see how far it gets you. You're still at one night, and my patience is thinner than the ice in my drink.",
                    offer: .init(nights: 1, tickets: 0, credit: 0), mood: -1)),
     ], text: "HAGGLE", sub: "the host is a live LLM. the rules are not")
-    film.run(seed: 5, from: 390, through: 390, text: "BEAT THE\nARCADE", sub: "", pace: 1.5, after: 1.5)
+    film.run(seed: 1, from: 375, through: 375, text: "BEAT THE\nARCADE", sub: "", pace: 2, after: 1)
     film.musicEnd = film.time
     film.card("SKEE SKEE SKEE", "A skee-ball roguelike for iPhone Duo", seconds: 4)
     film.finish()

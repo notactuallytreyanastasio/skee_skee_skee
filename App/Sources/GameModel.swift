@@ -76,6 +76,7 @@ final class GameModel {
     /// Winnings and the prize shelf, across runs.
     var wallet: Wallet
     var shopOpen = false
+    var confirmNew = false
     /// The coached practice warm-up, while it runs. The real run waits in
     /// `parked` and comes back when the walkthrough ends or is skipped.
     var walkthrough: Walkthrough?
@@ -209,6 +210,7 @@ final class GameModel {
         hud.aiming = aiming
         hud.wallet = wallet
         hud.shopOpen = shopOpen
+        hud.confirmNew = confirmNew
         if let w = walkthrough, !w.finished {
             hud.coach = w.card
             hud.over = nil   // the last card says it instead
@@ -320,6 +322,7 @@ final class GameModel {
             guard let self, !busy, state.round.pull == nil else { return }
             send(.pull(affordableBet))
         }
+        a.chooseBall = { [weak self] k in self?.send(.chooseBall(k)) }
         a.setBet = { [weak self] b in self?.bet = b; self?.haptics.tap() }
         a.pickRoom = { [weak self] r in self?.pickRoom(r) }
         a.openHost = { [weak self] in self?.openHost(); self?.haptics.tap() }
@@ -334,7 +337,9 @@ final class GameModel {
             if walkthrough?.finished == true { endWalkthrough() }
             haptics.tap()
         }
-        a.newRun = { [weak self] in self?.newGame() }
+        a.newRun = { [weak self] in self?.confirmNew = false; self?.newGame() }
+        a.askNewGame = { [weak self] in self?.confirmNew = true; self?.haptics.tap() }
+        a.keepPlaying = { [weak self] in self?.confirmNew = false; self?.haptics.tap() }
         a.openShop = { [weak self] in self?.shopOpen = true; self?.haptics.tap() }
         a.closeShop = { [weak self] in self?.shopOpen = false; self?.haptics.tap() }
         a.buyPrize = { [weak self] p in

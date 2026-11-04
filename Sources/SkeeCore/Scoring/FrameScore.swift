@@ -11,12 +11,16 @@ public struct BallRecord: Hashable, Sendable, Codable {
     /// Top slot reels this ball's symbol matched, and the combo level after it.
     public var slotHits: Int
     public var combo: Int
+    /// Which ball it was, and whether it found the frame's Hot Spot.
+    public var ball: BallKind
+    public var hot: Bool
 
     public init(hole: Hole, symbol: Symbol, chips: Int, rattles: Int = 0, fold: Double = 0, foul: Bool = false,
-                slotHits: Int = 0, combo: Int = 0) {
+                slotHits: Int = 0, combo: Int = 0, ball: BallKind = .classic, hot: Bool = false) {
         self.hole = hole; self.symbol = symbol; self.chips = chips
         self.rattles = rattles; self.fold = fold; self.foul = foul
         self.slotHits = slotHits; self.combo = combo
+        self.ball = ball; self.hot = hot
     }
 
     public var scored: Bool { hole != .gutter }

@@ -13,8 +13,11 @@
 ///    lower than the lip. It drops into the 50 hole or a pocket if it passes
 ///    over one, rolls off the bottom into the gutter, or settles against a
 ///    ring wall and scores that ring.
-public func simulateShot(_ launch: Launch, on table: Table) -> ShotResult {
-    var sim = ShotSim(launch: launch, table: table)
+///
+/// Random balls take their mischief from `seed`, so the same throw with the
+/// same seed is still the same shot. A classic ball ignores it.
+public func simulateShot(_ launch: Launch, on table: Table, ball: BallKind = .classic, seed: UInt64 = 0) -> ShotResult {
+    var sim = ShotSim(launch: launch, table: table, ball: ball, seed: seed)
     return sim.run()
 }
 
@@ -34,9 +37,41 @@ private struct ShotSim {
     var peak = 0.0
     var touchedWall = false
 
-    init(launch: Launch, table: Table) {
+    let ball: BallKind
+    var rng: SplitMix64
+    /// When a bean next hops, and the lane hop in progress.
+    var nextHop = 0.0
+    var hopUntil = 0.0
+    var hops = 0
+    /// A wobbler's sway: where in its swing it starts.
+    var swayPhase = 0.0
+
+    init(launch: Launch, table: Table, ball: BallKind, seed: UInt64) {
         self.launch = launch
         self.table = table
+        self.ball = ball
+        rng = SplitMix64(seed: seed)
+        if ball == .bean { nextHop = 0.08 + rng.nextUnit() * 0.12 }
+        if ball == .wobbler { swayPhase = rng.nextUnit() * 2 * .pi }
+    }
+
+    /// Sideways shove from a wobbler's sway, in m/s².
+    func sway(_ strength: Double) -> Double {
+        ball == .wobbler ? strength * _sin(2 * .pi * 1.6 * t + swayPhase) : 0
+    }
+
+    /// A marshmallow's drift toward the bullseye, in m/s². Bigger holes
+    /// alone barely helped: most balls score in the rings, not the holes.
+    func drift(_ p: Vec2) -> Vec2 {
+        guard ball == .marshmallow else { return Vec2(0, 0) }
+        let to = board.ringCenter - p
+        return to.length > 0.01 ? to.normalized * 1.6 : Vec2(0, 0)
+    }
+
+    /// How high a bean is on the lane right now: the path shows the hop.
+    var laneHeight: Double {
+        guard t < hopUntil else { return 0 }
+        return 0.035 * _sin(.pi * (hopUntil - t) / 0.14)
     }
 
     /// Record at 120 Hz (every 2nd 240 Hz step), so a 120 Hz display never
@@ -61,7 +96,7 @@ private struct ShotSim {
     mutating func run() -> ShotResult {
         let g = table.gravity, dt = table.dt
         let halfLane = lane.width / 2 - r
-        let v0 = launch.speed * (1 - lane.skidLoss * launch.skid)
+        let v0 = launch.speed * ball.speedScale * (1 - lane.skidLoss * launch.skid)
         let hook = launch.spin * lane.hook
         let angle = launch.aim * lane.maxAimAngle
         var x = launch.start * halfLane, s = launch.from
@@ -71,11 +106,17 @@ private struct ShotSim {
 
         // Phase 1: lane.
         while s < lane.length {
-            record(.lane, x, s, 0)
+            record(.lane, x, s, laneHeight)
+            if ball == .bean, t >= nextHop, vs > 0 {
+                vx += (rng.nextUnit() - 0.5) * 0.7
+                hopUntil = t + 0.14
+                nextHop = t + 0.22 + rng.nextUnit() * 0.2
+                emit(.hop)
+            }
             let speed = (vx * vx + vs * vs).squareRoot()
             let f = speed > 0 ? friction / speed : 0
             vs += (slopePull - f * vs) * dt
-            vx += (-f * vx + hook) * dt
+            vx += (-f * vx + hook + sway(10)) * dt
             x += vx * dt
             s += vs * dt
             if abs(x) > halfLane {
@@ -113,7 +154,7 @@ private struct ShotSim {
             record(airborne ? .air : .board, p.x, lane.length + p.y, z)
 
             if airborne {
-                v = v + gIn * dt
+                v = v + (gIn + Vec2(sway(4), 0) + drift(p)) * dt
                 vz -= gN * dt
                 let prevZ = z
                 p = p + v * dt
@@ -141,10 +182,20 @@ private struct ShotSim {
                 }
             } else {
                 let speed = v.length
-                var a = gIn
+                var a = gIn + Vec2(sway(4), 0) + drift(p)
                 if speed > 0 { a = a - v * (board.rollingFriction * gN / speed) }
                 v = v + a * dt
                 p = p + v * dt
+                if ball == .bean, hops < 3, t >= nextHop {
+                    // Mostly under the lip: it dances in its ring, and
+                    // only now and then jumps out of it.
+                    vz = 0.3 + rng.nextUnit() * 0.55
+                    v = v + Vec2((rng.nextUnit() - 0.5) * 0.5, rng.nextUnit() * 0.35)
+                    airborne = true
+                    hops += 1
+                    nextHop = t + 0.25 + rng.nextUnit() * 0.25
+                    emit(.hop)
+                }
             }
 
             if z < board.lipHeight { (p, v) = collideRingWalls(p, v) }

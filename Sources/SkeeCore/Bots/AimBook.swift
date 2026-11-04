@@ -15,10 +15,10 @@ public struct AimBook: Sendable {
 
     public static let defaultAims = stride(from: -1.0, through: 1.0, by: 0.125).map { $0 }
 
-    public init(table: Table, powerSteps: Int = 240, aims: [Double] = AimBook.defaultAims, fold: Double = 0) {
+    public init(table: Table, powerSteps: Int = 240, aims: [Double] = AimBook.defaultAims, fold: Double = 0, ball: BallKind = .classic) {
         let powers = (0...powerSteps).map { Double($0) / Double(powerSteps) }
         let grid = aims.map { aim in
-            powers.map { simulateShot(Launch(power: $0, aim: aim, fold: fold), on: table).hole }
+            powers.map { simulateShot(Launch(power: $0, aim: aim, fold: fold), on: table, ball: ball, seed: 1).hole }
         }
         var best: [Hole: Window] = [:]
         for (ai, row) in grid.enumerated() {

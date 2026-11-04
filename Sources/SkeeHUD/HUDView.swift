@@ -27,6 +27,9 @@ public struct HUDActions {
     public var hostRetry: () -> Void = {}
     public var hostDeal: () -> Void = {}
     public var closeHost: () -> Void = {}
+    public var chooseBall: (BallKind) -> Void = { _ in }
+    public var askNewGame: () -> Void = {}
+    public var keepPlaying: () -> Void = {}
     public init() {}
 }
 
@@ -128,6 +131,18 @@ public struct HUDView: View {
                     meter(geo.size)
                     guide()
                     trail()
+                    if let at = state.hotAt { HotSpotMark(clock: state.clock).position(at) }
+                    if state.over == nil && state.coach == nil {
+                        Button(action: actions.askNewGame) {
+                            Pill(fill: Ink.sky, radius: 12) { CelText(text: "NEW GAME", size: 13) }
+                        }
+                        .buttonStyle(.plain)
+                        .position(x: geo.size.width - 58, y: 72)
+                    }
+                    if state.rack && state.coach == nil {
+                        BallRack(selected: state.ball, pick: actions.chooseBall)
+                            .position(x: geo.size.width / 2, y: geo.size.height - 62)
+                    }
                     if let m = state.machine, state.counter == nil, state.over == nil {
                         MachineView(m: m, pull: actions.pull, setBet: actions.setBet)
                             .position(x: geo.size.width / 2, y: geo.size.height * 0.74)
@@ -140,6 +155,7 @@ public struct HUDView: View {
 
                     if let t = state.tally { TallyView(tally: t).position(x: geo.size.width / 2, y: geo.size.height * 0.27).allowsHitTesting(false) }
                     ForEach(Array(state.popups.enumerated()), id: \.offset) { _, p in popup(p) }
+                    if state.shower > 0 { CoinRain(progress: state.shower) }
                     if let b = state.banner { BannerView(banner: b).position(x: geo.size.width / 2, y: geo.size.height * 0.3).allowsHitTesting(false) }
                     if state.firstThrow && !state.busy && state.counter == nil && state.coach == nil && state.machine == nil {
                         VStack(spacing: 2) {
@@ -171,6 +187,9 @@ public struct HUDView: View {
                     }
                     .padding(.vertical, card.high ? geo.size.height * 0.12 : 14)
                     .frame(width: geo.size.width, height: geo.size.height)
+                }
+                if state.confirmNew {
+                    NewGamePrompt(yes: actions.newRun, no: actions.keepPlaying)
                 }
                 if state.shopOpen {
                     PrizeShopView(wallet: state.wallet, buy: actions.buyPrize, close: actions.closeShop)
@@ -355,7 +374,7 @@ public struct HUDView: View {
         case .tickets, .jackpot: Ink.butter
         case .bad: Ink.mult
         }
-        return CelText(text: p.text, size: p.kind == .jackpot ? 34 : 24, fill: color)
+        return CelText(text: p.text, size: p.kind == .jackpot ? 44 : 30, fill: color)
             .scaleEffect(1 + 0.3 * (1 - min(1, p.age * 4)))
             .opacity(1 - p.age * p.age)
             .position(x: p.at.x, y: p.at.y - 30 - 50 * p.age)

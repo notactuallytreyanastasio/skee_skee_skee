@@ -102,12 +102,16 @@ public struct Wallet: Hashable, Sendable, Codable {
     public var room: Room = .boardwalk
     /// Comped nights still to use, by room.
     public var comps: [Room: Comp] = [:]
+    /// Games played since the host last sat down, and how many times they
+    /// have. Saved so the visit survives closing the app.
+    public var gamesSinceHost = 0
+    public var hostVisits = 0
 
     public init(balance: Int = 0, lifetime: Int = 0, owned: [Prize] = []) {
         self.balance = balance; self.lifetime = lifetime; self.owned = owned
     }
 
-    enum CodingKeys: String, CodingKey { case balance, lifetime, owned, progressive, rooms, room, comps }
+    enum CodingKeys: String, CodingKey { case balance, lifetime, owned, progressive, rooms, room, comps, gamesSinceHost, hostVisits }
 
     /// Wallets saved before a field existed still load, with its default.
     public init(from decoder: Decoder) throws {
@@ -119,6 +123,8 @@ public struct Wallet: Hashable, Sendable, Codable {
         rooms = try c.decodeIfPresent(Set<Room>.self, forKey: .rooms) ?? [.boardwalk]
         room = try c.decodeIfPresent(Room.self, forKey: .room) ?? .boardwalk
         comps = try c.decodeIfPresent([Room: Comp].self, forKey: .comps) ?? [:]
+        gamesSinceHost = try c.decodeIfPresent(Int.self, forKey: .gamesSinceHost) ?? 0
+        hostVisits = try c.decodeIfPresent(Int.self, forKey: .hostVisits) ?? 0
     }
 
     /// The next room the host is ready to comp, if your winnings have
@@ -129,17 +135,39 @@ public struct Wallet: Hashable, Sendable, Codable {
         return lifetime >= next.compThreshold ? next : nil
     }
 
+    /// Games between the host's visits: three, then four, then three.
+    public var hostInterval: Int { hostVisits.isMultiple(of: 2) ? 3 : 4 }
+
+    /// A game ended, won, lost or walked away from.
+    public mutating func gamePlayed() { gamesSinceHost += 1 }
+
+    /// The room the host wants to talk about, once enough games have gone
+    /// by: the next room if winnings have earned it, otherwise a comped
+    /// stay where you are. A count, not a winnings threshold, because a
+    /// player who keeps losing is the one who most needs a free night.
+    public var hostDue: Room? {
+        gamesSinceHost >= hostInterval ? (compDue ?? room) : nil
+    }
+
     /// Close a haggle: the room is yours either way. A signed deal banks
     /// its nights and pays its credit; a host who walked leaves you the
     /// opening offer and nothing you talked them into. The new room is
-    /// where the next run happens.
+    /// where the next run happens. Nights left from an earlier deal stay,
+    /// and the better ticket perk applies to all of them.
     public mutating func close(_ h: Haggle) {
         guard h.status != .open else { return }
         let deal = h.final
         rooms.insert(deal.room)
         room = deal.room
-        comps[deal.room] = deal
+        var stay = deal
+        if let old = comps[deal.room] {
+            stay.nights += old.nights
+            stay.tickets = max(stay.tickets, old.tickets)
+        }
+        comps[deal.room] = stay
         credit(deal.credit)
+        gamesSinceHost = 0
+        hostVisits += 1
     }
 
     /// Start a run in the current room: use a comped night if one is left.

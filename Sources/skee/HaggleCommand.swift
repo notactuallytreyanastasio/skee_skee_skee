@@ -14,7 +14,7 @@ func haggleCommand() {
         fail("no DeepSeek key: run scripts/secrets.sh or set DEEPSEEK_API_KEY")
     }
     let client = DeepSeek(key: key)
-    var h = Haggle(room: room, seed: seed)
+    var h = Haggle(room: room, seed: seed, returning: has("returning"))
     var script = flag("say").map { $0.split(separator: "|").map(String.init) }
     print("[\(room.name)] budget \(h.budget) (hidden from the player), patience \(h.patience)")
     print("\(h.host.name): \(h.lines[0].text)")

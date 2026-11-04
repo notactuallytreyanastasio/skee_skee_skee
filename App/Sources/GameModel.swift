@@ -337,7 +337,7 @@ final class GameModel {
             if walkthrough?.finished == true { endWalkthrough() }
             haptics.tap()
         }
-        a.newRun = { [weak self] in self?.confirmNew = false; self?.newGame() }
+        a.newRun = { [weak self] in self?.confirmNew = false; self?.nextGame() }
         a.askNewGame = { [weak self] in self?.confirmNew = true; self?.haptics.tap() }
         a.keepPlaying = { [weak self] in self?.confirmNew = false; self?.haptics.tap() }
         a.openShop = { [weak self] in self?.shopOpen = true; self?.haptics.tap() }
@@ -378,8 +378,10 @@ final class GameModel {
             for e in step.events {
                 switch e {
                 case .pulled(let p): wallet.pulled(p); WalletStore.save(wallet)
-                case .roundFailed: wallet.credit(winnings(stats: state.stats, won: false)); WalletStore.save(wallet)
-                case .runWon: wallet.credit(winnings(stats: state.stats, won: true)); WalletStore.save(wallet)
+                case .roundFailed:
+                    wallet.credit(winnings(stats: state.stats, won: false)); wallet.gamePlayed(); WalletStore.save(wallet)
+                case .runWon:
+                    wallet.credit(winnings(stats: state.stats, won: true)); wallet.gamePlayed(); WalletStore.save(wallet)
                 default: break
                 }
             }
@@ -417,6 +419,19 @@ final class GameModel {
         }
     }
 
+    /// The player asked for another game. A game walked away from still
+    /// counts toward the host, and if the host is due they sit down first:
+    /// closing the table starts the new game. Arriving here rather than on
+    /// the game-over card means the score gets read and nobody can miss it.
+    func nextGame() {
+        let abandoned: Bool = switch state.phase {
+        case .lost, .won: false
+        default: !actions.isEmpty
+        }
+        if abandoned, walkthrough == nil { wallet.gamePlayed(); WalletStore.save(wallet) }
+        if walkthrough == nil, wallet.hostDue != nil { openHost() } else { newGame() }
+    }
+
     func newGame() {
         seed = UInt64(Date().timeIntervalSince1970)
         actions = []
@@ -442,8 +457,8 @@ final class GameModel {
     }
 
     func openHost() {
-        guard let room = wallet.compDue else { return }
-        haggle = Haggle(room: room, seed: UInt64(Date().timeIntervalSince1970))
+        guard let room = wallet.hostDue else { return }
+        haggle = Haggle(room: room, seed: UInt64(Date().timeIntervalSince1970), returning: wallet.rooms.contains(room))
         hostError = deepseek.key.isEmpty ? "The host can't be reached: this build has no DeepSeek key (run scripts/secrets.sh, then rebuild)." : nil
     }
 

@@ -189,7 +189,7 @@ struct RoomPicker: View {
                     .buttonStyle(.plain)
                 }
             }
-            if let due = wallet.compDue {
+            if let due = wallet.hostDue {
                 Button(action: host) {
                     Pill(fill: Ink.butter, radius: 16) {
                         VStack(spacing: -2) {

@@ -554,7 +554,7 @@ struct GameOverView: View {
                     .buttonStyle(.plain)
                 }
                 .padding(.top, 6)
-                if let due = wallet.compDue {
+                if let due = wallet.hostDue {
                     Button(action: host) {
                         Pill(fill: Ink.butter, radius: 16) { CelText(text: "THE HOST WANTS A WORD · \(due.name.uppercased())", size: 13) }
                     }

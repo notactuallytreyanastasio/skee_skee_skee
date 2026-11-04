@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 @testable import SkeeCore
 
@@ -48,6 +49,60 @@ struct CompTests {
         #expect(w.compDue == nil)
         w.credit(Room.highRoller.compThreshold)
         #expect(w.compDue == .highRoller)
+    }
+
+    @Test func theHostComesEveryThreeOrFourGamesWithoutAnyWinnings() {
+        var w = Wallet()
+        for expected in [3, 4, 3] {
+            #expect(w.hostInterval == expected)
+            for _ in 1..<expected { w.gamePlayed() }
+            #expect(w.hostDue == nil)
+            w.gamePlayed()
+            #expect(w.hostDue == .boardwalk)
+            var h = Haggle(room: .boardwalk, seed: 1, returning: true)
+            h.accept()
+            w.close(h)
+            #expect(w.hostDue == nil)
+        }
+    }
+
+    @Test func aVisitOffersTheNextRoomOnceWinningsEarnIt() {
+        var w = Wallet()
+        w.credit(Room.neonLounge.compThreshold)
+        #expect(w.hostDue == nil)
+        for _ in 0..<3 { w.gamePlayed() }
+        #expect(w.hostDue == .neonLounge)
+    }
+
+    @Test func anUnfinishedHaggleLeavesTheVisitDue() {
+        var w = Wallet()
+        for _ in 0..<3 { w.gamePlayed() }
+        w.close(Haggle(room: .boardwalk, seed: 1, returning: true))
+        #expect(w.hostDue == .boardwalk)
+    }
+
+    @Test func aSecondDealAddsToTheNightsAlreadyBanked() {
+        var w = Wallet()
+        w.comps[.boardwalk] = Comp(room: .boardwalk, nights: 2, tickets: 2, credit: 0)
+        var h = Haggle(room: .boardwalk, seed: 1, returning: true)
+        h.accept()
+        w.close(h)
+        #expect(w.comps[.boardwalk]?.nights == 3)
+        #expect(w.comps[.boardwalk]?.tickets == 2)
+    }
+
+    @Test func walletsFromBeforeVisitsStillLoad() throws {
+        let old = #"{"balance":10,"lifetime":10,"owned":[]}"#
+        let w = try JSONDecoder().decode(Wallet.self, from: Data(old.utf8))
+        #expect(w.gamesSinceHost == 0 && w.hostVisits == 0)
+    }
+
+    @Test func aReturningGuestIsNotToldTheyHaveBeenWinning() {
+        for seed in UInt64(0)..<12 {
+            let h = Haggle(room: .boardwalk, seed: seed, returning: true)
+            #expect(!h.lines[0].text.contains("winning"))
+            #expect(h.messages[0].content.contains("do not assume"))
+        }
     }
 
     @Test func aSignedDealBanksNightsAndPaysCredit() {

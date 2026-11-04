@@ -70,6 +70,9 @@ public struct Haggle: Hashable, Sendable, Codable {
 
     public let room: Room
     public let host: Host
+    /// The room is already the player's: this is a comped stay, not a
+    /// welcome. They may well be on a losing streak.
+    public let returning: Bool
     /// The most the deal may be worth (`Comp.value`). Hidden from the
     /// player; the model is told it so its offers stay near it.
     public let budget: Int
@@ -83,22 +86,32 @@ public struct Haggle: Hashable, Sendable, Codable {
     /// A fresh negotiation. The seed sets the budget (between 35% and 90%
     /// of the way from the opening offer to the ceiling) and the host's
     /// starting patience (3 or 4).
-    public init(room: Room, seed: UInt64) {
+    public init(room: Room, seed: UInt64, returning: Bool = false) {
         var rng = SplitMix64(seed: seed ^ 0x40575)
         self.room = room
         self.host = .of(room)
+        self.returning = returning
         let open = Comp.opening(room), top = Comp.ceiling(room)
         let share = 0.35 + 0.55 * rng.nextUnit()
         budget = open.value + Int(Double(top.value - open.value) * share)
         offer = open
         patience = 3 + rng.nextInt(below: 2)
-        let hello = Self.opening(room, host)
+        let hello = returning ? Self.welcomeBack(room, host, pick: rng.nextInt(below: 3)) : Self.opening(room, host)
         lines = [HaggleLine(speaker: .host, text: hello,
                             reply: HostReply(say: hello, offer: .init(nights: 1, tickets: 0, credit: 0)))]
     }
 
     static func opening(_ room: Room, _ host: Host) -> String {
         "\(host.name) here. You've been winning, and people noticed. \(room.name) is yours, on the house: one night to start. Interested?"
+    }
+
+    /// A visit comes around every few games, so one greeting would wear out.
+    static func welcomeBack(_ room: Room, _ host: Host, pick: Int) -> String {
+        switch pick {
+        case 0: "\(host.name) here. You keep coming back, and I like that in a guest. One night on the house in \(room.name)?"
+        case 1: "Sit down a minute, it's \(host.name). I've got a free night in \(room.name) with your name on it. Fair?"
+        default: "\(host.name) again. Good customers get looked after: one night in \(room.name), on me. Interested?"
+        }
     }
 
     /// The player says something. Each push costs one patience before the
@@ -153,7 +166,8 @@ public struct Haggle: Hashable, Sendable, Codable {
         let top = Comp.ceiling(room)
         let system = """
         You are \(host.name), \(host.manner), at an arcade-casino called Skee Skee Skee. You are negotiating a \
-        complimentary stay ("comp") in \(room.name) with a player who has been winning. The room is theirs either way; \
+        complimentary stay ("comp") in \(room.name) with \(returning ? "a regular guest you look after every few games; do not assume they have been winning" : "a player who has been winning"). \
+        The room is theirs either way; \
         you are haggling over the perks. If you walk out, they keep only your opening offer (one night, nothing else).
 
         The perks: nights (1 to \(top.nights), each night is one run that starts with bonus tickets), tickets (0 to \

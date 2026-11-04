@@ -60,6 +60,16 @@
       "to_change_id": "aa95f3c9-ec6c-40e6-b3d1-38490fec8434",
       "weight": 1.0
     },
+    "07af1ce4ae272a0758da": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T19:13:01.706815-05:00",
+      "edge_id": "07af1ce4ae272a0758da",
+      "edge_type": "leads_to",
+      "from_change_id": "2ea88dc2-ac76-4a02-8b64-cd0a7a0274de",
+      "rationale": "implementation",
+      "to_change_id": "c69d7ac9-910f-4e6a-987d-9fe12f520cc6",
+      "weight": 1.0
+    },
     "07e3a41046b3ae489d88": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T10:32:15.628494-04:00",
@@ -168,6 +178,16 @@
       "from_change_id": "bc6b7206-254a-4b57-abfd-52a79338e5ba",
       "rationale": "thumb throw in app",
       "to_change_id": "1187b69d-9291-4845-a869-324a21b36cce",
+      "weight": 1.0
+    },
+    "1f2dcad95550fd2b8cfc": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T19:21:26.105119-05:00",
+      "edge_id": "1f2dcad95550fd2b8cfc",
+      "edge_type": "leads_to",
+      "from_change_id": "c69d7ac9-910f-4e6a-987d-9fe12f520cc6",
+      "rationale": "deployed",
+      "to_change_id": "fed8b9af-127b-40b1-b9b5-06cd8cd0c5af",
       "weight": 1.0
     },
     "2027936827bf5a41b7d0": {
@@ -400,6 +420,26 @@
       "to_change_id": "59d4ea6a-5d26-42ae-8a82-1d36e744bd42",
       "weight": 1.0
     },
+    "475355a7097e0e8dbffa": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T19:11:26.511647-05:00",
+      "edge_id": "475355a7097e0e8dbffa",
+      "edge_type": "leads_to",
+      "from_change_id": "422cb85a-1927-45c8-aed1-9fe7b49edbed",
+      "rationale": "option",
+      "to_change_id": "14639265-5b63-4928-8d5d-78588766dde8",
+      "weight": 1.0
+    },
+    "47c0263846921a190d8e": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T19:23:08.001239-05:00",
+      "edge_id": "47c0263846921a190d8e",
+      "edge_type": "leads_to",
+      "from_change_id": "6e0cd2ce-244e-41cb-ae10-24e292e46c5b",
+      "rationale": "implementation",
+      "to_change_id": "8da0e688-133b-4ea7-a05a-22ea506ca8ea",
+      "weight": 1.0
+    },
     "4a563b1e3f6607b0c7d3": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:52:45.313887-04:00",
@@ -470,6 +510,16 @@
       "to_change_id": "1d989370-48e8-492d-88c6-db528f7f2783",
       "weight": 1.0
     },
+    "5a015a2b99dcb0d21c9a": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T19:11:25.516707-05:00",
+      "edge_id": "5a015a2b99dcb0d21c9a",
+      "edge_type": "leads_to",
+      "from_change_id": "7163a54f-95be-4508-ab0f-b373fd20e597",
+      "rationale": "result",
+      "to_change_id": "62f9c589-ca17-4f31-84a0-5e3253b1fec6",
+      "weight": 1.0
+    },
     "5afac24e806fe854d22e": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T10:32:15.500958-04:00",
@@ -478,6 +528,16 @@
       "from_change_id": "aa95f3c9-ec6c-40e6-b3d1-38490fec8434",
       "rationale": "chosen",
       "to_change_id": "1b730ae0-f224-4ff9-a7e2-dcd3c1dbcfa6",
+      "weight": 1.0
+    },
+    "5b6bd758e3cc635b9faf": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T19:38:11.548338-05:00",
+      "edge_id": "5b6bd758e3cc635b9faf",
+      "edge_type": "leads_to",
+      "from_change_id": "e3cbf14e-93c9-42bf-af58-0e2bef082b18",
+      "rationale": "new cut",
+      "to_change_id": "1f784ca3-2571-48cc-8249-d678701f30d5",
       "weight": 1.0
     },
     "5dcb45603092dbad75a1": {
@@ -508,6 +568,16 @@
       "from_change_id": "00306ae2-4254-4a5d-b103-09908862e6e5",
       "rationale": "result",
       "to_change_id": "41cf2595-2b38-4939-acbd-2cace58b859e",
+      "weight": 1.0
+    },
+    "5ee47d72be241cf410a4": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T19:38:11.216775-05:00",
+      "edge_id": "5ee47d72be241cf410a4",
+      "edge_type": "leads_to",
+      "from_change_id": "8da0e688-133b-4ea7-a05a-22ea506ca8ea",
+      "rationale": "result",
+      "to_change_id": "e2827b55-3dd5-4e5c-8a5c-f1f8287c37d7",
       "weight": 1.0
     },
     "5ef801381a44daef01eb": {
@@ -608,6 +678,16 @@
       "from_change_id": "067bae9a-b27a-440e-abe6-cb95c2d438c9",
       "rationale": "reward mechanic",
       "to_change_id": "fb8961bc-ce84-4d5d-93aa-53441619dd83",
+      "weight": 1.0
+    },
+    "6e628a16cee80707b3bb": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T19:06:49.225550-05:00",
+      "edge_id": "6e628a16cee80707b3bb",
+      "edge_type": "leads_to",
+      "from_change_id": "cdfb98ad-c71e-4941-b898-1b0ea4925455",
+      "rationale": "redefines the target",
+      "to_change_id": "78911d72-6de6-49f5-a4da-64e22c05a997",
       "weight": 1.0
     },
     "72043b7f5c10ce07cdc0": {
@@ -790,6 +870,16 @@
       "to_change_id": "7275c26b-c9a3-491e-864f-daee34443037",
       "weight": 1.0
     },
+    "8afbf87988bdb92f3710": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T19:11:27.148386-05:00",
+      "edge_id": "8afbf87988bdb92f3710",
+      "edge_type": "leads_to",
+      "from_change_id": "14639265-5b63-4928-8d5d-78588766dde8",
+      "rationale": "chosen",
+      "to_change_id": "2ea88dc2-ac76-4a02-8b64-cd0a7a0274de",
+      "weight": 1.0
+    },
     "8e5bb1c558160ecc5836": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:03:19.371602-04:00",
@@ -828,6 +918,16 @@
       "from_change_id": "d730cb71-dd1b-446c-9a54-61b7399cc897",
       "rationale": "chosen",
       "to_change_id": "1bbb905e-fd74-48ea-9a13-0df311d66fec",
+      "weight": 1.0
+    },
+    "9b00ea0941bb016b4bd0": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T22:37:35.224823-05:00",
+      "edge_id": "9b00ea0941bb016b4bd0",
+      "edge_type": "leads_to",
+      "from_change_id": "2d1d1ae6-5d92-40d4-94cf-93bf489a4fab",
+      "rationale": "Implementation commit",
+      "to_change_id": "dc52cb4f-6618-4ca0-9e7b-aa2bd01cce06",
       "weight": 1.0
     },
     "9bed6c9e5181c48d7e41": {
@@ -878,6 +978,16 @@
       "from_change_id": "5758ae68-d3a6-4e69-a507-638084cdfb5d",
       "rationale": "chosen",
       "to_change_id": "1b730ae0-f224-4ff9-a7e2-dcd3c1dbcfa6",
+      "weight": 1.0
+    },
+    "a46f81ad0ed2d13d33ea": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T19:06:11.479850-05:00",
+      "edge_id": "a46f81ad0ed2d13d33ea",
+      "edge_type": "leads_to",
+      "from_change_id": "7275c26b-c9a3-491e-864f-daee34443037",
+      "rationale": "user: too hard, no fun",
+      "to_change_id": "7163a54f-95be-4508-ab0f-b373fd20e597",
       "weight": 1.0
     },
     "a51ce9c51b27568e733a": {
@@ -1008,6 +1118,16 @@
       "from_change_id": "1a1e1f41-c265-438d-bd52-66b72504c694",
       "rationale": "chosen",
       "to_change_id": "b366c17e-d75c-4365-8c6d-dd6e27394c7d",
+      "weight": 1.0
+    },
+    "b7d07d7632fba0943840": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T19:06:49.338055-05:00",
+      "edge_id": "b7d07d7632fba0943840",
+      "edge_type": "leads_to",
+      "from_change_id": "78911d72-6de6-49f5-a4da-64e22c05a997",
+      "rationale": "chaos balls become how experts get difficulty",
+      "to_change_id": "422cb85a-1927-45c8-aed1-9fe7b49edbed",
       "weight": 1.0
     },
     "b7d52fe1e36df477f6fe": {
@@ -1222,6 +1342,16 @@
       "to_change_id": "8d9b699b-2e6e-4bbc-89df-47e12526989e",
       "weight": 1.0
     },
+    "d5ee7ea99d0b32a6c108": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T19:38:11.325801-05:00",
+      "edge_id": "d5ee7ea99d0b32a6c108",
+      "edge_type": "leads_to",
+      "from_change_id": "c69d7ac9-910f-4e6a-987d-9fe12f520cc6",
+      "rationale": "result",
+      "to_change_id": "e2827b55-3dd5-4e5c-8a5c-f1f8287c37d7",
+      "weight": 1.0
+    },
     "d6587783acca21402ac2": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T17:06:01.823158-04:00",
@@ -1322,6 +1452,16 @@
       "to_change_id": "59f8fb99-74c2-4375-9887-b325a620e006",
       "weight": 1.0
     },
+    "e2a15f72f28f2ce6c567": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T19:11:27.340279-05:00",
+      "edge_id": "e2a15f72f28f2ce6c567",
+      "edge_type": "leads_to",
+      "from_change_id": "6cbf2ae6-6481-460a-8015-30d29b7963ae",
+      "rationale": "rejected: rare and hidden behind shopping",
+      "to_change_id": "2ea88dc2-ac76-4a02-8b64-cd0a7a0274de",
+      "weight": 1.0
+    },
     "e44222948949652871bb": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T09:03:50.351907-04:00",
@@ -1330,6 +1470,16 @@
       "from_change_id": "40d6c012-87f0-4cff-b9ad-0b793c9a1df6",
       "rationale": "visual direction",
       "to_change_id": "a6e5c0ac-620d-4e88-a1ab-3b68dbd4eb81",
+      "weight": 1.0
+    },
+    "e551ff73f14cf70f2ef0": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T19:11:26.760449-05:00",
+      "edge_id": "e551ff73f14cf70f2ef0",
+      "edge_type": "leads_to",
+      "from_change_id": "422cb85a-1927-45c8-aed1-9fe7b49edbed",
+      "rationale": "option",
+      "to_change_id": "6cbf2ae6-6481-460a-8015-30d29b7963ae",
       "weight": 1.0
     },
     "e79e6535aaf0daf0c599": {
@@ -1430,6 +1580,16 @@
       "from_change_id": "40d6c012-87f0-4cff-b9ad-0b793c9a1df6",
       "rationale": "holes in every ring",
       "to_change_id": "4067a26c-4d2f-4921-ba29-7d629748a1ff",
+      "weight": 1.0
+    },
+    "fed9e29d165015a401c1": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T22:37:36.931849-05:00",
+      "edge_id": "fed9e29d165015a401c1",
+      "edge_type": "leads_to",
+      "from_change_id": "dc52cb4f-6618-4ca0-9e7b-aa2bd01cce06",
+      "rationale": "Result of push",
+      "to_change_id": "7201fec0-71ad-442b-b935-2598f364aede",
       "weight": 1.0
     }
   },
@@ -1582,6 +1742,19 @@
       "title": "iPhone Duo inner display is 669x951pt portrait; hinge runs horizontally across the middle; UIHingeInteraction reports hinge angle (iOS 27.1)",
       "updated_at": "2026-10-30T08:02:53.577656-04:00"
     },
+    "14639265-5b63-4928-8d5d-78588766dde8": {
+      "author": "Bobby Grayson",
+      "change_id": "14639265-5b63-4928-8d5d-78588766dde8",
+      "created_at": "2026-11-03T19:11:26.003622-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 85
+      },
+      "node_type": "option",
+      "status": "pending",
+      "title": "Free ball rack before any throw: Marshmallow x0.7, Classic x1, Jumping Bean x1.5, Wobbler x2, Comet x3, physics seeded per throw",
+      "updated_at": "2026-11-03T19:11:26.003622-05:00"
+    },
     "175653b3-d355-45bf-872c-aaa7b353f4eb": {
       "author": "Bobby Grayson",
       "change_id": "175653b3-d355-45bf-872c-aaa7b353f4eb",
@@ -1673,6 +1846,23 @@
       "status": "pending",
       "title": "Juice pass: timed cues, jackpot-chance slow-mo with camera lean and drum roll, star bursts and ring flash, synthesised sound, faster tally; installed on Duo",
       "updated_at": "2026-10-30T10:43:44.029195-04:00"
+    },
+    "1f784ca3-2571-48cc-8249-d678701f30d5": {
+      "author": "Bobby Grayson",
+      "change_id": "1f784ca3-2571-48cc-8249-d678701f30d5",
+      "created_at": "2026-11-03T19:38:11.438304-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 85,
+        "files": [
+          "out/trailer/trailer-16x9.mp4",
+          "out/trailer/trailer-9x16.mp4"
+        ]
+      },
+      "node_type": "outcome",
+      "status": "pending",
+      "title": "New trailer: 89.5s, 60fps, 16:9 and 9:16, -14.5 LUFS, all moments replayed from real runs including a GRAND jackpot and a 319,424 frame; music unheard",
+      "updated_at": "2026-11-03T19:38:11.438304-05:00"
     },
     "20e37db0-8b5a-475e-a58c-f97715d79687": {
       "author": "Bobby Grayson",
@@ -1812,6 +2002,20 @@
       "title": "Committed skee film, skee moments and the shared Synth",
       "updated_at": "2026-11-03T18:04:53.043282-05:00"
     },
+    "2d1d1ae6-5d92-40d4-94cf-93bf489a4fab": {
+      "author": "Bobby Grayson",
+      "change_id": "2d1d1ae6-5d92-40d4-94cf-93bf489a4fab",
+      "created_at": "2026-11-03T22:37:25.895582-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 95,
+        "prompt": "push it all lets roll"
+      },
+      "node_type": "goal",
+      "status": "pending",
+      "title": "Publish balls, curve, spectacle and New Game to GitHub",
+      "updated_at": "2026-11-03T22:37:25.895582-05:00"
+    },
     "2e90e1ad-4339-42bb-8140-8ffc0cdafdc0": {
       "author": "Bobby Grayson",
       "change_id": "2e90e1ad-4339-42bb-8140-8ffc0cdafdc0",
@@ -1825,6 +2029,19 @@
       "status": "pending",
       "title": "Shared CoreGraphics renderer (SkeeRender) driven by a pure scene description; one style per ante pair: pixel, cel, 3D, vector neon",
       "updated_at": "2026-10-30T08:13:19.231522-04:00"
+    },
+    "2ea88dc2-ac76-4a02-8b64-cd0a7a0274de": {
+      "author": "Bobby Grayson",
+      "change_id": "2ea88dc2-ac76-4a02-8b64-cd0a7a0274de",
+      "created_at": "2026-11-03T19:11:26.959259-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 85
+      },
+      "node_type": "decision",
+      "status": "pending",
+      "title": "Free rack beats counter consumables: the risk choice must be on every throw and open to a casual player from the start",
+      "updated_at": "2026-11-03T19:11:26.959259-05:00"
     },
     "343dd004-34eb-44b2-99ed-a907c90bd6e9": {
       "author": "Bobby Grayson",
@@ -2285,6 +2502,19 @@
       "title": "110 tests pass; bot score/target up 10-30% mid-run from chance matches; targets not retuned; human feel unverified",
       "updated_at": "2026-10-30T17:06:01.939285-04:00"
     },
+    "62f9c589-ca17-4f31-84a0-5e3253b1fec6": {
+      "author": "Bobby Grayson",
+      "change_id": "62f9c589-ca17-4f31-84a0-5e3253b1fec6",
+      "created_at": "2026-11-03T19:11:25.115469-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 85
+      },
+      "node_type": "outcome",
+      "status": "pending",
+      "title": "Curve set for a casual player: anteBase 360..4500, feature x1.3, boss x1.6, rooms 1/1.3/1/1.4: novice 33-45%, regular 42-75%, expert 64-86%, few deaths before ante 4",
+      "updated_at": "2026-11-03T19:11:25.115469-05:00"
+    },
     "6addc45a-99c3-483b-a867-a296f0740369": {
       "author": "Bobby Grayson",
       "change_id": "6addc45a-99c3-483b-a867-a296f0740369",
@@ -2298,6 +2528,19 @@
       "status": "pending",
       "title": "Built SkeeRender: procedural glyphs, pixel font, 4 styles, iris restyle, pure Presentation timeline, render/film CLI",
       "updated_at": "2026-10-30T08:42:56.683604-04:00"
+    },
+    "6cbf2ae6-6481-460a-8015-30d29b7963ae": {
+      "author": "Bobby Grayson",
+      "change_id": "6cbf2ae6-6481-460a-8015-30d29b7963ae",
+      "created_at": "2026-11-03T19:11:26.267043-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 35
+      },
+      "node_type": "option",
+      "status": "pending",
+      "title": "Chaos balls as prize counter consumables",
+      "updated_at": "2026-11-03T19:11:26.267043-05:00"
     },
     "6da7921c-b88d-477d-8b71-561b96144fad": {
       "author": "Bobby Grayson",
@@ -2399,6 +2642,20 @@
       "title": "65 core tests pass incl. never-impossible guarantee at ante 8 for every boss",
       "updated_at": "2026-10-30T08:16:16.038831-04:00"
     },
+    "7163a54f-95be-4508-ab0f-b373fd20e597": {
+      "author": "Bobby Grayson",
+      "change_id": "7163a54f-95be-4508-ab0f-b373fd20e597",
+      "created_at": "2026-11-03T19:06:11.363139-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 85,
+        "prompt": "make it more reasonable to play dude\nthat sounds no fun"
+      },
+      "node_type": "revisit",
+      "status": "pending",
+      "title": "First target pass was no fun: 0-6% wins. Retune for a playable game: regular wins about a third on the Boardwalk, almost no early deaths",
+      "updated_at": "2026-11-03T19:06:11.363139-05:00"
+    },
     "71b53359-8302-42f6-89d9-fe32162a069f": {
       "author": "Bobby Grayson",
       "change_id": "71b53359-8302-42f6-89d9-fe32162a069f",
@@ -2411,6 +2668,19 @@
       "status": "pending",
       "title": "Lower flick speed range to 300-3100 pt/s, even lift-off/peak weight; board symbols as camera-facing coins, fewer and bigger; slot moved under the rings",
       "updated_at": "2026-10-30T16:53:51.016185-04:00"
+    },
+    "7201fec0-71ad-442b-b935-2598f364aede": {
+      "author": "Bobby Grayson",
+      "change_id": "7201fec0-71ad-442b-b935-2598f364aede",
+      "created_at": "2026-11-03T22:37:36.833046-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 95
+      },
+      "node_type": "outcome",
+      "status": "pending",
+      "title": "Pushed to main: 169 core tests pass, no key in the diff; host still only reachable after a finished run",
+      "updated_at": "2026-11-03T22:37:36.833046-05:00"
     },
     "7275c26b-c9a3-491e-864f-daee34443037": {
       "author": "Bobby Grayson",
@@ -2451,6 +2721,20 @@
       "status": "pending",
       "title": "Ported toon.js to SceneKit shader modifiers; built 3D cabinet with holes in every ring; solved camera so hump sits on crease; rolling ball presenter; removed 2D renderer",
       "updated_at": "2026-10-30T09:20:50.017371-04:00"
+    },
+    "78911d72-6de6-49f5-a4da-64e22c05a997": {
+      "author": "Bobby Grayson",
+      "change_id": "78911d72-6de6-49f5-a4da-64e22c05a997",
+      "created_at": "2026-11-03T19:06:49.148300-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 95,
+        "prompt": "then get to the balls and throw spectable and a new trailer\nthis is met for MY MOTHER IN LAW, she is 60+ years old and likes shiny shit on her phone, this isnt targeting hardcore ballatro experts (but they should have fun too)"
+      },
+      "node_type": "observation",
+      "status": "pending",
+      "title": "Audience is the user's mother-in-law, 60+, likes shiny things on her phone; not hardcore players, though they should have fun. Balance to the novice bot; experts opt in to risk through chaos balls",
+      "updated_at": "2026-11-03T19:06:49.148300-05:00"
     },
     "7d6378e2-1990-4137-a62e-48a317ba6ff1": {
       "author": "Bobby Grayson",
@@ -2596,6 +2880,24 @@
       "status": "pending",
       "title": "RealityKit with CustomMaterial",
       "updated_at": "2026-10-30T09:03:50.631646-04:00"
+    },
+    "8da0e688-133b-4ea7-a05a-22ea506ca8ea": {
+      "author": "Bobby Grayson",
+      "change_id": "8da0e688-133b-4ea7-a05a-22ea506ca8ea",
+      "created_at": "2026-11-03T19:23:07.820411-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 80,
+        "files": [
+          "Sources/SkeeHUD/BallRack.swift",
+          "Sources/SkeeScene/ScenePresenter.swift",
+          "Sources/SkeeRender/Presentation.swift"
+        ]
+      },
+      "node_type": "action",
+      "status": "pending",
+      "title": "Ball rack, Hot Spot sparkle, ball skins and trails, shockwaves, sparks, coin showers, new cues and sounds",
+      "updated_at": "2026-11-03T19:23:07.820411-05:00"
     },
     "9dc303fc-554c-4bcd-b787-ff8b5317e328": {
       "author": "Bobby Grayson",
@@ -2897,6 +3199,24 @@
       "title": "Balance pass: novice 2% / regular 16% / expert 22% win; pockets exploit fixed; bot nondeterminism fixed",
       "updated_at": "2026-10-30T08:31:03.405363-04:00"
     },
+    "c69d7ac9-910f-4e6a-987d-9fe12f520cc6": {
+      "author": "Bobby Grayson",
+      "change_id": "c69d7ac9-910f-4e6a-987d-9fe12f520cc6",
+      "created_at": "2026-11-03T19:13:01.521195-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 80,
+        "files": [
+          "Sources/SkeeCore/Items/BallKind.swift",
+          "Sources/SkeeCore/Physics/Simulator.swift",
+          "Sources/SkeeCore/Run/Reducer.swift"
+        ]
+      },
+      "node_type": "action",
+      "status": "pending",
+      "title": "BallKind physics and pay, per-throw seeded chaos, free chooseBall action, Hot Spot hole paying x2, bots and balance tools play any ball",
+      "updated_at": "2026-11-03T19:13:01.521195-05:00"
+    },
     "c807069d-e911-4d48-985f-93d912cec18a": {
       "author": "Bobby Grayson",
       "change_id": "c807069d-e911-4d48-985f-93d912cec18a",
@@ -3047,6 +3367,20 @@
       "title": "Strengthened Slick Lane (0 friction, carry 1.04), added lane power gauge, skee play --hand noise",
       "updated_at": "2026-10-30T08:50:00.787041-04:00"
     },
+    "dc52cb4f-6618-4ca0-9e7b-aa2bd01cce06": {
+      "author": "Bobby Grayson",
+      "change_id": "dc52cb4f-6618-4ca0-9e7b-aa2bd01cce06",
+      "created_at": "2026-11-03T22:37:35.119267-05:00",
+      "metadata": {
+        "branch": "main",
+        "commit": "c0038f0a308a30b8727a33ef47526d24e889f620",
+        "confidence": 95
+      },
+      "node_type": "action",
+      "status": "pending",
+      "title": "Committed balls, Hot Spot, kinder curve, effects and mid-run New Game",
+      "updated_at": "2026-11-03T22:37:35.119267-05:00"
+    },
     "de36b4b8-eb8c-4f7c-8fbb-559c50cafedf": {
       "author": "Bobby Grayson",
       "change_id": "de36b4b8-eb8c-4f7c-8fbb-559c50cafedf",
@@ -3060,6 +3394,19 @@
       "status": "pending",
       "title": "Keep fixed symbols and just raise targets",
       "updated_at": "2026-10-30T08:25:40.007700-04:00"
+    },
+    "e2827b55-3dd5-4e5c-8a5c-f1f8287c37d7": {
+      "author": "Bobby Grayson",
+      "change_id": "e2827b55-3dd5-4e5c-8a5c-f1f8287c37d7",
+      "created_at": "2026-11-03T19:38:11.056183-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 85
+      },
+      "node_type": "outcome",
+      "status": "pending",
+      "title": "Balls, Hot Spot, effects and mid-run New Game with confirmation installed on the Duo; 169 core + 20 presentation tests pass; not yet played or commented on by a person; not committed",
+      "updated_at": "2026-11-03T19:38:11.056183-05:00"
     },
     "e3cbf14e-93c9-42bf-af58-0e2bef082b18": {
       "author": "Bobby Grayson",
@@ -3272,6 +3619,19 @@
       "status": "pending",
       "title": "SwiftUI views per style, emoji/SF Symbols for reel symbols",
       "updated_at": "2026-10-30T08:13:19.091131-04:00"
+    },
+    "fed8b9af-127b-40b1-b9b5-06cd8cd0c5af": {
+      "author": "Bobby Grayson",
+      "change_id": "fed8b9af-127b-40b1-b9b5-06cd8cd0c5af",
+      "created_at": "2026-11-03T19:21:25.925724-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 90
+      },
+      "node_type": "outcome",
+      "status": "pending",
+      "title": "Installed and launched on the Duo: curve and Hot Spot rules; ball rack not drawn yet",
+      "updated_at": "2026-11-03T19:21:25.925724-05:00"
     },
     "ffb74d6b-a9b7-47d3-ab06-3e0eb81fc138": {
       "author": "Bobby Grayson",

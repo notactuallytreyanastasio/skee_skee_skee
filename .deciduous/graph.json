@@ -2031,6 +2031,16 @@
       "rationale": "Chosen",
       "to_change_id": "578fc8be-aa82-4595-b7b0-e3db14101889",
       "weight": 1.0
+    },
+    "ff21e2a9b37e99b17850": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-04T12:42:57.760246-05:00",
+      "edge_id": "ff21e2a9b37e99b17850",
+      "edge_type": "leads_to",
+      "from_change_id": "62c28f47-9601-4482-ae68-3def1513acd5",
+      "rationale": "Result",
+      "to_change_id": "32ef31d0-d910-4098-8113-a70f80da7718",
+      "weight": 1.0
     }
   },
   "nodes": {
@@ -2667,6 +2677,19 @@
       "status": "pending",
       "title": "Free rack beats counter consumables: the risk choice must be on every throw and open to a casual player from the start",
       "updated_at": "2026-11-03T19:11:26.959259-05:00"
+    },
+    "32ef31d0-d910-4098-8113-a70f80da7718": {
+      "author": "Bobby Grayson",
+      "change_id": "32ef31d0-d910-4098-8113-a70f80da7718",
+      "created_at": "2026-11-04T12:42:57.588386-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 95
+      },
+      "node_type": "outcome",
+      "status": "pending",
+      "title": "Build 1.0 (1) uploaded to App Store Connect; screenshots ready; submission left to the account holder",
+      "updated_at": "2026-11-04T12:42:57.588386-05:00"
     },
     "343dd004-34eb-44b2-99ed-a907c90bd6e9": {
       "author": "Bobby Grayson",

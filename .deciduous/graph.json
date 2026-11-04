@@ -120,6 +120,16 @@
       "to_change_id": "00306ae2-4254-4a5d-b103-09908862e6e5",
       "weight": 1.0
     },
+    "0dab6977bd4bc8d3511f": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T22:38:39.430438-05:00",
+      "edge_id": "0dab6977bd4bc8d3511f",
+      "edge_type": "leads_to",
+      "from_change_id": "af79b833-c36a-4a37-9449-125f2c7f7884",
+      "rationale": "Chosen",
+      "to_change_id": "a1d5ff33-7d5b-4abb-9a39-6398e43f5adb",
+      "weight": 1.0
+    },
     "147eccdcc92bf3993d0d": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:03:20.678906-04:00",
@@ -660,6 +670,16 @@
       "to_change_id": "71b53359-8302-42f6-89d9-fe32162a069f",
       "weight": 1.0
     },
+    "66a0ee6f45055b4531d9": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T22:40:53.998593-05:00",
+      "edge_id": "66a0ee6f45055b4531d9",
+      "edge_type": "leads_to",
+      "from_change_id": "a5e10841-5e69-473d-84e7-3b5c81d68380",
+      "rationale": "Result",
+      "to_change_id": "251b9de3-4ae1-4807-8810-16f634436bd3",
+      "weight": 1.0
+    },
     "6717f314f98db5c39427": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T08:03:18.881996-04:00",
@@ -678,6 +698,26 @@
       "from_change_id": "067bae9a-b27a-440e-abe6-cb95c2d438c9",
       "rationale": "reward mechanic",
       "to_change_id": "fb8961bc-ce84-4d5d-93aa-53441619dd83",
+      "weight": 1.0
+    },
+    "6a7c5e5c5ee7cc8b2110": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T22:38:39.032153-05:00",
+      "edge_id": "6a7c5e5c5ee7cc8b2110",
+      "edge_type": "leads_to",
+      "from_change_id": "e66583c0-eb81-46d9-b0a1-e60339924ab0",
+      "rationale": "Possible approach",
+      "to_change_id": "af79b833-c36a-4a37-9449-125f2c7f7884",
+      "weight": 1.0
+    },
+    "6d0ae2d2c690a78b11d1": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T22:38:39.524505-05:00",
+      "edge_id": "6d0ae2d2c690a78b11d1",
+      "edge_type": "leads_to",
+      "from_change_id": "824b0f6f-2ad9-4d70-8849-a721103fd52d",
+      "rationale": "Rejected",
+      "to_change_id": "a1d5ff33-7d5b-4abb-9a39-6398e43f5adb",
       "weight": 1.0
     },
     "6e628a16cee80707b3bb": {
@@ -868,6 +908,16 @@
       "from_change_id": "3603f042-8e6a-48f4-802b-aa0393ff5e55",
       "rationale": "chosen",
       "to_change_id": "7275c26b-c9a3-491e-864f-daee34443037",
+      "weight": 1.0
+    },
+    "8aa971d3cc3abeddf978": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T22:38:39.757913-05:00",
+      "edge_id": "8aa971d3cc3abeddf978",
+      "edge_type": "leads_to",
+      "from_change_id": "a1d5ff33-7d5b-4abb-9a39-6398e43f5adb",
+      "rationale": "Implementation",
+      "to_change_id": "a5e10841-5e69-473d-84e7-3b5c81d68380",
       "weight": 1.0
     },
     "8afbf87988bdb92f3710": {
@@ -1200,6 +1250,16 @@
       "to_change_id": "277b5d09-28b3-4dc7-9c20-7827539af0b4",
       "weight": 1.0
     },
+    "bf30dd1e6c64c51d46d5": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T22:38:39.240099-05:00",
+      "edge_id": "bf30dd1e6c64c51d46d5",
+      "edge_type": "leads_to",
+      "from_change_id": "e66583c0-eb81-46d9-b0a1-e60339924ab0",
+      "rationale": "Possible approach",
+      "to_change_id": "824b0f6f-2ad9-4d70-8849-a721103fd52d",
+      "weight": 1.0
+    },
     "bf7a4caad7c4fb3041eb": {
       "author": "Bobby Grayson",
       "created_at": "2026-10-30T17:01:20.315766-04:00",
@@ -1420,6 +1480,16 @@
       "from_change_id": "067bae9a-b27a-440e-abe6-cb95c2d438c9",
       "rationale": "document everything",
       "to_change_id": "37b6071b-f2b2-45ab-a9ce-7cbba2ac6049",
+      "weight": 1.0
+    },
+    "db4f72d3977be4709c9f": {
+      "author": "Bobby Grayson",
+      "created_at": "2026-11-03T23:03:38.679965-05:00",
+      "edge_id": "db4f72d3977be4709c9f",
+      "edge_type": "leads_to",
+      "from_change_id": "251b9de3-4ae1-4807-8810-16f634436bd3",
+      "rationale": "Published after the user's go-ahead",
+      "to_change_id": "63747d4f-b2b5-4b5b-ab05-42a2e59b090e",
       "weight": 1.0
     },
     "dbd1408c7245a1a4a7c6": {
@@ -1906,6 +1976,19 @@
       "status": "pending",
       "title": "Playtest feedback: holes more visible + graphics polish, smooth ball roll, more give at the crease before a foul",
       "updated_at": "2026-10-30T09:32:41.097046-04:00"
+    },
+    "251b9de3-4ae1-4807-8810-16f634436bd3": {
+      "author": "Bobby Grayson",
+      "change_id": "251b9de3-4ae1-4807-8810-16f634436bd3",
+      "created_at": "2026-11-03T22:40:53.884174-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 90
+      },
+      "node_type": "outcome",
+      "status": "pending",
+      "title": "Host visits every 3-4 games: 175 core tests pass, live DeepSeek haggle with Sal took 2 pushes to +2 tickets, installed on Duo but launch was refused (phone likely locked); not committed",
+      "updated_at": "2026-11-03T22:40:53.884174-05:00"
     },
     "2572f870-5454-4bde-86dc-b183f98488a4": {
       "author": "Bobby Grayson",
@@ -2515,6 +2598,20 @@
       "title": "Curve set for a casual player: anteBase 360..4500, feature x1.3, boss x1.6, rooms 1/1.3/1/1.4: novice 33-45%, regular 42-75%, expert 64-86%, few deaths before ante 4",
       "updated_at": "2026-11-03T19:11:25.115469-05:00"
     },
+    "63747d4f-b2b5-4b5b-ab05-42a2e59b090e": {
+      "author": "Bobby Grayson",
+      "change_id": "63747d4f-b2b5-4b5b-ab05-42a2e59b090e",
+      "created_at": "2026-11-03T23:03:38.551806-05:00",
+      "metadata": {
+        "branch": "main",
+        "commit": "60084ff36f34d03e6812781c7c25e4876c9b8ad6",
+        "confidence": 95
+      },
+      "node_type": "action",
+      "status": "pending",
+      "title": "Committed and pushed host visits every 3-4 games",
+      "updated_at": "2026-11-03T23:03:38.551806-05:00"
+    },
     "6addc45a-99c3-483b-a867-a296f0740369": {
       "author": "Bobby Grayson",
       "change_id": "6addc45a-99c3-483b-a867-a296f0740369",
@@ -2750,6 +2847,19 @@
       "title": "Pull machine: 3x3, bets, line wins banked to the frame, wilds and 2X/3X, centre row = targets, BONUS free games, progressive jackpots in the wallet, lever UI, targets +20%",
       "updated_at": "2026-11-01T10:48:13.365385-05:00"
     },
+    "824b0f6f-2ad9-4d70-8849-a721103fd52d": {
+      "author": "Bobby Grayson",
+      "change_id": "824b0f6f-2ad9-4d70-8849-a721103fd52d",
+      "created_at": "2026-11-03T22:38:39.144898-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 50
+      },
+      "node_type": "option",
+      "status": "pending",
+      "title": "Lower the lifetime-winnings thresholds so rooms unlock sooner",
+      "updated_at": "2026-11-03T22:38:39.144898-05:00"
+    },
     "87a64772-12fa-42b9-8d8e-a8deda65a0c5": {
       "author": "Bobby Grayson",
       "change_id": "87a64772-12fa-42b9-8d8e-a8deda65a0c5",
@@ -2966,6 +3076,19 @@
       "title": "Flick range 300-3100 pt/s; billboarded coin symbols; slot moved under rings; installed on Duo",
       "updated_at": "2026-10-30T16:54:00.891829-04:00"
     },
+    "a1d5ff33-7d5b-4abb-9a39-6398e43f5adb": {
+      "author": "Bobby Grayson",
+      "change_id": "a1d5ff33-7d5b-4abb-9a39-6398e43f5adb",
+      "created_at": "2026-11-03T22:38:39.339391-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 85
+      },
+      "node_type": "decision",
+      "status": "pending",
+      "title": "Game-count visits beat lower thresholds: thresholds would run out after three rooms and push a novice into harder rooms",
+      "updated_at": "2026-11-03T22:38:39.339391-05:00"
+    },
     "a288fb15-4cf7-49f5-a576-26b2dae7df2b": {
       "author": "Bobby Grayson",
       "change_id": "a288fb15-4cf7-49f5-a576-26b2dae7df2b",
@@ -2979,6 +3102,26 @@
       "status": "pending",
       "title": "Port the cel-shading engine from whats_going_through_your_mind (three.js toon.js/grade.js) to Swift",
       "updated_at": "2026-10-30T09:05:15.442995-04:00"
+    },
+    "a5e10841-5e69-473d-84e7-3b5c81d68380": {
+      "author": "Bobby Grayson",
+      "change_id": "a5e10841-5e69-473d-84e7-3b5c81d68380",
+      "created_at": "2026-11-03T22:38:39.651105-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 85,
+        "files": [
+          "Sources/SkeeCore/Meta/PrizeShelf.swift",
+          "Sources/SkeeCore/Meta/Host.swift",
+          "App/Sources/GameModel.swift",
+          "Sources/SkeeHUD/HostView.swift",
+          "Sources/SkeeHUD/HUDView.swift"
+        ]
+      },
+      "node_type": "action",
+      "status": "pending",
+      "title": "Add visit counting to Wallet, returning-guest haggles, host arriving at New Run",
+      "updated_at": "2026-11-03T22:38:39.651105-05:00"
     },
     "a6e5c0ac-620d-4e88-a1ab-3b68dbd4eb81": {
       "author": "Bobby Grayson",
@@ -3062,6 +3205,19 @@
       "status": "pending",
       "title": "Bot fixed, skill order holds; first target pass overshot (wins 0-6%, close rounds 4-15%); pushed as work in progress at the user's request",
       "updated_at": "2026-11-03T18:15:37.604956-05:00"
+    },
+    "af79b833-c36a-4a37-9449-125f2c7f7884": {
+      "author": "Bobby Grayson",
+      "change_id": "af79b833-c36a-4a37-9449-125f2c7f7884",
+      "created_at": "2026-11-03T22:38:38.921053-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 85
+      },
+      "node_type": "option",
+      "status": "pending",
+      "title": "Host arrives on a game count (3 then 4 alternating), offering the next room if earned, else a comped stay in the current room",
+      "updated_at": "2026-11-03T22:38:38.921053-05:00"
     },
     "b321742b-db07-4936-bd77-d68386e32c17": {
       "author": "Bobby Grayson",
@@ -3421,6 +3577,20 @@
       "status": "pending",
       "title": "Shareable trailer video showing off the whole game",
       "updated_at": "2026-11-03T17:12:09.095244-05:00"
+    },
+    "e66583c0-eb81-46d9-b0a1-e60339924ab0": {
+      "author": "Bobby Grayson",
+      "change_id": "e66583c0-eb81-46d9-b0a1-e60339924ab0",
+      "created_at": "2026-11-03T22:37:47.151227-05:00",
+      "metadata": {
+        "branch": "main",
+        "confidence": 85,
+        "prompt": "I want there to be more negotiating, it should be a thing after you do like, say, 3-4 games"
+      },
+      "node_type": "goal",
+      "status": "pending",
+      "title": "Host negotiation becomes a regular event after every 3-4 games",
+      "updated_at": "2026-11-03T22:37:47.151227-05:00"
     },
     "e94066c6-423d-4e3b-aff3-5980946a9d74": {
       "author": "Bobby Grayson",
